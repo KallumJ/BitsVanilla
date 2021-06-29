@@ -34,4 +34,11 @@ public abstract class Command implements com.mojang.brigadier.Command<ServerComm
         }
     }
 
+    public CommandHelpInformation getHelpInformation() {
+        return helpInformation;
+    }
+
+    public String getName() {
+        return name;
+    }
 }
