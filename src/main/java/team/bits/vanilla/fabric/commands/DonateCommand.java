@@ -1,9 +1,7 @@
 package team.bits.vanilla.fabric.commands;
 
-import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.tree.CommandNode;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -12,25 +10,22 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.server.command.ServerCommandSource;
 import team.bits.vanilla.fabric.BitsVanilla;
 
-import static net.minecraft.server.command.CommandManager.literal;
+public class DonateCommand extends Command {
+    private static final String DONATE_LINK = "http://bits.team/donate";
 
-public class DiscordCommand extends Command {
-
-    private static final String DISCORD_INVITE = "https://discord.gg/Arfcnku";
-
-    public DiscordCommand() {
-        super("discord", new CommandHelpInformation()
-                .setDescription("Displays the discord invite to the player")
-                .setPublic(true)
+    public DonateCommand() {
+        super("donate", new CommandHelpInformation()
+            .setDescription("Displays the donate link to the player")
+            .setPublic(true)
         );
     }
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        TextComponent message = Component.text("Join our discord here: " + DISCORD_INVITE)
+        TextComponent message = Component.text("Donate here! Thank you very much for your generosity!: " + DONATE_LINK)
                 .color(NamedTextColor.GREEN)
-                .hoverEvent(HoverEvent.showText(Component.text("Click here to join!")))
-                .clickEvent(ClickEvent.openUrl(DISCORD_INVITE));
+                .hoverEvent(HoverEvent.showText(Component.text("Click here to donate!")))
+                .clickEvent(ClickEvent.openUrl(DONATE_LINK));
 
         BitsVanilla.adventure().audience(context.getSource())
                 .sendMessage(message);

@@ -9,15 +9,18 @@ import static net.minecraft.server.command.CommandManager.literal;
 public abstract class Command implements com.mojang.brigadier.Command<ServerCommandSource> {
     private final String name;
     private final String[] aliases;
+    private final CommandHelpInformation helpInformation;
 
-    public Command(String name) {
+    public Command(String name, CommandHelpInformation helpInfo) {
         this.name = name;
         this.aliases = null;
+        this.helpInformation = helpInfo;
     }
 
-    public Command(String name, String[] aliases) {
+    public Command(String name, String[] aliases, CommandHelpInformation helpInfo) {
         this.name = name;
         this.aliases = aliases;
+        this.helpInformation = helpInfo;
     }
 
     public void registerCommand(CommandDispatcher<ServerCommandSource> dispatcher) {

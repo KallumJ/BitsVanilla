@@ -10,6 +10,7 @@ public class Commands {
 
     static {
         addCommand(new DiscordCommand());
+        addCommand(new DonateCommand());
     }
 
     public static void registerCommands() {
