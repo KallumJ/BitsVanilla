@@ -4,12 +4,9 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.minecraft.command.CommandSource;
 import net.minecraft.server.command.ServerCommandSource;
-import org.lwjgl.system.CallbackI;
 import team.bits.vanilla.fabric.BitsVanilla;
 
 import java.util.ArrayList;
@@ -17,7 +14,7 @@ import java.util.ArrayList;
 public class HelpCommand extends Command {
 
     private final static String CMD_HELP_STRING = "%s - %s";
-    private final static String USAGE_STRING = " (Usage: %s)";
+    private final static String USAGE_STRING = "Usage: %s %s";
 
     public HelpCommand() {
         super("help", new CommandHelpInformation()
@@ -42,13 +39,15 @@ public class HelpCommand extends Command {
                 // Generate string with name and description
                 cmdString.append(String.format(CMD_HELP_STRING, commandName, helpDesc));
 
-                // If a usage is specified, add that too!
+                TextComponent textComponent = Component.text(cmdString + "\n");
+
+                // If there is usage, add it as a hover event
                 if (helpInformation.getUsage() != null) {
-                    cmdString.append(String.format(USAGE_STRING, helpInformation.getUsage()));
+                    textComponent = textComponent.hoverEvent(HoverEvent.showText(Component.text(String.format(USAGE_STRING, commandName, helpInformation.getUsage()))));
                 }
 
                 // Add the string as a TextComponent to the array list
-                cmdStrings.add(Component.text(cmdString + "\n").color(NamedTextColor.WHITE));
+                cmdStrings.add(textComponent);
             }
         }
 

@@ -13,6 +13,7 @@ public class Commands {
         addCommand(new DiscordCommand());
         addCommand(new DonateCommand());
         addCommand(new HelpCommand());
+        addCommand(new BeamCommand());
     }
 
     public static void registerCommands() {

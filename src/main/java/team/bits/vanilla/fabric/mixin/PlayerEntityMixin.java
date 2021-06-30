@@ -29,7 +29,7 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
             method = "tickMovement",
             at = @At(value = "TAIL")
     )
-    private void onWakeUp(CallbackInfo ci) {
+    private void onTickMovement(CallbackInfo ci) {
         PlayerEntity player = PlayerEntity.class.cast(this);
         Vec3d currentPos = player.getPos();
         Vec3d moveVector = this.previousPos.subtract(currentPos);
