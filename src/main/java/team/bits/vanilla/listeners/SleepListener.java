@@ -11,6 +11,9 @@ import org.jetbrains.annotations.NotNull;
 import team.bits.vanilla.fabric.BitsVanilla;
 import team.bits.vanilla.fabric.event.sleep.PlayerSleepCallback;
 import team.bits.vanilla.fabric.event.sleep.PlayerWakeUpCallback;
+import team.bits.vanilla.fabric.teleport.Teleporter;
+import team.bits.vanilla.fabric.util.Location;
+import team.bits.vanilla.fabric.util.Scheduler;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -30,6 +33,10 @@ public class SleepListener implements PlayerSleepCallback, PlayerWakeUpCallback 
     @Override
     public void onWakeUp(@NotNull PlayerEntity player) {
         this.sleeping.remove(player);
+
+        Scheduler.schedule(() -> {
+            Teleporter.queueTeleport(player, Location.get(player).add(10, 0, 0), null);
+        }, 20);
     }
 
     private void checkSleeping(@NotNull ServerWorld world) {

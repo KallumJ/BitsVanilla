@@ -10,19 +10,14 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.suggestion.SuggestionProviders;
-import net.minecraft.entity.EntityType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.dimension.DimensionType;
 import team.bits.vanilla.fabric.BitsVanilla;
+import team.bits.vanilla.fabric.teleport.Teleporter;
 import team.bits.vanilla.fabric.util.CommandSuggestionUtils;
+import team.bits.vanilla.fabric.util.Location;
 import team.bits.vanilla.fabric.util.Server;
 
 import java.util.HashMap;
@@ -60,6 +55,7 @@ public class BeamCommand extends Command {
 
     /**
      * A method to initialise a beam request
+     *
      * @param context The command context
      * @return int, command error code
      * @throws CommandSyntaxException if sending player is not in the same dimension, they are beaming to themselves, or there is no player by that name online
@@ -95,6 +91,7 @@ public class BeamCommand extends Command {
 
     /**
      * A method to accept a beam request
+     *
      * @param context The command context
      * @return int, command error code
      * @throws CommandSyntaxException if no beam for this player is active
@@ -116,7 +113,8 @@ public class BeamCommand extends Command {
 
     /**
      * A method to add beam request to map of requests
-     * @param sendingPlayer The player making the request
+     *
+     * @param sendingPlayer   The player making the request
      * @param receivingPlayer The player receiving the request
      */
     private void addBeam(ServerPlayerEntity sendingPlayer, ServerPlayerEntity receivingPlayer) {
@@ -153,16 +151,8 @@ public class BeamCommand extends Command {
 record Beam(ServerPlayerEntity sendingPlayer,
             ServerPlayerEntity receivingPlayer) {
 
-    public ServerPlayerEntity getReceivingPlayer() {
-        return receivingPlayer;
-    }
-
-    public ServerPlayerEntity getSendingPlayer() {
-        return sendingPlayer;
-    }
-
     public void executeBeam() {
-        sendingPlayer.teleport(receivingPlayer.getX(), receivingPlayer.getY(), receivingPlayer.getZ());
+        Teleporter.queueTeleport(this.sendingPlayer, Location.get(this.receivingPlayer), null, false);
     }
 }
 

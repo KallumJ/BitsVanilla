@@ -12,7 +12,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import team.bits.vanilla.fabric.event.sleep.PlayerSleepCallback;
 import team.bits.vanilla.fabric.event.sleep.PlayerWakeUpCallback;
-import team.bits.vanilla.fabric.util.ExtendedPlayerEntity;
 
 @Mixin(ServerPlayerEntity.class)
 public class SleepMixin {
@@ -24,7 +23,7 @@ public class SleepMixin {
     )
     private void onSleep(BlockPos pos,
                          CallbackInfoReturnable<Either<PlayerEntity.SleepFailureReason, Unit>> cir) {
-        PlayerEntity player = ((ExtendedPlayerEntity) this).self();
+        PlayerEntity player = PlayerEntity.class.cast(this);
         PlayerSleepCallback.EVENT.invoker().onSleep(player);
     }
 
@@ -34,7 +33,7 @@ public class SleepMixin {
             method = "wakeUp"
     )
     private void onWakeUp(boolean bl, boolean updateSleepingPlayers, CallbackInfo ci) {
-        PlayerEntity player = ((ExtendedPlayerEntity) this).self();
+        PlayerEntity player = PlayerEntity.class.cast(this);
         PlayerWakeUpCallback.EVENT.invoker().onWakeUp(player);
     }
 

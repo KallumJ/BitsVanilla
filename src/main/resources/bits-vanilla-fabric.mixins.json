@@ -7,7 +7,8 @@
     ],
     "server": [
         "PlayerEntityMixin",
-        "SleepMixin"
+        "SleepMixin",
+        "SchedulerHandler"
     ],
     "injectors": {
         "defaultRequire": 1
