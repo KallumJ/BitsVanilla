@@ -4,7 +4,6 @@ import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
 
 public interface PlayerDamageCallback {

@@ -1,7 +1,7 @@
 package team.bits.vanilla.fabric.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.tree.LiteralCommandNode;
+import com.mojang.brigadier.tree.CommandNode;
 import net.minecraft.server.command.ServerCommandSource;
 
 import static net.minecraft.server.command.CommandManager.literal;
@@ -24,14 +24,9 @@ public abstract class Command implements com.mojang.brigadier.Command<ServerComm
     }
 
     public void registerCommand(CommandDispatcher<ServerCommandSource> dispatcher) {
-        LiteralCommandNode<ServerCommandSource> commandNode = dispatcher.register(literal(name).executes(this));
+        CommandNode<ServerCommandSource> commandNode = dispatcher.register(literal(name).executes(this));
 
-        // If aliases are provided, then use them
-        if (aliases != null) {
-            for (String alias : aliases) {
-                dispatcher.register(literal(alias).redirect(commandNode));
-            }
-        }
+        registerAliases(dispatcher, commandNode);
     }
 
     public CommandHelpInformation getHelpInformation() {
@@ -40,5 +35,14 @@ public abstract class Command implements com.mojang.brigadier.Command<ServerComm
 
     public String getName() {
         return name;
+    }
+
+    protected void registerAliases(CommandDispatcher<ServerCommandSource> dispatcher, CommandNode<ServerCommandSource> commandNode) {
+        // If aliases are provided, then use them
+        if (aliases != null) {
+            for (String alias : aliases) {
+                dispatcher.register(literal(alias).redirect(commandNode));
+            }
+        }
     }
 }

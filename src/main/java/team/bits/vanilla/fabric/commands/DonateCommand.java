@@ -15,8 +15,8 @@ public class DonateCommand extends Command {
 
     public DonateCommand() {
         super("donate", new CommandHelpInformation()
-            .setDescription("Displays the donate link to the player")
-            .setPublic(true)
+                .setDescription("Displays the donate link to the player")
+                .setPublic(true)
         );
     }
 

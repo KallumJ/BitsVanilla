@@ -22,6 +22,33 @@ public class SleepListener implements PlayerSleepCallback, PlayerWakeUpCallback 
 
     private final Set<PlayerEntity> sleeping = new HashSet<>();
 
+    private static int getOnlinePlayerCount(MinecraftServer server) {
+        return Math.toIntExact(server.getPlayerManager().getPlayerList().stream()
+                        .filter(player -> player.interactionManager.getGameMode() == GameMode.SURVIVAL)
+//                .filter(player -> AFKDetector.INSTANCE.isNotAFK(player))
+                        .count()
+        );
+    }
+
+    private static void sendSleepingMessage(MinecraftServer server, int sleeping, int online, boolean green) {
+        float ratio = (float) sleeping / online;
+        TextComponent message = Component.text()
+                .append(
+                        Component.text()
+                                .append(Component.text(sleeping))
+                                .append(Component.text('/'))
+                                .append(Component.text(Math.max(online, 1)))
+                                .append(Component.text(" player(s) sleeping, "))
+                                .append(Component.text(Math.min(Math.round(ratio * 100f), 100f)))
+                                .append(Component.text("%"))
+                )
+                .color(green ? NamedTextColor.GREEN : NamedTextColor.YELLOW)
+                .build();
+
+        BitsVanilla.adventure().audience(server.getPlayerManager().getPlayerList())
+                .sendMessage(message);
+    }
+
     @Override
     public void onSleep(@NotNull PlayerEntity player) {
         ServerWorld world = (ServerWorld) player.world;
@@ -59,32 +86,5 @@ public class SleepListener implements PlayerSleepCallback, PlayerWakeUpCallback 
         } else {
             sendSleepingMessage(server, sleeping, online, false);
         }
-    }
-
-    private static int getOnlinePlayerCount(MinecraftServer server) {
-        return Math.toIntExact(server.getPlayerManager().getPlayerList().stream()
-                        .filter(player -> player.interactionManager.getGameMode() == GameMode.SURVIVAL)
-//                .filter(player -> AFKDetector.INSTANCE.isNotAFK(player))
-                        .count()
-        );
-    }
-
-    private static void sendSleepingMessage(MinecraftServer server, int sleeping, int online, boolean green) {
-        float ratio = (float) sleeping / online;
-        TextComponent message = Component.text()
-                .append(
-                        Component.text()
-                                .append(Component.text(sleeping))
-                                .append(Component.text('/'))
-                                .append(Component.text(Math.max(online, 1)))
-                                .append(Component.text(" player(s) sleeping, "))
-                                .append(Component.text(Math.min(Math.round(ratio * 100f), 100f)))
-                                .append(Component.text("%"))
-                )
-                .color(green ? NamedTextColor.GREEN : NamedTextColor.YELLOW)
-                .build();
-
-        BitsVanilla.adventure().audience(server.getPlayerManager().getPlayerList())
-                .sendMessage(message);
     }
 }

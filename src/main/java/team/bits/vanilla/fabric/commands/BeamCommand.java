@@ -5,6 +5,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import com.mojang.brigadier.tree.CommandNode;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -18,14 +19,13 @@ import team.bits.vanilla.fabric.BitsVanilla;
 import team.bits.vanilla.fabric.teleport.Teleporter;
 import team.bits.vanilla.fabric.util.CommandSuggestionUtils;
 import team.bits.vanilla.fabric.util.Location;
-import team.bits.vanilla.fabric.util.Server;
+import team.bits.vanilla.fabric.util.ServerWrapper;
 
 import java.util.HashMap;
 
 import static net.minecraft.server.command.CommandManager.literal;
 
 public class BeamCommand extends Command {
-    //TODO: autocomplete
 
     private final static HashMap<ServerPlayerEntity, Beam> BEAM_REQUESTS = new HashMap<>();
     private final static String REQUEST_STRING = "Beam requested!";
@@ -47,12 +47,7 @@ public class BeamCommand extends Command {
     @Override
     public void registerCommand(CommandDispatcher<ServerCommandSource> dispatcher) {
         // Register /beam <player>
-        dispatcher.register(literal(super.getName())
-                .then(CommandManager.argument("player", StringArgumentType.string())
-                        .suggests(CommandSuggestionUtils.ONLINE_PLAYERS)
-                        .executes(this::initialiseBeamRequest)
-                )
-        );
+        CommandNode<ServerCommandSource> commandNode = dispatcher.register(literal(super.getName()).then(CommandManager.argument("player", StringArgumentType.string()).suggests(CommandSuggestionUtils.ONLINE_PLAYERS).executes(this::initialiseBeamRequest)));
 
         // Register /beam accept
         dispatcher.register(literal(super.getName())
@@ -60,6 +55,8 @@ public class BeamCommand extends Command {
                         .executes(this::acceptBeam)
                 )
         );
+
+        super.registerAliases(dispatcher, commandNode);
     }
 
     /**
@@ -74,8 +71,8 @@ public class BeamCommand extends Command {
 
         String playerArg = context.getArgument("player", String.class);
 
-        Server server = new Server(context.getSource().getMinecraftServer());
-        ServerPlayerEntity receivingPlayer = server.getPlayerFromName(playerArg);
+        ServerWrapper serverWrapper = new ServerWrapper(context.getSource().getMinecraftServer());
+        ServerPlayerEntity receivingPlayer = serverWrapper.getPlayerFromName(playerArg);
 
         // If a recieving player is found, proceed, else, throw exception
         if (receivingPlayer != null) {

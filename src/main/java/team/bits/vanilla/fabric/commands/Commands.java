@@ -1,7 +1,6 @@
 package team.bits.vanilla.fabric.commands;
 
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
-import org.apache.logging.log4j.core.tools.picocli.CommandLine;
 
 import java.util.ArrayList;
 
@@ -14,6 +13,7 @@ public class Commands {
         addCommand(new DonateCommand());
         addCommand(new HelpCommand());
         addCommand(new BeamCommand());
+        addCommand(new PlayerHeadCommand());
     }
 
     public static void registerCommands() {

@@ -7,12 +7,12 @@ import org.jetbrains.annotations.NotNull;
 
 public record Location(Vec3d position, World world) {
 
-    public @NotNull Location add(double x, double y, double z) {
-        return new Location(this.position.add(x, y, z), this.world);
-    }
-
     public static @NotNull Location get(@NotNull Entity entity) {
         return new Location(entity.getPos(), entity.getEntityWorld());
+    }
+
+    public @NotNull Location add(double x, double y, double z) {
+        return new Location(this.position.add(x, y, z), this.world);
     }
 
     public double x() {

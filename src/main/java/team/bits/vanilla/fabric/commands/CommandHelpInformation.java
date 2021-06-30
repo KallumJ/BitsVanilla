@@ -5,7 +5,8 @@ public class CommandHelpInformation {
     private String usage;
     private boolean isPublic;
 
-    public CommandHelpInformation() {}
+    public CommandHelpInformation() {
+    }
 
     public CommandHelpInformation(String description, String usage, boolean isPublic) {
         this.description = description;
@@ -17,22 +18,22 @@ public class CommandHelpInformation {
         return description;
     }
 
-    public String getUsage() {
-        return usage;
-    }
-
-    public boolean isPublic() {
-        return isPublic;
-    }
-
     public CommandHelpInformation setDescription(String description) {
         this.description = description;
         return this;
     }
 
+    public String getUsage() {
+        return usage;
+    }
+
     public CommandHelpInformation setUsage(String usage) {
         this.usage = usage;
         return this;
+    }
+
+    public boolean isPublic() {
+        return isPublic;
     }
 
     public CommandHelpInformation setPublic(boolean aPublic) {

@@ -18,7 +18,7 @@ public class HelpCommand extends Command {
 
     public HelpCommand() {
         super("help", new CommandHelpInformation()
-            .setPublic(false)
+                .setPublic(false)
         );
     }
 
@@ -39,7 +39,7 @@ public class HelpCommand extends Command {
                 // Generate string with name and description
                 cmdString.append(String.format(CMD_HELP_STRING, commandName, helpDesc));
 
-                TextComponent textComponent = Component.text(cmdString + "\n");
+                TextComponent textComponent = Component.text(cmdString + "\n").color(NamedTextColor.WHITE);
 
                 // If there is usage, add it as a hover event
                 if (helpInformation.getUsage() != null) {
@@ -53,7 +53,7 @@ public class HelpCommand extends Command {
 
         // Create the final text component
         TextComponent message = Component.text("---List of commands--- \n").color(NamedTextColor.GREEN)
-            .append(Component.text().append(cmdStrings));
+                .append(Component.text().append(cmdStrings));
 
         // Send the message
         BitsVanilla.adventure().audience(context.getSource())

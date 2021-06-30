@@ -2,15 +2,14 @@
   "schemaVersion": 1,
   "id": "bits-vanilla-fabric",
   "version": "${version}",
-
   "name": "BitsVanilla (fabric)",
-  "authors": ["Koenn"],
+  "authors": [
+    "Koenn"
+  ],
   "contact": {
     "homepage": "https://bits.team/"
   },
-
   "license": "CC0-1.0",
-
   "environment": "*",
   "entrypoints": {
     "main": [
@@ -20,7 +19,6 @@
   "mixins": [
     "bits-vanilla-fabric.mixins.json"
   ],
-
   "depends": {
     "fabricloader": ">=0.11.3",
     "minecraft": "1.17.x",

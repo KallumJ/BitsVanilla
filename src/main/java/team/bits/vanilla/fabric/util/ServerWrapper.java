@@ -6,13 +6,14 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Server {
+public class ServerWrapper {
 
     private static MinecraftServer server = null;
 
-    public Server(MinecraftServer mcserver) {
+    public ServerWrapper(MinecraftServer mcserver) {
         server = mcserver;
     }
+
     public ServerPlayerEntity getPlayerFromName(String name) {
         return server.getPlayerManager().getPlayer(name);
     }
