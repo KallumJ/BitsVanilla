@@ -47,10 +47,19 @@ public class BeamCommand extends Command {
     @Override
     public void registerCommand(CommandDispatcher<ServerCommandSource> dispatcher) {
         // Register /beam <player>
-        dispatcher.register(literal(super.getName()).then(CommandManager.argument("player", StringArgumentType.string()).suggests(CommandSuggestionUtils.ONLINE_PLAYERS).executes(this::initialiseBeamRequest)));
+        dispatcher.register(literal(super.getName())
+                .then(CommandManager.argument("player", StringArgumentType.string())
+                        .suggests(CommandSuggestionUtils.ONLINE_PLAYERS)
+                        .executes(this::initialiseBeamRequest)
+                )
+        );
 
         // Register /beam accept
-        dispatcher.register(literal(super.getName()).then(literal("accept").executes(this::acceptBeam)));
+        dispatcher.register(literal(super.getName())
+                .then(literal("accept")
+                        .executes(this::acceptBeam)
+                )
+        );
     }
 
     /**
