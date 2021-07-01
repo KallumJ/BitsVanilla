@@ -60,10 +60,6 @@ public class SleepListener implements PlayerSleepCallback, PlayerWakeUpCallback 
     @Override
     public void onWakeUp(@NotNull PlayerEntity player) {
         this.sleeping.remove(player);
-
-        Scheduler.schedule(() -> {
-            Teleporter.queueTeleport(player, Location.get(player).add(10, 0, 0), null);
-        }, 20);
     }
 
     private void checkSleeping(@NotNull ServerWorld world) {

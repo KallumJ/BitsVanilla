@@ -14,6 +14,7 @@ public class Commands {
         addCommand(new HelpCommand());
         addCommand(new BeamCommand());
         addCommand(new PlayerHeadCommand());
+        addCommand(new BedCommand());
     }
 
     public static void registerCommands() {

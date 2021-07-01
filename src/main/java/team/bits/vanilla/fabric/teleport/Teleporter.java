@@ -7,10 +7,12 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import team.bits.vanilla.Colors;
@@ -102,7 +104,10 @@ public final class Teleporter implements PlayerMoveCallback, PlayerDamageCallbac
         int chunkZ = ((int) destination.position().z) >> 4;
         world.getChunk(chunkX, chunkZ);
 
-        player.teleport(position.x, position.y, position.z);
+        // This line prints out the dimension attached to the destination world System.out.println(world.getRegistryKey().getValue());
+
+        player.moveToWorld((ServerWorld) world);
+        //player.teleport(position.x, position.y, position.z);
 
         BitsVanilla.audience(player).sendMessage(TELEPORT_DONE);
 
