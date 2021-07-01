@@ -5,9 +5,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.minecraft.command.CommandSource;
 import net.minecraft.entity.EntityType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
@@ -16,8 +14,6 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
-import org.apache.logging.log4j.core.jmx.Server;
-import org.w3c.dom.Text;
 import team.bits.vanilla.fabric.BitsVanilla;
 
 import java.util.ArrayList;
@@ -25,6 +21,8 @@ import java.util.List;
 import java.util.Set;
 
 public class ChunkInspectCommand extends Command {
+    //TODO: check player is operator
+
     private static final List<EntityRecord> ENTITY_RECORD_LIST = new ArrayList<>();
     private static final String ENTITY_RECORD_STRING = "%s at %s, count %d";
     private static final String TELEPORT_COMMAND = "/execute in %s run tp %s %s";
@@ -33,47 +31,9 @@ public class ChunkInspectCommand extends Command {
 
     public ChunkInspectCommand() {
         super("chunkinspect", new String[]{"ci"}, new CommandHelpInformation()
-            .setDescription("Provides a list of large groups of entities across the server")
-            .setPublic(false)
+                .setDescription("Provides a list of large groups of entities across the server")
+                .setPublic(false)
         );
-    }
-
-    @Override
-    public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        MinecraftServer server = context.getSource().getMinecraftServer();
-
-        Set<RegistryKey<World>> worldRegKeys = server.getWorldRegistryKeys();
-
-        // For every dimension on the server
-        for (RegistryKey<World> worldRegKey : worldRegKeys) {
-            ServerWorld world = server.getWorld(worldRegKey);
-
-            // Iterate over every loaded entity
-            world.iterateEntities().forEach(entity -> {
-                ChunkPos entityChunkPos = entity.getChunkPos();
-                EntityType<?> entityType = entity.getType();
-
-                // See if we have already recorded an entity of this type in this chunk...
-                EntityRecord matchingEntityRecord = findMatchingEntityRecord(entityType, entityChunkPos);
-
-                // ...if this we have, increment its count...
-                if (matchingEntityRecord != null) {
-                    matchingEntityRecord.incrementCount();
-
-                    //...if we haven't, create a new record
-                } else {
-                    ENTITY_RECORD_LIST.add(new EntityRecord(entityType, entityChunkPos, worldRegKey));
-                }
-            });
-        }
-
-
-        // Send the records to the player
-        sendEntityList(context.getSource().getPlayer());
-
-        ENTITY_RECORD_LIST.clear();
-
-        return 1;
     }
 
     private static void sendEntityList(ServerPlayerEntity player) {
@@ -98,9 +58,9 @@ public class ChunkInspectCommand extends Command {
 
                 // Add it to text component
                 TextComponent textComponent = Component.text(String.format(ENTITY_RECORD_STRING,
-                            getEntityStringFromKey(entityKey),
-                            entityChunkPos,
-                            entityCount) + "\n")
+                        getEntityStringFromKey(entityKey),
+                        entityChunkPos,
+                        entityCount) + "\n")
                         .color(color)
                         // Add command to teleport to entities on click
                         .clickEvent(ClickEvent.runCommand(String.format(TELEPORT_COMMAND,
@@ -168,6 +128,44 @@ public class ChunkInspectCommand extends Command {
             }
         }
         return null;
+    }
+
+    @Override
+    public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        MinecraftServer server = context.getSource().getMinecraftServer();
+
+        Set<RegistryKey<World>> worldRegKeys = server.getWorldRegistryKeys();
+
+        // For every dimension on the server
+        for (RegistryKey<World> worldRegKey : worldRegKeys) {
+            ServerWorld world = server.getWorld(worldRegKey);
+
+            // Iterate over every loaded entity
+            world.iterateEntities().forEach(entity -> {
+                ChunkPos entityChunkPos = entity.getChunkPos();
+                EntityType<?> entityType = entity.getType();
+
+                // See if we have already recorded an entity of this type in this chunk...
+                EntityRecord matchingEntityRecord = findMatchingEntityRecord(entityType, entityChunkPos);
+
+                // ...if this we have, increment its count...
+                if (matchingEntityRecord != null) {
+                    matchingEntityRecord.incrementCount();
+
+                    //...if we haven't, create a new record
+                } else {
+                    ENTITY_RECORD_LIST.add(new EntityRecord(entityType, entityChunkPos, worldRegKey));
+                }
+            });
+        }
+
+
+        // Send the records to the player
+        sendEntityList(context.getSource().getPlayer());
+
+        ENTITY_RECORD_LIST.clear();
+
+        return 1;
     }
 }
 

@@ -6,10 +6,10 @@
   "mixins": [
   ],
   "server": [
+    "CreeperMixin",
     "PlayerEntityMixin",
     "SchedulerHandler",
-    "SleepMixin",
-    "CreeperMixin"
+    "SleepMixin"
   ],
   "injectors": {
     "defaultRequire": 1

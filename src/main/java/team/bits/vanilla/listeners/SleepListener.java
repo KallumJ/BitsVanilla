@@ -11,9 +11,6 @@ import org.jetbrains.annotations.NotNull;
 import team.bits.vanilla.fabric.BitsVanilla;
 import team.bits.vanilla.fabric.event.sleep.PlayerSleepCallback;
 import team.bits.vanilla.fabric.event.sleep.PlayerWakeUpCallback;
-import team.bits.vanilla.fabric.teleport.Teleporter;
-import team.bits.vanilla.fabric.util.Location;
-import team.bits.vanilla.fabric.util.Scheduler;
 
 import java.util.HashSet;
 import java.util.Set;

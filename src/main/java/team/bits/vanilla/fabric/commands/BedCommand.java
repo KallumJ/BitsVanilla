@@ -15,11 +15,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
-import org.apache.logging.log4j.core.jmx.Server;
 import team.bits.vanilla.fabric.teleport.Teleporter;
 import team.bits.vanilla.fabric.util.Location;
 
-import java.awt.*;
 import java.util.Objects;
 import java.util.Optional;
 //TODO: respawn anchor support
@@ -33,51 +31,51 @@ public class BedCommand extends Command {
 
     public BedCommand() {
         super("bed", new String[]{"b", "home"}, new CommandHelpInformation()
-            .setDescription("Teleports you back to your bed")
-            .setPublic(true)
+                .setDescription("Teleports you back to your bed")
+                .setPublic(true)
         );
     }
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-            ServerPlayerEntity player = context.getSource().getPlayer();
-            MinecraftServer server = context.getSource().getMinecraftServer();
+        ServerPlayerEntity player = context.getSource().getPlayer();
+        MinecraftServer server = context.getSource().getMinecraftServer();
 
-            BlockPos spawnPosition = player.getSpawnPointPosition();
-            RegistryKey<World> spawnDimension = player.getSpawnPointDimension();
-            World spawnWorld = server.getWorld(spawnDimension);
+        BlockPos spawnPosition = player.getSpawnPointPosition();
+        RegistryKey<World> spawnDimension = player.getSpawnPointDimension();
+        World spawnWorld = server.getWorld(spawnDimension);
 
-            // If no spawn position is found
-            if (spawnPosition != null) {
+        // If no spawn position is found
+        if (spawnPosition != null) {
 
-                // Get the spawn positions block
-                BlockState blockState = Objects.requireNonNull(spawnWorld).getBlockState(spawnPosition);
-                Block block = blockState.getBlock();
+            // Get the spawn positions block
+            BlockState blockState = Objects.requireNonNull(spawnWorld).getBlockState(spawnPosition);
+            Block block = blockState.getBlock();
 
-                // If spawn position is a bed
-                if (block instanceof BedBlock) {
-                    Optional<Vec3d> bedPos = BedBlock.findWakeUpPosition(EntityType.PLAYER, spawnWorld, spawnPosition, 1f);
+            // If spawn position is a bed
+            if (block instanceof BedBlock) {
+                Optional<Vec3d> bedPos = BedBlock.findWakeUpPosition(EntityType.PLAYER, spawnWorld, spawnPosition, 1f);
 
-                    if (bedPos.isPresent()) {
-                        Teleporter.queueTeleport(player, new Location(bedPos.get(), spawnWorld), null, false);
-                    } else {
-                        throw new SimpleCommandExceptionType(() -> BED_ERR).create();
-                    }
-
-                    // If spawn position is a respawn anchor
-                } else if (block instanceof RespawnAnchorBlock && blockState.get(RespawnAnchorBlock.CHARGES) > 0 && RespawnAnchorBlock.isNether(spawnWorld)) {
-                    Optional<Vec3d> respawnAnchorPos = RespawnAnchorBlock.findRespawnPosition(EntityType.PLAYER, spawnWorld, spawnPosition);
-                    if (respawnAnchorPos.isPresent()) {
-                        Teleporter.queueTeleport(player, new Location(respawnAnchorPos.get(), spawnWorld), null, false);
-                    } else {
-                        throw new SimpleCommandExceptionType(() -> RESPAWN_ANCHOR_ERR).create();
-                    }
+                if (bedPos.isPresent()) {
+                    Teleporter.queueTeleport(player, new Location(bedPos.get(), spawnWorld), null, false);
                 } else {
-                    throw new SimpleCommandExceptionType(() -> NO_SPAWN_ERR).create();
+                    throw new SimpleCommandExceptionType(() -> BED_ERR).create();
+                }
+
+                // If spawn position is a respawn anchor
+            } else if (block instanceof RespawnAnchorBlock && blockState.get(RespawnAnchorBlock.CHARGES) > 0 && RespawnAnchorBlock.isNether(spawnWorld)) {
+                Optional<Vec3d> respawnAnchorPos = RespawnAnchorBlock.findRespawnPosition(EntityType.PLAYER, spawnWorld, spawnPosition);
+                if (respawnAnchorPos.isPresent()) {
+                    Teleporter.queueTeleport(player, new Location(respawnAnchorPos.get(), spawnWorld), null, false);
+                } else {
+                    throw new SimpleCommandExceptionType(() -> RESPAWN_ANCHOR_ERR).create();
                 }
             } else {
                 throw new SimpleCommandExceptionType(() -> NO_SPAWN_ERR).create();
             }
+        } else {
+            throw new SimpleCommandExceptionType(() -> NO_SPAWN_ERR).create();
+        }
 
         return 1;
     }

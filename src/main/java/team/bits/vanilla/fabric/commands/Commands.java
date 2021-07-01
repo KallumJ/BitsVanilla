@@ -1,7 +1,6 @@
 package team.bits.vanilla.fabric.commands;
 
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
-import net.minecraft.world.chunk.Chunk;
 
 import java.util.ArrayList;
 
