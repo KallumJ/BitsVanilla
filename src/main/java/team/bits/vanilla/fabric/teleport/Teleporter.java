@@ -106,8 +106,8 @@ public final class Teleporter implements PlayerMoveCallback, PlayerDamageCallbac
 
         // This line prints out the dimension attached to the destination world System.out.println(world.getRegistryKey().getValue());
 
-        player.moveToWorld((ServerWorld) world);
-        //player.teleport(position.x, position.y, position.z);
+        // This line successfully moves the player to the right dimension, but, gets stuck waiting for the chunk player.moveToWorld((ServerWorld) world);
+        player.teleport(position.x, position.y, position.z);
 
         BitsVanilla.audience(player).sendMessage(TELEPORT_DONE);
 
