@@ -32,7 +32,7 @@ public class BedCommand extends Command {
     private static final String BED_ERR = "Could not teleport to your bed";
 
     public BedCommand() {
-        super("bed", new String[]{"b, home"}, new CommandHelpInformation()
+        super("bed", new String[]{"b", "home"}, new CommandHelpInformation()
             .setDescription("Teleports you back to your bed")
             .setPublic(true)
         );
@@ -68,8 +68,6 @@ public class BedCommand extends Command {
                 } else if (block instanceof RespawnAnchorBlock && blockState.get(RespawnAnchorBlock.CHARGES) > 0 && RespawnAnchorBlock.isNether(spawnWorld)) {
                     Optional<Vec3d> respawnAnchorPos = RespawnAnchorBlock.findRespawnPosition(EntityType.PLAYER, spawnWorld, spawnPosition);
                     if (respawnAnchorPos.isPresent()) {
-                        spawnWorld.setBlockState(spawnPosition, blockState.with(RespawnAnchorBlock.CHARGES, blockState.get(RespawnAnchorBlock.CHARGES) - 1), 3);
-
                         Teleporter.queueTeleport(player, new Location(respawnAnchorPos.get(), spawnWorld), null, false);
                     } else {
                         throw new SimpleCommandExceptionType(() -> RESPAWN_ANCHOR_ERR).create();
