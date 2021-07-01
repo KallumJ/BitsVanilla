@@ -41,7 +41,14 @@ public abstract class Command implements com.mojang.brigadier.Command<ServerComm
         // If aliases are provided, then use them
         if (aliases != null) {
             for (String alias : aliases) {
-                dispatcher.register(literal(alias).redirect(commandNode));
+
+                // if the node has no children (arguments) we can just execute the command
+                // otherwise we have to redirect the children
+                if (commandNode.getChildren().isEmpty()) {
+                    dispatcher.register(literal(alias).executes(commandNode.getCommand()));
+                } else {
+                    dispatcher.register(literal(alias).redirect(commandNode));
+                }
             }
         }
     }
