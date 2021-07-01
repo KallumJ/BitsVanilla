@@ -16,14 +16,11 @@ import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 import team.bits.vanilla.fabric.BitsVanilla;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class ChunkInspectCommand extends Command {
     //TODO: check player is operator
 
-    private static final List<EntityRecord> ENTITY_RECORD_LIST = new ArrayList<>();
     private static final String ENTITY_RECORD_STRING = "%s at %s, count %d";
     private static final String TELEPORT_COMMAND = "/execute in %s run tp %s %s";
     private static final int YELLOW_THRESHOLD = 15;
@@ -36,13 +33,10 @@ public class ChunkInspectCommand extends Command {
         );
     }
 
-    private static void sendEntityList(ServerPlayerEntity player) {
-        // This solution is non ideal, but it works for now. only problem arises if we ever had more dimensions
-        List<TextComponent> overworldEntityStrings = new ArrayList<>();
-        List<TextComponent> netherEntityStrings = new ArrayList<>();
-        List<TextComponent> endEntityStrings = new ArrayList<>();
+    private static void sendEntityList(ServerPlayerEntity player, List<EntityRecord> entityRecords) {
+        Map<RegistryKey<World>, List<TextComponent>> entityStrings = new HashMap<>();
 
-        for (EntityRecord entityRecord : ENTITY_RECORD_LIST) {
+        for (EntityRecord entityRecord : entityRecords) {
 
             // If theres enough entities in this chunk to scare us
             if (entityRecord.getCount() >= YELLOW_THRESHOLD) {
@@ -71,41 +65,28 @@ public class ChunkInspectCommand extends Command {
 
 
                 // Add text to relevant dimension list
-                if (dimension.equals(World.OVERWORLD)) {
-                    overworldEntityStrings.add(textComponent);
-                } else if (dimension.equals(World.NETHER)) {
-                    netherEntityStrings.add(textComponent);
-                } else if (dimension.equals(World.END)) {
-                    endEntityStrings.add(textComponent);
-                }
-
+                entityStrings.computeIfAbsent(dimension, k -> new ArrayList<>());
+                entityStrings.get(dimension).add(textComponent);
             }
         }
 
         // Create text components for each dimension, with all entity records in it
-        TextComponent overworldMessage = Component.text("---Overworld--- \n").color(NamedTextColor.GREEN);
-        if (!overworldEntityStrings.isEmpty()) {
-            overworldMessage = overworldMessage.append(Component.text().append(overworldEntityStrings));
-        } else {
-            overworldMessage = overworldMessage.append(Component.text("No entities found \n").color(NamedTextColor.GRAY));
-        }
+        List<TextComponent> finalMessages = new ArrayList<>();
 
-        TextComponent netherMessage = Component.text("---Nether--- \n").color(NamedTextColor.GREEN);
-        if (!netherEntityStrings.isEmpty()) {
-            netherMessage = netherMessage.append(Component.text().append(netherEntityStrings));
-        } else {
-            netherMessage = netherMessage.append(Component.text("No entities found \n").color(NamedTextColor.GRAY));
-        }
+        entityStrings.forEach((worldRegistryKey, textComponents) -> {
+            TextComponent message = Component.text("---" + worldRegistryKey.getValue() + "--- \n").color(NamedTextColor.GREEN);
+            if (!textComponents.isEmpty()) {
+                message = message.append(Component.text().append(textComponents));
+            } else {
+                message = message.append(Component.text("No entities found \n").color(NamedTextColor.GRAY));
+            }
 
-        TextComponent endMessage = Component.text("---End--- \n").color(NamedTextColor.GREEN);
-        if (!endEntityStrings.isEmpty()) {
-            endMessage = endMessage.append(Component.text().append(endEntityStrings));
-        } else {
-            endMessage = endMessage.append(Component.text("No entities found \n").color(NamedTextColor.GRAY));
-        }
+            finalMessages.add(message);
+        });
+
 
         // Collate the per dimension information into one text component
-        TextComponent collatedMessage = Component.text().append(overworldMessage).append(netherMessage).append(endMessage).build();
+        TextComponent collatedMessage = Component.text().append(finalMessages).build();
 
         // Send the message
         BitsVanilla.adventure().audience(player).sendMessage(collatedMessage);
@@ -121,8 +102,8 @@ public class ChunkInspectCommand extends Command {
         return key.split("\\.")[key.split("\\.").length - 1];
     }
 
-    private static EntityRecord findMatchingEntityRecord(EntityType<?> entityType, ChunkPos chunkPos) {
-        for (EntityRecord entityRecord : ENTITY_RECORD_LIST) {
+    private static EntityRecord findMatchingEntityRecord(EntityType<?> entityType, ChunkPos chunkPos, List<EntityRecord> entityRecords) {
+        for (EntityRecord entityRecord : entityRecords) {
             if (entityRecord.getEntityType().equals(entityType) && entityRecord.getChunkPos().equals(chunkPos)) {
                 return entityRecord;
             }
@@ -132,6 +113,8 @@ public class ChunkInspectCommand extends Command {
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        final List<EntityRecord> entityRecords = new ArrayList<>();
+
         MinecraftServer server = context.getSource().getMinecraftServer();
 
         Set<RegistryKey<World>> worldRegKeys = server.getWorldRegistryKeys();
@@ -146,7 +129,7 @@ public class ChunkInspectCommand extends Command {
                 EntityType<?> entityType = entity.getType();
 
                 // See if we have already recorded an entity of this type in this chunk...
-                EntityRecord matchingEntityRecord = findMatchingEntityRecord(entityType, entityChunkPos);
+                EntityRecord matchingEntityRecord = findMatchingEntityRecord(entityType, entityChunkPos, entityRecords);
 
                 // ...if this we have, increment its count...
                 if (matchingEntityRecord != null) {
@@ -154,16 +137,14 @@ public class ChunkInspectCommand extends Command {
 
                     //...if we haven't, create a new record
                 } else {
-                    ENTITY_RECORD_LIST.add(new EntityRecord(entityType, entityChunkPos, worldRegKey));
+                    entityRecords.add(new EntityRecord(entityType, entityChunkPos, worldRegKey));
                 }
             });
         }
 
 
         // Send the records to the player
-        sendEntityList(context.getSource().getPlayer());
-
-        ENTITY_RECORD_LIST.clear();
+        sendEntityList(context.getSource().getPlayer(), entityRecords);
 
         return 1;
     }
