@@ -7,12 +7,15 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ChunkTicketType;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import team.bits.vanilla.Colors;
@@ -88,7 +91,16 @@ public final class Teleporter implements PlayerMoveCallback, PlayerDamageCallbac
     }
 
     private static void teleport(@NotNull Teleport teleport) {
-        final PlayerEntity player = teleport.getPlayer();
+        final ServerPlayerEntity player = (ServerPlayerEntity) teleport.getPlayer();
+        final Location destination = teleport.getDestination();
+        final ServerWorld world = (ServerWorld) destination.world();
+        final Vec3d position = destination.position();
+
+        // load the chunk at the destination
+        ChunkPos chunkPos = new ChunkPos(new BlockPos(position));
+        world.getChunkManager().addTicket(ChunkTicketType.POST_TELEPORT, chunkPos, 1, player.getId());
+
+        // give the player slow falling
         player.addStatusEffect(
                 new StatusEffectInstance(
                         StatusEffects.SLOW_FALLING, 10, 4,
@@ -96,21 +108,23 @@ public final class Teleporter implements PlayerMoveCallback, PlayerDamageCallbac
                 )
         );
 
-        final Location destination = teleport.getDestination();
-        final World world = Objects.requireNonNull(destination.world());
-        final Vec3d position = destination.position();
+        // make sure the player isn't riding an entity or sleeping
+        player.stopRiding();
+        if (player.isSleeping()) {
+            player.wakeUp(true, true);
+        }
 
-        int chunkX = ((int) destination.position().x) >> 4;
-        int chunkZ = ((int) destination.position().z) >> 4;
-        world.getChunk(chunkX, chunkZ);
+        // teleport the player to the destination
+        if (world == player.world) {
+            player.networkHandler.requestTeleport(position.x, position.y, position.z, player.getYaw(), player.getPitch());
+        } else {
+            player.teleport(world, position.x, position.y, position.z, player.getYaw(), player.getPitch());
+        }
 
-        // This line prints out the dimension attached to the destination world System.out.println(world.getRegistryKey().getValue());
-
-        // This line successfully moves the player to the right dimension, but, gets stuck waiting for the chunk player.moveToWorld((ServerWorld) world);
-        player.teleport(position.x, position.y, position.z);
-
+        // send a confirmation message
         BitsVanilla.audience(player).sendMessage(TELEPORT_DONE);
 
+        // play sound and particle
         world.playSound(
                 null, position.x, position.y, position.z,
                 SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS,
