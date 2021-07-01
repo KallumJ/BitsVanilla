@@ -17,6 +17,8 @@ import net.minecraft.world.World;
 import team.bits.vanilla.fabric.BitsVanilla;
 
 import java.util.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 public class ChunkInspectCommand extends Command {
     //TODO: check player is operator
@@ -25,6 +27,8 @@ public class ChunkInspectCommand extends Command {
     private static final String TELEPORT_COMMAND = "/execute in %s run tp %s %s";
     private static final int YELLOW_THRESHOLD = 15;
     private static final int RED_THRESHOLD = 25;
+
+    private final Executor executor = Executors.newSingleThreadExecutor();
 
     public ChunkInspectCommand() {
         super("chunkinspect", new String[]{"ci"}, new CommandHelpInformation()
@@ -115,36 +119,41 @@ public class ChunkInspectCommand extends Command {
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         final List<EntityRecord> entityRecords = new ArrayList<>();
 
-        MinecraftServer server = context.getSource().getMinecraftServer();
+        final MinecraftServer server = context.getSource().getMinecraftServer();
+        final ServerPlayerEntity player = context.getSource().getPlayer();
 
-        Set<RegistryKey<World>> worldRegKeys = server.getWorldRegistryKeys();
+        final Set<RegistryKey<World>> worldRegKeys = server.getWorldRegistryKeys();
 
-        // For every dimension on the server
-        for (RegistryKey<World> worldRegKey : worldRegKeys) {
-            ServerWorld world = server.getWorld(worldRegKey);
+        // execute the rest of this command on a separate thread
+        this.executor.execute(() -> {
 
-            // Iterate over every loaded entity
-            world.iterateEntities().forEach(entity -> {
-                ChunkPos entityChunkPos = entity.getChunkPos();
-                EntityType<?> entityType = entity.getType();
+            // For every dimension on the server
+            for (RegistryKey<World> worldRegKey : worldRegKeys) {
+                ServerWorld world = server.getWorld(worldRegKey);
 
-                // See if we have already recorded an entity of this type in this chunk...
-                EntityRecord matchingEntityRecord = findMatchingEntityRecord(entityType, entityChunkPos, entityRecords);
+                // Iterate over every loaded entity
+                world.iterateEntities().forEach(entity -> {
+                    ChunkPos entityChunkPos = entity.getChunkPos();
+                    EntityType<?> entityType = entity.getType();
 
-                // ...if this we have, increment its count...
-                if (matchingEntityRecord != null) {
-                    matchingEntityRecord.incrementCount();
+                    // See if we have already recorded an entity of this type in this chunk...
+                    EntityRecord matchingEntityRecord = findMatchingEntityRecord(entityType, entityChunkPos, entityRecords);
 
-                    //...if we haven't, create a new record
-                } else {
-                    entityRecords.add(new EntityRecord(entityType, entityChunkPos, worldRegKey));
-                }
-            });
-        }
+                    // ...if this we have, increment its count...
+                    if (matchingEntityRecord != null) {
+                        matchingEntityRecord.incrementCount();
+
+                        //...if we haven't, create a new record
+                    } else {
+                        entityRecords.add(new EntityRecord(entityType, entityChunkPos, worldRegKey));
+                    }
+                });
+            }
 
 
-        // Send the records to the player
-        sendEntityList(context.getSource().getPlayer(), entityRecords);
+            // Send the records to the player
+            sendEntityList(player, entityRecords);
+        });
 
         return 1;
     }
