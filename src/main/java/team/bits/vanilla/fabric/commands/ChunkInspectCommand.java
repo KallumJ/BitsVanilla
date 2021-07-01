@@ -55,34 +55,35 @@ public class ChunkInspectCommand extends Command {
                 int entityCount = entityRecord.getCount();
 
                 // Add it to text component
-                TextComponent textComponent = Component.text(String.format(ENTITY_RECORD_STRING,
-                        getEntityStringFromKey(entityKey),
-                        entityChunkPos,
-                        entityCount) + "\n")
-                        .color(color)
-                        // Add command to teleport to entities on click
+                TextComponent textComponent = Component.text(
+                        String.format(ENTITY_RECORD_STRING,
+                                getEntityStringFromKey(entityKey),
+                                entityChunkPos,
+                                entityCount
+                        ), color)
                         .clickEvent(ClickEvent.runCommand(String.format(TELEPORT_COMMAND,
                                 dimension.getValue(),
                                 player.getEntityName(),
                                 getCommandLocationString(entityChunkPos)
-                        )));
+                        )))
+                        .append(Component.newline());
 
 
                 // Add text to relevant dimension list
-                entityStrings.computeIfAbsent(dimension, k -> new ArrayList<>());
+                entityStrings.computeIfAbsent(dimension, k -> new LinkedList<>());
                 entityStrings.get(dimension).add(textComponent);
             }
         }
 
         // Create text components for each dimension, with all entity records in it
-        List<TextComponent> finalMessages = new ArrayList<>();
+        List<TextComponent> finalMessages = new LinkedList<>();
 
         entityStrings.forEach((worldRegistryKey, textComponents) -> {
-            TextComponent message = Component.text("---" + worldRegistryKey.getValue() + "--- \n").color(NamedTextColor.GREEN);
+            TextComponent message = Component.text("---" + worldRegistryKey.getValue() + "---", NamedTextColor.GREEN).append(Component.newline());
             if (!textComponents.isEmpty()) {
                 message = message.append(Component.text().append(textComponents));
             } else {
-                message = message.append(Component.text("No entities found \n").color(NamedTextColor.GRAY));
+                message = message.append(Component.text("No entities found", NamedTextColor.GRAY).append(Component.newline()));
             }
 
             finalMessages.add(message);
@@ -106,18 +107,18 @@ public class ChunkInspectCommand extends Command {
         return key.split("\\.")[key.split("\\.").length - 1];
     }
 
-    private static EntityRecord findMatchingEntityRecord(EntityType<?> entityType, ChunkPos chunkPos, List<EntityRecord> entityRecords) {
+    private static Optional<EntityRecord> findMatchingEntityRecord(EntityType<?> entityType, ChunkPos chunkPos, List<EntityRecord> entityRecords) {
         for (EntityRecord entityRecord : entityRecords) {
             if (entityRecord.getEntityType().equals(entityType) && entityRecord.getChunkPos().equals(chunkPos)) {
-                return entityRecord;
+                return Optional.of(entityRecord);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        final List<EntityRecord> entityRecords = new ArrayList<>();
+        final List<EntityRecord> entityRecords = new LinkedList<>();
 
         final MinecraftServer server = context.getSource().getMinecraftServer();
         final ServerPlayerEntity player = context.getSource().getPlayer();
@@ -129,7 +130,7 @@ public class ChunkInspectCommand extends Command {
 
             // For every dimension on the server
             for (RegistryKey<World> worldRegKey : worldRegKeys) {
-                ServerWorld world = server.getWorld(worldRegKey);
+                ServerWorld world = Objects.requireNonNull(server.getWorld(worldRegKey));
 
                 // Iterate over every loaded entity
                 world.iterateEntities().forEach(entity -> {
@@ -137,11 +138,11 @@ public class ChunkInspectCommand extends Command {
                     EntityType<?> entityType = entity.getType();
 
                     // See if we have already recorded an entity of this type in this chunk...
-                    EntityRecord matchingEntityRecord = findMatchingEntityRecord(entityType, entityChunkPos, entityRecords);
+                    Optional<EntityRecord> matchingEntityRecord = findMatchingEntityRecord(entityType, entityChunkPos, entityRecords);
 
                     // ...if this we have, increment its count...
-                    if (matchingEntityRecord != null) {
-                        matchingEntityRecord.incrementCount();
+                    if (matchingEntityRecord.isPresent()) {
+                        matchingEntityRecord.get().incrementCount();
 
                         //...if we haven't, create a new record
                     } else {
