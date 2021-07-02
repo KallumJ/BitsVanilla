@@ -23,7 +23,7 @@ public class PlayerHeadCommand extends Command {
     private static final String INVALID_USERNAME_ERR = "Username %s is invalid";
 
     public PlayerHeadCommand() {
-        super("playerhead", new String[]{"ph"}, new CommandHelpInformation()
+        super("playerhead", new String[]{"ph"}, new CommandInformation()
                 .setDescription("Gives the player the specified players head, at the cost of a diamond")
                 .setUsage("<player>")
                 .setPublic(true)

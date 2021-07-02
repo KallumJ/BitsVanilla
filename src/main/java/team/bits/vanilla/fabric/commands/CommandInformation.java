@@ -1,14 +1,14 @@
 package team.bits.vanilla.fabric.commands;
 
-public class CommandHelpInformation {
+public class CommandInformation {
     private String description;
     private String usage;
     private boolean isPublic;
 
-    public CommandHelpInformation() {
+    public CommandInformation() {
     }
 
-    public CommandHelpInformation(String description, String usage, boolean isPublic) {
+    public CommandInformation(String description, String usage, boolean isPublic, boolean permissionLevel) {
         this.description = description;
         this.usage = usage;
         this.isPublic = isPublic;
@@ -18,7 +18,7 @@ public class CommandHelpInformation {
         return description;
     }
 
-    public CommandHelpInformation setDescription(String description) {
+    public CommandInformation setDescription(String description) {
         this.description = description;
         return this;
     }
@@ -27,7 +27,7 @@ public class CommandHelpInformation {
         return usage;
     }
 
-    public CommandHelpInformation setUsage(String usage) {
+    public CommandInformation setUsage(String usage) {
         this.usage = usage;
         return this;
     }
@@ -36,7 +36,7 @@ public class CommandHelpInformation {
         return isPublic;
     }
 
-    public CommandHelpInformation setPublic(boolean aPublic) {
+    public CommandInformation setPublic(boolean aPublic) {
         isPublic = aPublic;
         return this;
     }

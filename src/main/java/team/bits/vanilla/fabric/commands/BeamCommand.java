@@ -37,7 +37,7 @@ public class BeamCommand extends Command {
     private static final String NO_ARGS_ERR = "To use /beam, you must specify a player, or do /beam accept. For more info, do /help";
 
     public BeamCommand() {
-        super("beam", new CommandHelpInformation()
+        super("beam", new CommandInformation()
                 .setDescription("Teleports you to the specified player")
                 .setUsage("<player>|accept")
                 .setPublic(true)

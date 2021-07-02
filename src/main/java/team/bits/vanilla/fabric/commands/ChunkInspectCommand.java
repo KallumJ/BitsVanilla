@@ -21,7 +21,6 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 public class ChunkInspectCommand extends Command {
-    //TODO: check player is operator
 
     private static final String ENTITY_RECORD_STRING = "%s at %s, count %d";
     private static final String TELEPORT_COMMAND = "/execute in %s run tp %s %s";
@@ -31,7 +30,7 @@ public class ChunkInspectCommand extends Command {
     private final Executor executor = Executors.newSingleThreadExecutor();
 
     public ChunkInspectCommand() {
-        super("chunkinspect", new String[]{"ci"}, new CommandHelpInformation()
+        super("chunkinspect", new String[]{"ci"}, new CommandInformation()
                 .setDescription("Provides a list of large groups of entities across the server")
                 .setPublic(false)
         );

@@ -17,7 +17,7 @@ public class HelpCommand extends Command {
     private final static String USAGE_STRING = "Usage: %s %s";
 
     public HelpCommand() {
-        super("help", new CommandHelpInformation()
+        super("help", new CommandInformation()
                 .setPublic(false)
         );
     }
@@ -28,12 +28,12 @@ public class HelpCommand extends Command {
 
         for (Command command : Commands.COMMANDS_LIST) {
             // If command is to be used by the public
-            if (command.getHelpInformation().isPublic()) {
+            if (command.getCommandInformation().isPublic()) {
                 StringBuilder cmdString = new StringBuilder();
 
                 String commandName = generateCommandString(command);
 
-                CommandHelpInformation helpInformation = command.getHelpInformation();
+                CommandInformation helpInformation = command.getCommandInformation();
                 String helpDesc = helpInformation.getDescription();
 
                 // Generate string with name and description

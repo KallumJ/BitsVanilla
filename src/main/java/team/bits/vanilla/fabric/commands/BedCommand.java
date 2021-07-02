@@ -20,9 +20,6 @@ import team.bits.vanilla.fabric.util.Location;
 
 import java.util.Objects;
 import java.util.Optional;
-//TODO: respawn anchor support
-//TODO: error messages
-
 
 public class BedCommand extends Command {
     private static final String NO_SPAWN_ERR = "No spawn position could be found";
@@ -30,7 +27,7 @@ public class BedCommand extends Command {
     private static final String BED_ERR = "Could not teleport to your bed";
 
     public BedCommand() {
-        super("bed", new String[]{"b", "home"}, new CommandHelpInformation()
+        super("bed", new String[]{"b", "home"}, new CommandInformation()
                 .setDescription("Teleports you back to your bed")
                 .setPublic(true)
         );

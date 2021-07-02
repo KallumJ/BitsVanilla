@@ -9,28 +9,31 @@ import static net.minecraft.server.command.CommandManager.literal;
 public abstract class Command implements com.mojang.brigadier.Command<ServerCommandSource> {
     private final String name;
     private final String[] aliases;
-    private final CommandHelpInformation helpInformation;
+    private final CommandInformation commandInformation;
+    private int permissionLevel;
 
-    public Command(String name, CommandHelpInformation helpInfo) {
+    public Command(String name, CommandInformation helpInfo) {
         this.name = name;
         this.aliases = null;
-        this.helpInformation = helpInfo;
+        this.commandInformation = helpInfo;
     }
 
-    public Command(String name, String[] aliases, CommandHelpInformation helpInfo) {
+    public Command(String name, String[] aliases, CommandInformation cmdInfo) {
         this.name = name;
         this.aliases = aliases;
-        this.helpInformation = helpInfo;
+        this.commandInformation = cmdInfo;
     }
 
     public void registerCommand(CommandDispatcher<ServerCommandSource> dispatcher) {
-        CommandNode<ServerCommandSource> commandNode = dispatcher.register(literal(name).executes(this));
+        permissionLevel = getCommandInformation().isPublic() ? 0 : 4;
+
+        CommandNode<ServerCommandSource> commandNode= dispatcher.register(literal(name).requires(serverCommandSource -> serverCommandSource.hasPermissionLevel(permissionLevel)).executes(this));
 
         registerAliases(dispatcher, commandNode);
     }
 
-    public CommandHelpInformation getHelpInformation() {
-        return helpInformation;
+    public CommandInformation getCommandInformation() {
+        return commandInformation;
     }
 
     public String getName() {
@@ -40,16 +43,20 @@ public abstract class Command implements com.mojang.brigadier.Command<ServerComm
     protected void registerAliases(CommandDispatcher<ServerCommandSource> dispatcher, CommandNode<ServerCommandSource> commandNode) {
         // If aliases are provided, then use them
         if (aliases != null) {
+            permissionLevel = getCommandInformation().isPublic() ? 0 : 4;
             for (String alias : aliases) {
-
                 // if the node has no children (arguments) we can just execute the command
                 // otherwise we have to redirect the children
                 if (commandNode.getChildren().isEmpty()) {
-                    dispatcher.register(literal(alias).executes(commandNode.getCommand()));
+                    dispatcher.register(literal(alias).requires(serverCommandSource -> serverCommandSource.hasPermissionLevel(permissionLevel)).executes(commandNode.getCommand()));
                 } else {
-                    dispatcher.register(literal(alias).redirect(commandNode));
+                    dispatcher.register(literal(alias).requires(serverCommandSource -> serverCommandSource.hasPermissionLevel(permissionLevel)).redirect(commandNode));
                 }
             }
         }
+    }
+
+    public int getPermissionLevel() {
+        return permissionLevel;
     }
 }

@@ -14,7 +14,7 @@ public class DonateCommand extends Command {
     private static final String DONATE_LINK = "http://bits.team/donate";
 
     public DonateCommand() {
-        super("donate", new CommandHelpInformation()
+        super("donate", new CommandInformation()
                 .setDescription("Displays the donate link to the player")
                 .setPublic(true)
         );

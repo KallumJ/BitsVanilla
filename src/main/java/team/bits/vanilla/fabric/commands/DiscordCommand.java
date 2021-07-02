@@ -15,7 +15,7 @@ public class DiscordCommand extends Command {
     private static final String DISCORD_INVITE = "https://discord.gg/Arfcnku";
 
     public DiscordCommand() {
-        super("discord", new CommandHelpInformation()
+        super("discord", new CommandInformation()
                 .setDescription("Displays the discord invite to the player")
                 .setPublic(true)
         );
