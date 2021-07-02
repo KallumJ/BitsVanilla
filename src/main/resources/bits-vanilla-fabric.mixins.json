@@ -9,7 +9,8 @@
     "CreeperMixin",
     "PlayerEntityMixin",
     "SchedulerHandler",
-    "SleepMixin"
+    "SleepMixin",
+    "SignColorMixin"
   ],
   "injectors": {
     "defaultRequire": 1
