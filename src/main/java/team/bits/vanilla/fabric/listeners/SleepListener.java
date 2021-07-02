@@ -1,4 +1,4 @@
-package team.bits.vanilla.listeners;
+package team.bits.vanilla.fabric.listeners;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;

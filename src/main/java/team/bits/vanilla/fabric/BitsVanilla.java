@@ -12,7 +12,7 @@ import team.bits.vanilla.fabric.event.sleep.PlayerMoveCallback;
 import team.bits.vanilla.fabric.event.sleep.PlayerSleepCallback;
 import team.bits.vanilla.fabric.event.sleep.PlayerWakeUpCallback;
 import team.bits.vanilla.fabric.teleport.Teleporter;
-import team.bits.vanilla.listeners.SleepListener;
+import team.bits.vanilla.fabric.listeners.SleepListener;
 
 public class BitsVanilla implements ModInitializer {
 
