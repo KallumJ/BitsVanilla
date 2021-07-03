@@ -10,7 +10,7 @@ import team.bits.vanilla.fabric.util.Scheduler;
 import java.util.function.BooleanSupplier;
 
 @Mixin(MinecraftServer.class)
-class SchedulerHandler {
+public class SchedulerHandler {
 
     @Inject(
             at = @At(
