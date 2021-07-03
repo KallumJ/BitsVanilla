@@ -16,6 +16,7 @@ public class Commands {
         addCommand(new PlayerHeadCommand());
         addCommand(new BedCommand());
         addCommand(new ChunkInspectCommand());
+        addCommand(new NicknameCommand());
     }
 
     public static void registerCommands() {
