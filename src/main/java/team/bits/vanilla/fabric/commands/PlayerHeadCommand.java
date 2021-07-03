@@ -12,8 +12,14 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import team.bits.vanilla.fabric.database.player.PlayerDataHandle;
+import team.bits.vanilla.fabric.database.player.PlayerUtils;
+import team.bits.vanilla.fabric.util.CommandSuggestionUtils;
 import team.bits.vanilla.fabric.util.MojangApiUtils;
 import team.bits.vanilla.fabric.util.PlayerWrapper;
+
+import java.util.Optional;
+import java.util.UUID;
 
 import static net.minecraft.server.command.CommandManager.literal;
 
@@ -32,7 +38,13 @@ public class PlayerHeadCommand extends Command {
 
     @Override
     public void registerCommand(CommandDispatcher<ServerCommandSource> dispatcher) {
-        CommandNode<ServerCommandSource> commandNode = dispatcher.register(literal(super.getName()).then(CommandManager.argument("player", StringArgumentType.string()).executes(this)));
+        CommandNode<ServerCommandSource> commandNode = dispatcher.register(
+                literal(super.getName())
+                        .then(CommandManager.argument("player", StringArgumentType.string())
+                                .executes(this)
+                                .suggests(CommandSuggestionUtils.ALL_PLAYERS)
+                        )
+        );
 
         super.registerAliases(dispatcher, commandNode);
     }
@@ -43,10 +55,17 @@ public class PlayerHeadCommand extends Command {
         ServerPlayerEntity requestingPlayer = context.getSource().getPlayer();
         PlayerWrapper playerWrapper = new PlayerWrapper(requestingPlayer);
         String playerHeadString = context.getArgument("player", String.class);
+        String userInput = playerHeadString;
 
         try {
-            if (!MojangApiUtils.checkUsernameIsValid(playerHeadString)) {
-                throw new IllegalArgumentException();
+            Optional<UUID> uuid = PlayerUtils.nameToUUID(playerHeadString);
+            if (uuid.isPresent()) {
+                playerHeadString = PlayerDataHandle.get(uuid.get()).getUsername();
+
+            } else {
+                if (!MojangApiUtils.checkUsernameIsValid(playerHeadString)) {
+                    throw new IllegalArgumentException();
+                }
             }
 
             if (playerWrapper.checkPlayerHasItem(Items.DIAMOND)) {
@@ -64,7 +83,7 @@ public class PlayerHeadCommand extends Command {
                 throw new IllegalStateException();
             }
         } catch (IllegalArgumentException ex) {
-            throw new SimpleCommandExceptionType(() -> String.format(INVALID_USERNAME_ERR, playerHeadString)).create();
+            throw new SimpleCommandExceptionType(() -> String.format(INVALID_USERNAME_ERR, userInput)).create();
         } catch (IllegalStateException ex) {
             throw new SimpleCommandExceptionType(() -> NO_DIAMOND_ERR).create();
         }

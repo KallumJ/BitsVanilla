@@ -16,12 +16,13 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.dimension.DimensionType;
 import team.bits.vanilla.fabric.BitsVanilla;
+import team.bits.vanilla.fabric.database.player.PlayerUtils;
 import team.bits.vanilla.fabric.teleport.Teleporter;
 import team.bits.vanilla.fabric.util.CommandSuggestionUtils;
 import team.bits.vanilla.fabric.util.Location;
-import team.bits.vanilla.fabric.util.ServerWrapper;
 
 import java.util.HashMap;
+import java.util.Optional;
 
 import static net.minecraft.server.command.CommandManager.literal;
 
@@ -71,22 +72,21 @@ public class BeamCommand extends Command {
 
         String playerArg = context.getArgument("player", String.class);
 
-        ServerWrapper serverWrapper = new ServerWrapper(context.getSource().getMinecraftServer());
-        ServerPlayerEntity receivingPlayer = serverWrapper.getPlayerFromName(playerArg);
+        Optional<ServerPlayerEntity> receivingPlayer = PlayerUtils.getPlayer(playerArg);
 
-        // If a recieving player is found, proceed, else, throw exception
-        if (receivingPlayer != null) {
+        // If a receiving player is found, proceed, else, throw exception
+        if (receivingPlayer.isPresent()) {
             DimensionType sendingDimension = sendingPlayer.world.getDimension();
-            DimensionType receivingDimension = receivingPlayer.world.getDimension();
+            DimensionType receivingDimension = receivingPlayer.get().world.getDimension();
 
             // If players are not in the same dimension, throw exception
             if (!sendingDimension.equals(receivingDimension)) {
                 throw new SimpleCommandExceptionType(() -> SAME_DIM_ERR).create();
                 // If player is beaming to themselves, throw exception
-            } else if (sendingPlayer.getEntityName().equals(receivingPlayer.getEntityName())) {
+            } else if (sendingPlayer.equals(receivingPlayer.get())) {
                 throw new SimpleCommandExceptionType(() -> BEAM_SELF_ERR).create();
             } else {
-                addBeam(sendingPlayer, receivingPlayer);
+                addBeam(sendingPlayer, receivingPlayer.get());
             }
         } else {
             throw new SimpleCommandExceptionType(() -> String.format(NO_PLAYER_ERR, playerArg)).create();
@@ -137,7 +137,8 @@ public class BeamCommand extends Command {
                 .sendMessage(requestMessage);
 
         // Notify receiving player of request
-        TextComponent acceptMessage = Component.text(String.format(ACCEPT_STRING, receivingPlayer.getEntityName()))
+        String sendingPlayerName = PlayerUtils.getEffectiveName(sendingPlayer);
+        TextComponent acceptMessage = Component.text(String.format(ACCEPT_STRING, sendingPlayerName))
                 .hoverEvent(HoverEvent.showText(Component.text("Click here to accept!")))
                 .clickEvent(ClickEvent.runCommand("/beam accept"))
                 .color(NamedTextColor.GREEN);
