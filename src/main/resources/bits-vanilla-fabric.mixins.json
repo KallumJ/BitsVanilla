@@ -5,7 +5,7 @@
     "compatibilityLevel": "JAVA_16",
     "mixins": [
     ],
-    "server": ["CreeperMixin", "PlayerEntityMixin", "SchedulerHandler", "ServerInstanceMixin", "SignColorMixin", "SleepMixin"],
+    "server": ["CreeperMixin", "PlayerEntityMixin", "PlayerJoinMixin", "SchedulerHandler", "ServerInstanceMixin", "SignColorMixin", "SleepMixin"],
     "injectors": {
         "defaultRequire": 1
     }
