@@ -1,18 +1,12 @@
 {
-  "required": true,
-  "minVersion": "0.8",
-  "package": "team.bits.vanilla.fabric.mixin",
-  "compatibilityLevel": "JAVA_16",
-  "mixins": [
-  ],
-  "server": [
-    "CreeperMixin",
-    "PlayerEntityMixin",
-    "SchedulerHandler",
-    "SleepMixin",
-    "SignColorMixin"
-  ],
-  "injectors": {
-    "defaultRequire": 1
-  }
+    "required": true,
+    "minVersion": "0.8",
+    "package": "team.bits.vanilla.fabric.mixin",
+    "compatibilityLevel": "JAVA_16",
+    "mixins": [
+    ],
+    "server": ["CreeperMixin", "PlayerEntityMixin", "SchedulerHandler", "ServerInstanceMixin", "SignColorMixin", "SleepMixin"],
+    "injectors": {
+        "defaultRequire": 1
+    }
 }
