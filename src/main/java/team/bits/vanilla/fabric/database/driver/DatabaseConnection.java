@@ -1,6 +1,7 @@
 package team.bits.vanilla.fabric.database.driver;
 
 import org.jetbrains.annotations.NotNull;
+import team.bits.vanilla.fabric.database.util.ServerUtils;
 import team.bits.vanilla.fabric.util.PropertiesFileUtils;
 
 import java.sql.Connection;
@@ -15,6 +16,8 @@ public final class DatabaseConnection {
         Properties properties = PropertiesFileUtils.loadFromClasspath("database.properties");
         driver = new DatabaseDriver(new DatabaseProperties(properties));
         driver.open();
+
+        ServerUtils.getServerID(getConnection());
     }
 
     public static @NotNull IDatabaseDriver getDriver() {

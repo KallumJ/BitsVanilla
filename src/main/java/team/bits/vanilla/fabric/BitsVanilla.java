@@ -6,10 +6,13 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.fabric.FabricServerAudiences;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandOutput;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import team.bits.vanilla.fabric.commands.Commands;
 import team.bits.vanilla.fabric.database.driver.DatabaseConnection;
 import team.bits.vanilla.fabric.database.player.PlayerUtils;
+import team.bits.vanilla.fabric.database.util.ServerUtils;
 import team.bits.vanilla.fabric.event.damage.PlayerDamageCallback;
 import team.bits.vanilla.fabric.event.misc.PlayerConnectEvent;
 import team.bits.vanilla.fabric.event.sleep.PlayerMoveCallback;
@@ -19,6 +22,8 @@ import team.bits.vanilla.fabric.listeners.SleepListener;
 import team.bits.vanilla.fabric.teleport.Teleporter;
 
 public class BitsVanilla implements ModInitializer, ServerLifecycleEvents.ServerStopped {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static FabricServerAudiences adventure;
 
@@ -37,6 +42,8 @@ public class BitsVanilla implements ModInitializer, ServerLifecycleEvents.Server
     public void onInitialize() {
         ServerLifecycleEvents.SERVER_STARTING.register(server -> adventure = FabricServerAudiences.of(server));
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> adventure = null);
+
+        LOGGER.info(String.format("Server name is '%s'", ServerUtils.getServerName()));
 
         DatabaseConnection.open();
 
