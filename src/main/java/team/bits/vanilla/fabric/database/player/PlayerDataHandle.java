@@ -94,7 +94,8 @@ public class PlayerDataHandle {
                 this.nickname = resultSet.getString("nickname");
                 this.vip = resultSet.getBoolean("vip");
 
-                this.colour = new Color(resultSet.getInt("colour"));
+                int result = resultSet.getInt("colour");
+                this.colour = new Color(result);
                 if (resultSet.wasNull()) {
                     this.colour = null;
                 }
@@ -143,7 +144,7 @@ public class PlayerDataHandle {
                             DataTypes.STRING.create(this.getUsername()),
                             DataTypes.STRING.create(this.nickname),
                             DataTypes.BOOLEAN.create(this.vip),
-                            DataTypes.INTEGER.create(this.colour != null ? this.colour.getRGB() : null),
+                            DataTypes.INTEGER.create(this.colour != null ? this.getColorRGB() : null),
                             DataTypes.INTEGER.create(uuidID)
                     )
             );
@@ -159,6 +160,13 @@ public class PlayerDataHandle {
             Connection databaseConnection = DatabaseConnection.getConnection();
             this.uuidID = UUIDHelper.getUUIDId(this.playerUUID, databaseConnection);
         }
+    }
+
+    private int getColorRGB() {
+        if (this.colour != null) {
+            return (this.colour.getRed() << 16) | (this.colour.getGreen() << 8) | (this.colour.getBlue());
+        }
+        return 0xFFFFFF;
     }
 
     public static @NotNull PlayerDataHandle get(@NotNull ServerPlayerEntity player) {
