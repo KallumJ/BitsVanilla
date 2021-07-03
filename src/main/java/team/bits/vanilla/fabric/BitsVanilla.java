@@ -9,7 +9,9 @@ import net.minecraft.server.command.CommandOutput;
 import org.jetbrains.annotations.NotNull;
 import team.bits.vanilla.fabric.commands.Commands;
 import team.bits.vanilla.fabric.database.driver.DatabaseConnection;
+import team.bits.vanilla.fabric.database.player.PlayerUtils;
 import team.bits.vanilla.fabric.event.damage.PlayerDamageCallback;
+import team.bits.vanilla.fabric.event.misc.PlayerConnectEvent;
 import team.bits.vanilla.fabric.event.sleep.PlayerMoveCallback;
 import team.bits.vanilla.fabric.event.sleep.PlayerSleepCallback;
 import team.bits.vanilla.fabric.event.sleep.PlayerWakeUpCallback;
@@ -49,6 +51,8 @@ public class BitsVanilla implements ModInitializer, ServerLifecycleEvents.Server
         PlayerDamageCallback.EVENT.register(teleporter);
 
         ServerLifecycleEvents.SERVER_STOPPED.register(this);
+
+        PlayerConnectEvent.EVENT.register((player, connection) -> PlayerUtils.updatePlayerUsername(player));
     }
 
     @Override

@@ -2,6 +2,8 @@ package team.bits.vanilla.fabric.database.player;
 
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import team.bits.vanilla.fabric.database.driver.DatabaseConnection;
 import team.bits.vanilla.fabric.database.util.QueryHelper;
@@ -21,6 +23,8 @@ import java.util.*;
  * functions at the same time, it's better to use {@link PlayerDataHandle} instead.
  */
 public final class PlayerUtils {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private PlayerUtils() {
     }
@@ -172,5 +176,11 @@ public final class PlayerUtils {
             // convert the result to a player object
             return nameToUUID(name).map(playerManager::getPlayer);
         }
+    }
+
+    public static void updatePlayerUsername(@NotNull ServerPlayerEntity player) {
+        PlayerDataHandle dataHandle = PlayerDataHandle.get(player);
+        LOGGER.info(String.format("Player '%s' updated in database", dataHandle.getEffectiveName()));
+        dataHandle.save();
     }
 }
