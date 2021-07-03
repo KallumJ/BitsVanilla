@@ -18,6 +18,7 @@ public class Commands {
         addCommand(new ChunkInspectCommand());
         addCommand(new NicknameCommand());
         addCommand(new WarpCommand());
+        addCommand(new RandomTeleportCommand());
     }
 
     public static void registerCommands() {
