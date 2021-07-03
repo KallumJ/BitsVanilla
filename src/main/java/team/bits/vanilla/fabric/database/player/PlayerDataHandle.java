@@ -64,6 +64,18 @@ public class PlayerDataHandle {
         return Objects.requireNonNullElseGet(this.nickname, this::getUsername);
     }
 
+    public void setNickname(@Nullable String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void setVip(boolean vip) {
+        this.vip = vip;
+    }
+
+    public void setColour(@Nullable Color colour) {
+        this.colour = colour;
+    }
+
     public void load() {
         Connection databaseConnection = DatabaseConnection.getConnection();
         try {
