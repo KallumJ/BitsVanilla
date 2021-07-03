@@ -20,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import team.bits.vanilla.Colors;
 import team.bits.vanilla.fabric.BitsVanilla;
+import team.bits.vanilla.fabric.database.player.PlayerUtils;
 import team.bits.vanilla.fabric.event.damage.PlayerDamageCallback;
 import team.bits.vanilla.fabric.event.sleep.PlayerMoveCallback;
 import team.bits.vanilla.fabric.util.Location;
@@ -47,7 +48,7 @@ public final class Teleporter implements PlayerMoveCallback, PlayerDamageCallbac
         Scheduler.scheduleAtFixedRate(Teleporter::teleportTask, 0, TASK_INTERVAL);
     }
 
-    public static void queueTeleport(@NotNull PlayerEntity player, @NotNull Location location, @Nullable Runnable cancelCallback, boolean cancelOnMove) {
+    public static void queueTeleport(@NotNull ServerPlayerEntity player, @NotNull Location location, @Nullable Runnable cancelCallback, boolean cancelOnMove) {
         Objects.requireNonNull(player);
         Objects.requireNonNull(location);
 
@@ -67,8 +68,7 @@ public final class Teleporter implements PlayerMoveCallback, PlayerDamageCallbac
             teleportParticle(currentLocation);
             teleportParticle(targetLocation);
 
-//            int time = PlayerData.isVIP(player) ? SHORT_WARMUP : LONG_WARMUP;
-            int time = LONG_WARMUP;
+            int time = PlayerUtils.isVIP(player) ? SHORT_WARMUP : LONG_WARMUP;
             Teleport teleport = new Teleport(player, targetLocation, cancelCallback, time);
 
             TELEPORTS.add(teleport);
@@ -86,7 +86,7 @@ public final class Teleporter implements PlayerMoveCallback, PlayerDamageCallbac
         }
     }
 
-    public static void queueTeleport(@NotNull PlayerEntity player, @NotNull Location location, @Nullable Runnable cancelCallback) {
+    public static void queueTeleport(@NotNull ServerPlayerEntity player, @NotNull Location location, @Nullable Runnable cancelCallback) {
         queueTeleport(player, location, cancelCallback, true);
     }
 
