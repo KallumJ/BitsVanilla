@@ -17,7 +17,6 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import team.bits.vanilla.Colors;
 import team.bits.vanilla.fabric.BitsVanilla;
 import team.bits.vanilla.fabric.database.player.PlayerUtils;
@@ -48,7 +47,7 @@ public final class Teleporter implements PlayerMoveCallback, PlayerDamageCallbac
         Scheduler.scheduleAtFixedRate(Teleporter::teleportTask, 0, TASK_INTERVAL);
     }
 
-    public static void queueTeleport(@NotNull ServerPlayerEntity player, @NotNull Location location, @Nullable Runnable cancelCallback, boolean cancelOnMove) {
+    public static void queueTeleport(@NotNull ServerPlayerEntity player, @NotNull Location location, boolean cancelOnMove) {
         Objects.requireNonNull(player);
         Objects.requireNonNull(location);
 
@@ -69,7 +68,7 @@ public final class Teleporter implements PlayerMoveCallback, PlayerDamageCallbac
             teleportParticle(targetLocation);
 
             int time = PlayerUtils.isVIP(player) ? SHORT_WARMUP : LONG_WARMUP;
-            Teleport teleport = new Teleport(player, targetLocation, cancelCallback, time);
+            Teleport teleport = new Teleport(player, targetLocation, time);
 
             TELEPORTS.add(teleport);
             TELEPORTING.add(player);
@@ -79,15 +78,7 @@ public final class Teleporter implements PlayerMoveCallback, PlayerDamageCallbac
 
         } else {
             BitsVanilla.audience(player).sendMessage(TELEPORT_CANCEL);
-
-            if (cancelCallback != null) {
-                cancelCallback.run();
-            }
         }
-    }
-
-    public static void queueTeleport(@NotNull ServerPlayerEntity player, @NotNull Location location, @Nullable Runnable cancelCallback) {
-        queueTeleport(player, location, cancelCallback, true);
     }
 
     private static void teleport(@NotNull Teleport teleport) {
@@ -146,10 +137,7 @@ public final class Teleporter implements PlayerMoveCallback, PlayerDamageCallbac
                 .filter(teleport -> teleport.getPlayer().equals(player))
                 .findFirst();
 
-        optionalTeleport.ifPresent(teleport -> {
-            teleport.runCancel();
-            TELEPORTS.remove(teleport);
-        });
+        optionalTeleport.ifPresent(TELEPORTS::remove);
     }
 
     public static void teleportParticle(@NotNull Location location) {

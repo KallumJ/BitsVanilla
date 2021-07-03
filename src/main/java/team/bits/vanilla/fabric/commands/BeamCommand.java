@@ -159,7 +159,7 @@ record Beam(ServerPlayerEntity sendingPlayer,
             ServerPlayerEntity receivingPlayer) {
 
     public void executeBeam() {
-        Teleporter.queueTeleport(this.sendingPlayer, Location.get(this.receivingPlayer), null, false);
+        Teleporter.queueTeleport(this.sendingPlayer, Location.get(this.receivingPlayer), false);
     }
 }
 

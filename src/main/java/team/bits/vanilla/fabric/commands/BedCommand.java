@@ -54,7 +54,7 @@ public class BedCommand extends Command {
                 Optional<Vec3d> bedPos = BedBlock.findWakeUpPosition(EntityType.PLAYER, spawnWorld, spawnPosition, 1f);
 
                 if (bedPos.isPresent()) {
-                    Teleporter.queueTeleport(player, new Location(bedPos.get(), spawnWorld), null, false);
+                    Teleporter.queueTeleport(player, new Location(bedPos.get(), spawnWorld), false);
                 } else {
                     throw new SimpleCommandExceptionType(() -> BED_ERR).create();
                 }
@@ -63,7 +63,7 @@ public class BedCommand extends Command {
             } else if (block instanceof RespawnAnchorBlock && blockState.get(RespawnAnchorBlock.CHARGES) > 0 && RespawnAnchorBlock.isNether(spawnWorld)) {
                 Optional<Vec3d> respawnAnchorPos = RespawnAnchorBlock.findRespawnPosition(EntityType.PLAYER, spawnWorld, spawnPosition);
                 if (respawnAnchorPos.isPresent()) {
-                    Teleporter.queueTeleport(player, new Location(respawnAnchorPos.get(), spawnWorld), null, false);
+                    Teleporter.queueTeleport(player, new Location(respawnAnchorPos.get(), spawnWorld), false);
                 } else {
                     throw new SimpleCommandExceptionType(() -> RESPAWN_ANCHOR_ERR).create();
                 }
