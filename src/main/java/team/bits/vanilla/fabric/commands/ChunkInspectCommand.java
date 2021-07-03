@@ -9,7 +9,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.entity.EntityType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.registry.RegistryKey;
@@ -36,7 +35,7 @@ public class ChunkInspectCommand extends Command {
         );
     }
 
-    private static void sendEntityList(ServerPlayerEntity player, List<EntityRecord> entityRecords) {
+    private static void sendEntityList(ServerCommandSource source, List<EntityRecord> entityRecords) {
         Map<RegistryKey<World>, List<TextComponent>> entityStrings = new HashMap<>();
 
         for (EntityRecord entityRecord : entityRecords) {
@@ -62,7 +61,7 @@ public class ChunkInspectCommand extends Command {
                         ), color)
                         .clickEvent(ClickEvent.runCommand(String.format(TELEPORT_COMMAND,
                                 dimension.getValue(),
-                                player.getEntityName(),
+                                source.getName(),
                                 getCommandLocationString(entityChunkPos)
                         )))
                         .append(Component.newline());
@@ -93,7 +92,7 @@ public class ChunkInspectCommand extends Command {
         TextComponent collatedMessage = Component.text().append(finalMessages).build();
 
         // Send the message
-        BitsVanilla.adventure().audience(player).sendMessage(collatedMessage);
+        BitsVanilla.adventure().audience(source).sendMessage(collatedMessage);
     }
 
     // Get actual co ordinates from chunk pos, default to y 100;
@@ -120,7 +119,6 @@ public class ChunkInspectCommand extends Command {
         final List<EntityRecord> entityRecords = new LinkedList<>();
 
         final MinecraftServer server = context.getSource().getMinecraftServer();
-        final ServerPlayerEntity player = context.getSource().getPlayer();
 
         final Set<RegistryKey<World>> worldRegKeys = server.getWorldRegistryKeys();
 
@@ -152,7 +150,7 @@ public class ChunkInspectCommand extends Command {
 
 
             // Send the records to the player
-            sendEntityList(player, entityRecords);
+            sendEntityList(context.getSource(), entityRecords);
         });
 
         return 1;
