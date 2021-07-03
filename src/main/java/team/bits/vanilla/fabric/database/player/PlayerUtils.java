@@ -15,6 +15,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Most of these operations can be done with the {@link PlayerDataHandle} class,
@@ -33,7 +34,7 @@ public final class PlayerUtils {
      * Get a list of effective names of all the players that played on the server.
      * An effective name is a player's nickname if they have one, otherwise their username.
      *
-     * @return a list of effective names of all players on the server
+     * @return a list of effective names of all players that have ever played
      */
     public static @NotNull Collection<String> getAllNames() {
         final Connection databaseConnection = DatabaseConnection.getConnection();
@@ -44,6 +45,49 @@ public final class PlayerUtils {
             ResultSet resultSet = databaseConnection.prepareStatement(
                     "SELECT COALESCE(nickname, username) AS name FROM player_data"
             ).executeQuery();
+
+            // convert the result set into a list
+            Collection<String> names = new LinkedList<>();
+            while (resultSet.next()) {
+                names.add(resultSet.getString(1));
+            }
+
+            return Collections.unmodifiableCollection(names);
+
+        } catch (SQLException ex) {
+            throw new RuntimeException("SQLException while obtaining player data", ex);
+        }
+    }
+
+    /**
+     * Get a list of effective names of all the online players on the server.
+     * An effective name is a player's nickname if they have one, otherwise their username.
+     *
+     * @return a list of effective names of all players on the server
+     */
+    public static @NotNull Collection<String> getOnlinePlayerNames() {
+        final PlayerManager playerManager = ServerInstance.get().getPlayerManager();
+
+        // in order to only get online players, get the list of all online players
+        // and create a template string with the same number of question marks
+        // as online players. These will be replaced by the usernames in the SQL query.
+        int playerCount = playerManager.getCurrentPlayerCount();
+        String[] playerNamesArray = playerManager.getPlayerNames();
+        String playerNamesTemplate = ",?".repeat(playerCount).substring(1);
+
+        final Connection databaseConnection = DatabaseConnection.getConnection();
+        try {
+            // we use the COALESCE function just like above to get
+            // a player's effective name.
+            PreparedStatement getNamesStatement = QueryHelper.prepareStatement(
+                    databaseConnection,
+                    String.format("SELECT COALESCE(nickname, username) AS name FROM player_data WHERE username IN (%s)", playerNamesTemplate),
+                    Arrays.stream(playerNamesArray)
+                            .map(DataTypes.STRING::create)
+                            .collect(Collectors.toUnmodifiableList())
+            );
+
+            ResultSet resultSet = getNamesStatement.executeQuery();
 
             // convert the result set into a list
             Collection<String> names = new LinkedList<>();
@@ -178,6 +222,10 @@ public final class PlayerUtils {
         }
     }
 
+    /**
+     * This function will update a player's username in the database.
+     * Usually this will do nothing, but it handles player name changes.
+     */
     public static void updatePlayerUsername(@NotNull ServerPlayerEntity player) {
         PlayerDataHandle dataHandle = PlayerDataHandle.get(player);
         LOGGER.info(String.format("Player '%s' updated in database", dataHandle.getEffectiveName()));

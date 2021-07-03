@@ -14,16 +14,7 @@ public class CommandSuggestionUtils {
     public static final SuggestionProvider<ServerCommandSource> ALL_PLAYERS;
 
     static {
-        ONLINE_PLAYERS = (context, builder) -> {
-            ServerWrapper serverWrapper = new ServerWrapper(context.getSource().getMinecraftServer());
-
-            Collection<String> playersList = serverWrapper.getOnlinePlayers().stream()
-                    .map(PlayerUtils::getEffectiveName)
-                    .toList();
-
-            return filterSuggestionsByInput(builder, playersList);
-        };
-
+        ONLINE_PLAYERS = (context, builder) -> filterSuggestionsByInput(builder, PlayerUtils.getOnlinePlayerNames());
         ALL_PLAYERS = (context, builder) -> filterSuggestionsByInput(builder, PlayerUtils.getAllNames());
     }
 
