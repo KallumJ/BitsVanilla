@@ -75,6 +75,10 @@ public final class PlayerUtils {
         String[] playerNamesArray = playerManager.getPlayerNames();
         String playerNamesTemplate = ",?".repeat(playerCount).substring(1);
 
+        // as an example, if the players 'Koenn' and 'KallumJ' are on the server,
+        // the playerNamesTemplate will become '?, ?' and the final SQL query will
+        // look like "SELECT ... WHERE username IN ('Koenn', 'KallumJ');
+
         final Connection databaseConnection = DatabaseConnection.getConnection();
         try {
             // we use the COALESCE function just like above to get
