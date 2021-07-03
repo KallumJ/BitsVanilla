@@ -17,6 +17,7 @@ public class Commands {
         addCommand(new BedCommand());
         addCommand(new ChunkInspectCommand());
         addCommand(new NicknameCommand());
+        addCommand(new WarpCommand());
     }
 
     public static void registerCommands() {
