@@ -13,7 +13,7 @@ import team.bits.vanilla.fabric.event.sleep.PlayerMoveCallback;
 import team.bits.vanilla.fabric.util.ExtendedPlayerEntity;
 
 @Mixin(PlayerEntity.class)
-public class PlayerEntityMixin implements ExtendedPlayerEntity {
+public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
 
     private Vec3d previousPos = Vec3d.ZERO;
 
@@ -21,6 +21,15 @@ public class PlayerEntityMixin implements ExtendedPlayerEntity {
      * Last time (unix timestamp) at which the player used /rtp
      */
     private long lastRTPTime = 0;
+
+    /**
+     * True if the player has played on the server before, false if
+     * this is the first time the player joined.
+     */
+    private boolean hasPlayedBefore;
+
+    @Shadow
+    public abstract PlayerInventory getInventory();
 
     /**
      * Caller for the {@link PlayerMoveCallback}
@@ -81,6 +90,47 @@ public class PlayerEntityMixin implements ExtendedPlayerEntity {
         if (nbt.contains("LastRTP")) {
             this.lastRTPTime = nbt.getLong("LastRTP");
         }
+    }
+
+    @Override
+    public void giveItem(@NotNull ItemStack itemStack) {
+        final PlayerInventory inventory = this.getInventory();
+
+        int occupiedSlot = inventory.getOccupiedSlotWithRoomForStack(itemStack);
+
+        if (occupiedSlot != -1) {
+            inventory.insertStack(occupiedSlot, itemStack);
+        } else {
+            inventory.insertStack(inventory.getEmptySlot(), itemStack);
+        }
+    }
+
+    @Override
+    public boolean hasItem(@NotNull Item item, int amount) {
+        final PlayerInventory inventory = this.getInventory();
+
+        for (int slot = 0; slot < inventory.size(); slot++) {
+            ItemStack stack = inventory.getStack(slot);
+            if (stack.isOf(item) && stack.getCount() >= amount) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean removeItem(@NotNull Item item, int amount) {
+        final PlayerInventory inventory = this.getInventory();
+
+        for (int slot = 0; slot < inventory.size(); slot++) {
+            if (inventory.getStack(slot).isOf(item)) {
+                inventory.removeStack(slot, amount);
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override

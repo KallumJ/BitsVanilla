@@ -15,8 +15,8 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import team.bits.vanilla.fabric.database.player.PlayerDataHandle;
 import team.bits.vanilla.fabric.database.player.PlayerUtils;
 import team.bits.vanilla.fabric.util.CommandSuggestionUtils;
+import team.bits.vanilla.fabric.util.ExtendedPlayerEntity;
 import team.bits.vanilla.fabric.util.MojangApiUtils;
-import team.bits.vanilla.fabric.util.PlayerWrapper;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -53,7 +53,7 @@ public class PlayerHeadCommand extends Command {
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
 
         ServerPlayerEntity requestingPlayer = context.getSource().getPlayer();
-        PlayerWrapper playerWrapper = new PlayerWrapper(requestingPlayer);
+        ExtendedPlayerEntity ePlayer = (ExtendedPlayerEntity) requestingPlayer;
         String playerHeadString = context.getArgument("player", String.class);
         String userInput = playerHeadString;
 
@@ -68,7 +68,7 @@ public class PlayerHeadCommand extends Command {
                 }
             }
 
-            if (playerWrapper.checkPlayerHasItem(Items.DIAMOND)) {
+            if (ePlayer.hasItem(Items.DIAMOND, 1)) {
                 ItemStack playerHead = new ItemStack(Items.PLAYER_HEAD, 1);
                 NbtCompound tag = playerHead.getOrCreateTag();
 
@@ -76,8 +76,8 @@ public class PlayerHeadCommand extends Command {
 
                 playerHead.setTag(tag);
 
-                playerWrapper.giveItem(playerHead);
-                playerWrapper.removeItem(playerWrapper.getSlotOfItem(Items.DIAMOND), 1);
+                ePlayer.giveItem(playerHead);
+                ePlayer.removeItem(Items.DIAMOND, 1);
 
             } else {
                 throw new IllegalStateException();
