@@ -19,7 +19,8 @@ public class FishSlapMixin {
 
     @Inject(
             method = "damage",
-            at = @At("HEAD")
+            at = @At("HEAD"),
+            cancellable = true
     )
     public void onPlayerDamage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
         final ServerPlayerEntity attackedPlayer = ServerPlayerEntity.class.cast(this);
@@ -42,6 +43,8 @@ public class FishSlapMixin {
                     Vec3d launchVector = getLaunchVector(attackingPlayer);
                     attackedPlayer.setVelocity(attackedPlayer.getVelocity().add(launchVector));
                     attackedPlayer.velocityModified = true;
+
+                    cir.cancel();
                 }
             }
         }
@@ -54,16 +57,14 @@ public class FishSlapMixin {
         final float HORIZONTAL_POWER = 0.5f;
         final float VERTICAL_POWER = 0.2f;
 
-        // get the player's yaw and pitch
+        // get the player's yaw
         float yaw = entity.getYaw();
-        float pitch = entity.getPitch();
 
         // convert the yaw and pitch to an X and Z component of a vector
         // we don't care about the Y component since we will be replacing
         // that with an upward force
-        double xz = Math.cos(Math.toRadians(pitch));
-        double x = -xz * Math.sin(Math.toRadians(yaw));
-        double z = xz * Math.cos(Math.toRadians(yaw));
+        double x = -Math.sin(Math.toRadians(yaw));
+        double z = Math.cos(Math.toRadians(yaw));
 
         // create a vector with the X and Z component and scale the power
         Vec3d horizontalLookVector = new Vec3d(x, 0, z)
