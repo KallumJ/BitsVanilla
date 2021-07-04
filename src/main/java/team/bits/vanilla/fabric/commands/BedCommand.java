@@ -11,6 +11,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.RegistryKey;
@@ -40,7 +41,7 @@ public class BedCommand extends Command {
 
         BlockPos spawnPosition = player.getSpawnPointPosition();
         RegistryKey<World> spawnDimension = player.getSpawnPointDimension();
-        World spawnWorld = server.getWorld(spawnDimension);
+        ServerWorld spawnWorld = server.getWorld(spawnDimension);
 
         // If no spawn position is found
         if (spawnPosition != null) {
