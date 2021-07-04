@@ -1,6 +1,7 @@
 package team.bits.vanilla.fabric.database.warp;
 
 import net.minecraft.server.dedicated.MinecraftDedicatedServer;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
@@ -69,8 +70,8 @@ public final class WarpUtils {
                 int y = resultSet.getInt("y");
                 int z = resultSet.getInt("z");
 
-                World world = server.getWorld(nameToWorldKey(worldName));
-                Location location = new Location(new Vec3d(x, y, z), world);
+                ServerWorld world = server.getWorld(nameToWorldKey(worldName));
+                Location location = new Location(new Vec3d(x + 0.5f, y + 0.5f, z + 0.5f), world);
 
                 return Optional.of(new Warp(name, location));
 
