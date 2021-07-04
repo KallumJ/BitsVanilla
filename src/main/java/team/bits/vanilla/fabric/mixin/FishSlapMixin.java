@@ -19,8 +19,7 @@ public class FishSlapMixin {
 
     @Inject(
             method = "damage",
-            at = @At("HEAD"),
-            cancellable = true
+            at = @At("HEAD")
     )
     public void onPlayerDamage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
         final ServerPlayerEntity attackedPlayer = ServerPlayerEntity.class.cast(this);
