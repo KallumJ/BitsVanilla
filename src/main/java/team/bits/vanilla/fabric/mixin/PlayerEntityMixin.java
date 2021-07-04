@@ -2,9 +2,14 @@ package team.bits.vanilla.fabric.mixin;
 
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.Vec3d;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -87,6 +92,7 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
             at = @At("TAIL")
     )
     public void readCustomDataFromNBt(NbtCompound nbt, CallbackInfo ci) {
+        this.hasPlayedBefore = true;
         if (nbt.contains("LastRTP")) {
             this.lastRTPTime = nbt.getLong("LastRTP");
         }
@@ -141,6 +147,11 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
     @Override
     public void setLastRTPTime(long time) {
         this.lastRTPTime = time;
+    }
+
+    @Override
+    public boolean hasPlayedBefore() {
+        return this.hasPlayedBefore;
     }
 }
 

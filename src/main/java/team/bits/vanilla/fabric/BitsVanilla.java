@@ -18,6 +18,7 @@ import team.bits.vanilla.fabric.event.misc.PlayerConnectEvent;
 import team.bits.vanilla.fabric.event.sleep.PlayerMoveCallback;
 import team.bits.vanilla.fabric.event.sleep.PlayerSleepCallback;
 import team.bits.vanilla.fabric.event.sleep.PlayerWakeUpCallback;
+import team.bits.vanilla.fabric.listeners.NewPlayerListener;
 import team.bits.vanilla.fabric.listeners.SleepListener;
 import team.bits.vanilla.fabric.teleport.Teleporter;
 
@@ -60,6 +61,7 @@ public class BitsVanilla implements ModInitializer, ServerLifecycleEvents.Server
         ServerLifecycleEvents.SERVER_STOPPED.register(this);
 
         PlayerConnectEvent.EVENT.register((player, connection) -> PlayerUtils.updatePlayerUsername(player));
+        PlayerConnectEvent.EVENT.register(new NewPlayerListener());
     }
 
     @Override
