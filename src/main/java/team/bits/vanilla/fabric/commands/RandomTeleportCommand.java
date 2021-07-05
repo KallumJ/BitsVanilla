@@ -12,7 +12,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.border.WorldBorder;
-import team.bits.vanilla.Colors;
+import team.bits.vanilla.fabric.util.Colors;
 import team.bits.vanilla.fabric.BitsVanilla;
 import team.bits.vanilla.fabric.util.ExtendedPlayerEntity;
 import team.bits.vanilla.fabric.util.ServerInstance;
