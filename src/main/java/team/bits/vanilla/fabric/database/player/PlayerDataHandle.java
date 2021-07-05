@@ -1,5 +1,6 @@
 package team.bits.vanilla.fabric.database.player;
 
+import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
@@ -174,6 +175,10 @@ public class PlayerDataHandle {
             } else {
                 player.setCustomName(null);
             }
+
+            ServerInstance.get().getPlayerManager().sendToAll(
+                    new PlayerListS2CPacket(PlayerListS2CPacket.Action.UPDATE_DISPLAY_NAME, player)
+            );
         }
     }
 

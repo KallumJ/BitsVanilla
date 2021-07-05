@@ -8,7 +8,6 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import team.bits.vanilla.fabric.database.player.PlayerDataHandle;
 import team.bits.vanilla.fabric.util.ExtendedPlayerEntity;
 
 @Mixin(ServerPlayerEntity.class)
@@ -27,6 +26,6 @@ public abstract class ServerPlayerEntityMixin {
     @Overwrite
     public @Nullable Text getPlayerListName() {
         ServerPlayerEntity self = ServerPlayerEntity.class.cast(this);
-        return PlayerDataHandle.get(self).getFormattedNickname();
+        return self.getCustomName();
     }
 }
