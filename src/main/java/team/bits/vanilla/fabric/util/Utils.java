@@ -8,6 +8,7 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 public final class Utils {
@@ -61,5 +62,15 @@ public final class Utils {
         } else {
             player.teleport(world, position.x, position.y, position.z, player.getYaw(), player.getPitch());
         }
+    }
+
+    public static @NotNull String fancyFormat(@NotNull String input) {
+        Objects.requireNonNull(input);
+        String[] words = input.replace("_", " ").split(" ");
+        StringBuilder builder = new StringBuilder();
+        Arrays.stream(words).forEach((word) -> {
+            builder.append(word.substring(0, 1).toUpperCase()).append(word.substring(1).toLowerCase()).append(' ');
+        });
+        return builder.toString().trim();
     }
 }

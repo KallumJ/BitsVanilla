@@ -22,6 +22,7 @@ import team.bits.vanilla.fabric.listeners.NewPlayerListener;
 import team.bits.vanilla.fabric.listeners.SleepListener;
 import team.bits.vanilla.fabric.teleport.Teleporter;
 import team.bits.vanilla.fabric.util.Scheduler;
+import team.bits.vanilla.fabric.util.color.NameColors;
 
 public class BitsVanilla implements ModInitializer, ServerLifecycleEvents.ServerStopped {
 
@@ -48,6 +49,8 @@ public class BitsVanilla implements ModInitializer, ServerLifecycleEvents.Server
         LOGGER.info(String.format("Server name is '%s'", ServerUtils.getServerName()));
 
         DatabaseConnection.open();
+
+        NameColors.INSTANCE.load();
 
         Commands.registerCommands();
 

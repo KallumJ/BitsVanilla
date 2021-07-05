@@ -20,6 +20,7 @@ public class Commands {
         addCommand(new WarpCommand());
         addCommand(new RandomTeleportCommand());
         addCommand(new DuelCommand());
+        addCommand(new ColorNameCommand());
     }
 
     public static void registerCommands() {
