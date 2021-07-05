@@ -37,7 +37,7 @@ public class DuelCommand extends Command {
     private final Map<ServerPlayerEntity, ServerPlayerEntity> duelRequests = new HashMap<>();
 
     public DuelCommand() {
-        super("duel", new String[]{}, new CommandInformation()
+        super("duel", new CommandInformation()
                 .setDescription("Invite another player to a duel")
                 .setUsage("<player>")
                 .setPublic(true)

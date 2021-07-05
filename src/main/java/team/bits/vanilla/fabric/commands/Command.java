@@ -29,7 +29,9 @@ public abstract class Command implements com.mojang.brigadier.Command<ServerComm
 
         CommandNode<ServerCommandSource> commandNode= dispatcher.register(literal(name).requires(serverCommandSource -> serverCommandSource.hasPermissionLevel(permissionLevel)).executes(this));
 
-        registerAliases(dispatcher, commandNode);
+        if (aliases != null) {
+            registerAliases(dispatcher, commandNode);
+        }
     }
 
     public CommandInformation getCommandInformation() {

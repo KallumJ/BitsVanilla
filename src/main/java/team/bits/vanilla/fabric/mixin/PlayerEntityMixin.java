@@ -3,6 +3,7 @@ package team.bits.vanilla.fabric.mixin;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -43,6 +44,8 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
     private boolean hasPlayedBefore;
 
     private PlayerEntity duelTarget;
+
+    private static final int HEAD_SLOT = 39;
 
     @Shadow
     public abstract PlayerInventory getInventory();
@@ -197,6 +200,27 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
     @Override
     public boolean hasPlayedBefore() {
         return this.hasPlayedBefore;
+    }
+
+    @Override
+    public void insertItemAtHead(ItemStack item) {
+        Inventory inventory = getInventory();
+        ItemStack itemAtHead = inventory.getStack(HEAD_SLOT);
+
+        inventory.setStack(HEAD_SLOT, item);
+        giveItem(itemAtHead);
+    }
+
+    @Override
+    public int getSlotOfStack(ItemStack item) {
+        final PlayerInventory inventory = this.getInventory();
+
+        for (int slot = 0; slot < inventory.size(); slot++) {
+            if (inventory.getStack(slot).equals(item)) {
+                return slot;
+            }
+        }
+        return -1;
     }
 }
 

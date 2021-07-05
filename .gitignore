@@ -31,3 +31,4 @@ bin/
 # fabric
 
 run/
+/open_db_console.bat

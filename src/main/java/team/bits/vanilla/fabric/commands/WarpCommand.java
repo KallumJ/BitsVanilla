@@ -41,7 +41,7 @@ public class WarpCommand extends Command {
     private static final String WARP_DELETED = "Warp deleted!";
 
     public WarpCommand() {
-        super("warp", new String[]{}, new CommandInformation()
+        super("warp", new CommandInformation()
                 .setDescription("Teleport to a warp")
                 .setUsage("<warp>")
                 .setPublic(true)

@@ -21,6 +21,7 @@ public class Commands {
         addCommand(new RandomTeleportCommand());
         addCommand(new DuelCommand());
         addCommand(new ColorNameCommand());
+        addCommand(new HatCommand());
     }
 
     public static void registerCommands() {

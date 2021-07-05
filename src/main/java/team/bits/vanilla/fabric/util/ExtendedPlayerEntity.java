@@ -34,4 +34,8 @@ public interface ExtendedPlayerEntity {
     void copyFromOldPlayer(@NotNull ExtendedPlayerEntity oldPlayer);
 
     @Nullable Text getColoredName();
+
+    void insertItemAtHead(ItemStack item);
+
+    int getSlotOfStack(ItemStack item);
 }
