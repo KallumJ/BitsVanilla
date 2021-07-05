@@ -2,6 +2,8 @@ package team.bits.vanilla.fabric.database.player;
 
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import team.bits.vanilla.fabric.database.driver.DatabaseConnection;
@@ -110,6 +112,8 @@ public class PlayerDataHandle {
         } catch (SQLException ex) {
             throw new RuntimeException("SQLException while obtaining player data", ex);
         }
+
+        this.loadCustomName();
     }
 
     private void insert() {
@@ -130,6 +134,8 @@ public class PlayerDataHandle {
         } catch (SQLException ex) {
             throw new RuntimeException("SQLException while inserting player data", ex);
         }
+
+        this.loadCustomName();
     }
 
     public void save() {
@@ -152,6 +158,30 @@ public class PlayerDataHandle {
 
         } catch (SQLException ex) {
             throw new RuntimeException("SQLException while obtaining player data", ex);
+        }
+
+        this.loadCustomName();
+    }
+
+    public @Nullable Text getFormattedNickname() {
+        return new LiteralText(this.nickname).styled(style -> style.withColor(this.getColorRGB()));
+    }
+
+    public void loadCustomName(ServerPlayerEntity player) {
+        if (player != null) {
+            if (nickname != null) {
+                player.setCustomName(this.getFormattedNickname());
+            } else {
+                player.setCustomName(null);
+            }
+        }
+    }
+
+    private void loadCustomName() {
+        if (this.playerUUID != null) {
+            this.loadCustomName(
+                    ServerInstance.get().getPlayerManager().getPlayer(this.playerUUID)
+            );
         }
     }
 

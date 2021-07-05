@@ -1,8 +1,13 @@
 package team.bits.vanilla.fabric.util;
 
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Optional;
 
 /**
  * Interface with custom methods added to the {@link net.minecraft.entity.player.PlayerEntity} class.

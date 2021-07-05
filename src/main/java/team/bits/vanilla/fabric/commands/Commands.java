@@ -19,6 +19,7 @@ public class Commands {
         addCommand(new NicknameCommand());
         addCommand(new WarpCommand());
         addCommand(new RandomTeleportCommand());
+        addCommand(new DuelCommand());
     }
 
     public static void registerCommands() {

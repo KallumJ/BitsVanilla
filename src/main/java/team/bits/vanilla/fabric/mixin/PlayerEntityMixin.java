@@ -6,16 +6,25 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Style;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import team.bits.vanilla.fabric.database.player.PlayerDataHandle;
 import team.bits.vanilla.fabric.event.damage.PlayerDamageCallback;
 import team.bits.vanilla.fabric.event.sleep.PlayerMoveCallback;
 import team.bits.vanilla.fabric.util.ExtendedPlayerEntity;
+import team.bits.vanilla.fabric.util.Scheduler;
+
+import java.util.Optional;
 
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
@@ -73,6 +82,18 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
         PlayerDamageCallback.EVENT.invoker().onPlayerDamage(player, source, amount);
     }
 
+    @Redirect(
+            method = "getDisplayName",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/entity/player/PlayerEntity;getName()Lnet/minecraft/text/Text;"
+            )
+    )
+    public Text getCustomName(PlayerEntity playerEntity) {
+        Text customName = playerEntity.getCustomName();
+        return customName != null ? customName.copy().setStyle(Style.EMPTY) : playerEntity.getName();
+    }
+
     /**
      * Write custom data to the player's NBT
      */
@@ -98,6 +119,18 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
         if (nbt.contains("LastRTP")) {
             this.lastRTPTime = nbt.getLong("LastRTP");
         }
+    }
+
+    @Override
+    public void copyFromOldPlayer(@NotNull ExtendedPlayerEntity oldPlayer) {
+        PlayerEntityMixin cOldPlayer = (PlayerEntityMixin) oldPlayer;
+        this.hasPlayedBefore = cOldPlayer.hasPlayedBefore;
+        this.lastRTPTime = cOldPlayer.lastRTPTime;
+
+        Scheduler.runOffThread(() -> {
+            ServerPlayerEntity self = ServerPlayerEntity.class.cast(this);
+            PlayerDataHandle.get(self).loadCustomName(self);
+        });
     }
 
     @Override

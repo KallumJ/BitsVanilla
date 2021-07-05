@@ -21,6 +21,7 @@ import team.bits.vanilla.fabric.event.sleep.PlayerWakeUpCallback;
 import team.bits.vanilla.fabric.listeners.NewPlayerListener;
 import team.bits.vanilla.fabric.listeners.SleepListener;
 import team.bits.vanilla.fabric.teleport.Teleporter;
+import team.bits.vanilla.fabric.util.Scheduler;
 
 public class BitsVanilla implements ModInitializer, ServerLifecycleEvents.ServerStopped {
 
@@ -66,6 +67,7 @@ public class BitsVanilla implements ModInitializer, ServerLifecycleEvents.Server
 
     @Override
     public void onServerStopped(MinecraftServer server) {
+        Scheduler.stop();
         DatabaseConnection.close();
     }
 }
