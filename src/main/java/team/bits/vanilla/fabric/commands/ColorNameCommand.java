@@ -65,7 +65,11 @@ public class ColorNameCommand extends Command {
                         )
         );
 
-        super.registerAliases(dispatcher, commandNode);
+        dispatcher.register(
+                literal("cn")
+                        .executes(this::list)
+                        .redirect(commandNode)
+        );
     }
 
     public int list(CommandContext<ServerCommandSource> context) {
