@@ -62,21 +62,21 @@ public class WarpCommand extends Command {
                         )
 
                         // if the first argument is 'set' and the second is a name, run the setWarp handler
-                        .then(RestrictedCommandNode.create(literal("set")
+                        .then(literal("set")
                                 .requires(source -> source.hasPermissionLevel(4)) // requires permission level 4
-                                .then(CommandManager.argument("name", StringArgumentType.greedyString())
+                                .then(CommandManager.argument("name", StringArgumentType.string())
                                         .executes(this::setWarp)
                                 )
-                        ))
+                        )
 
                         // if the first argument is 'del' and the second is a warp, run the delWarp handler
-                        .then(RestrictedCommandNode.create(literal("del")
+                        .then(literal("del")
                                 .requires(source -> source.hasPermissionLevel(4)) // requires permission level 4
                                 .then(CommandManager.argument("warp", StringArgumentType.greedyString())
                                         .suggests(CommandSuggestionUtils.WARPS)
                                         .executes(this::delWarp)
                                 )
-                        ))
+                        )
         );
 
         // forward /spawn to /warp spawn
