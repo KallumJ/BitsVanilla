@@ -22,6 +22,7 @@ public class Commands {
         addCommand(new DuelCommand());
         addCommand(new ColorNameCommand());
         addCommand(new HatCommand());
+        addCommand(new VIPCommand());
     }
 
     public static void registerCommands() {
