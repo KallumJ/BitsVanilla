@@ -21,4 +21,12 @@ public interface ExtendedPlayerEntity {
     boolean hasItem(@NotNull Item item, int amount);
 
     boolean removeItem(@NotNull Item item, int amount);
+
+    Optional<PlayerEntity> getDuelTarget();
+
+    void setDuelTarget(@Nullable PlayerEntity player);
+
+    void copyFromOldPlayer(@NotNull ExtendedPlayerEntity oldPlayer);
+
+    @Nullable Text getColoredName();
 }

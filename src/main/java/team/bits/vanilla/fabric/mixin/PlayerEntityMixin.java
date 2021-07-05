@@ -33,6 +33,8 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
      */
     private boolean hasPlayedBefore;
 
+    private PlayerEntity duelTarget;
+
     @Shadow
     public abstract PlayerInventory getInventory();
 
@@ -137,6 +139,16 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
         }
 
         return false;
+    }
+
+    @Override
+    public Optional<PlayerEntity> getDuelTarget() {
+        return Optional.ofNullable(this.duelTarget);
+    }
+
+    @Override
+    public void setDuelTarget(@Nullable PlayerEntity player) {
+        this.duelTarget = player;
     }
 
     @Override
