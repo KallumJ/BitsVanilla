@@ -37,7 +37,7 @@ public class BedCommand extends Command {
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         ServerPlayerEntity player = context.getSource().getPlayer();
-        MinecraftServer server = context.getSource().getMinecraftServer();
+        MinecraftServer server = context.getSource().getServer();
 
         BlockPos spawnPosition = player.getSpawnPointPosition();
         RegistryKey<World> spawnDimension = player.getSpawnPointDimension();

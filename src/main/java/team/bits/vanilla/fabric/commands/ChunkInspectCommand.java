@@ -118,7 +118,7 @@ public class ChunkInspectCommand extends Command {
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         final List<EntityRecord> entityRecords = new LinkedList<>();
 
-        final MinecraftServer server = context.getSource().getMinecraftServer();
+        final MinecraftServer server = context.getSource().getServer();
 
         final Set<RegistryKey<World>> worldRegKeys = server.getWorldRegistryKeys();
 
