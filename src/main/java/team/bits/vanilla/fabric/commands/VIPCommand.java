@@ -62,46 +62,59 @@ public class VIPCommand extends Command {
 
         // Get the player whose status is being updated, and update their status
         String playerArg = context.getArgument("player", String.class);
-        Optional<ServerPlayerEntity> player = PlayerUtils.getPlayer(playerArg);
         ServerPlayerEntity requestingPlayer = context.getSource().getPlayer();
 
-        if (player.isPresent()) {
-            updateVip(true, player.get(), requestingPlayer);
+        if (updateVip(true, playerArg, requestingPlayer)) {
+            return 1;
         } else {
             throw new SimpleCommandExceptionType(() -> String.format(SET_ERR, playerArg)).create();
         }
-
-        return 1;
     }
 
     public int delVip(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
 
         // Get the player whose status is being updated, and update their status
         String playerArg = context.getArgument("player", String.class);
-        Optional<ServerPlayerEntity> player = PlayerUtils.getPlayer(playerArg);
         ServerPlayerEntity requestingPlayer = context.getSource().getPlayer();
 
-        if (player.isPresent()) {
-           updateVip(false, player.get(), requestingPlayer);
+        if (updateVip(false, playerArg, requestingPlayer)) {
+            return 1;
         } else {
             throw new SimpleCommandExceptionType(() -> String.format(DEL_ERR, playerArg)).create();
         }
-
-        return 1;
     }
 
-    private void updateVip(boolean vipStatus, ServerPlayerEntity playerToChange, ServerPlayerEntity requestingPlayer) {
+    /**
+     * A method to update the VIP status of the player with the passed name
+     * @param vipStatus true if vip, false otherwise
+     * @param playerArg player's username/nickname
+     * @param requestingPlayer the player making the change
+     * @return true if succeeded, false if failed.
+     */
+    private boolean updateVip(boolean vipStatus, String playerArg, ServerPlayerEntity requestingPlayer) {
+        Optional<ServerPlayerEntity> playerToChange = PlayerUtils.getPlayer(playerArg);
 
-        // Update the passed player with the passed status, and inform the requesting player
-        PlayerDataHandle playerDataHandle = PlayerDataHandle.get(playerToChange);
+        if (playerToChange.isPresent()) {
+            ServerPlayerEntity player = playerToChange.get();
 
-        playerDataHandle.setVip(vipStatus);
-        playerDataHandle.save();
+            // Update the passed player with the passed status, and inform the requesting player
+            PlayerDataHandle playerDataHandle = PlayerDataHandle.get(player);
 
-        BitsVanilla.audience(requestingPlayer).sendMessage(
-                Component.text(String.format(UPDATE_SUCCESS, playerToChange.getEntityName()), Colors.POSITIVE)
-        );
+            playerDataHandle.setVip(vipStatus);
+            playerDataHandle.save();
+
+
+            BitsVanilla.audience(requestingPlayer).sendMessage(
+                    Component.text(String.format(UPDATE_SUCCESS, player.getEntityName()), Colors.POSITIVE)
+            );
+
+            return true;
+
+        } else {
+            return false;
+        }
 
     }
+
 
 }
