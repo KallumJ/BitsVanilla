@@ -1,4 +1,4 @@
 # Bits Vanilla Fabric
 
-**A fabric reimplementation of the Bits Vanilla plugin**
+_**A fabric reimplementation of the Bits Vanilla plugin**_
 
