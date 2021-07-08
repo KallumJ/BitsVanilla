@@ -1,0 +1,32 @@
+{
+  "type": "minecraft:advancement_reward",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:diamond",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 8,
+                "max": 14
+              }
+            },
+            {
+              "function": "minecraft:set_name",
+              "name": {
+                "text": "Testing Diamonds",
+                "color": "aqua",
+                "italic": "false"
+              },
+              "entity": "this"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
