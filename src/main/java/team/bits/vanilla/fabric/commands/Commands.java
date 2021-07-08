@@ -23,6 +23,7 @@ public class Commands {
         addCommand(new ColorNameCommand());
         addCommand(new HatCommand());
         addCommand(new VIPCommand());
+        addCommand(new EndLockCommand());
     }
 
     public static void registerCommands() {

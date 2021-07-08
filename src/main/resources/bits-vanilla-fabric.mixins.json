@@ -1,12 +1,24 @@
 {
-    "required": true,
-    "minVersion": "0.8",
-    "package": "team.bits.vanilla.fabric.mixin",
-    "compatibilityLevel": "JAVA_16",
-    "mixins": [
-    ],
-    "server": ["CreeperMixin", "FishSlapMixin", "PlayerEntityMixin", "PlayerJoinMixin", "PlayerLeaveMixin", "PvPMixin", "SchedulerHandler", "ServerInstanceMixin", "ServerPlayerEntityMixin", "SignColorMixin", "SleepMixin", "ItemEntityMixin"],
-    "injectors": {
-        "defaultRequire": 1
-    }
+  "required": true,
+  "minVersion": "0.8",
+  "package": "team.bits.vanilla.fabric.mixin",
+  "compatibilityLevel": "JAVA_16",
+  "mixins": [],
+  "server": [
+    "CreeperMixin",
+    "FishSlapMixin",
+    "ItemEntityMixin",
+    "PlayerEntityMixin",
+    "PlayerJoinMixin",
+    "PlayerLeaveMixin",
+    "PvPMixin",
+    "SchedulerHandler",
+    "ServerInstanceMixin",
+    "ServerPlayerEntityMixin",
+    "SignColorMixin",
+    "SleepMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
 }
