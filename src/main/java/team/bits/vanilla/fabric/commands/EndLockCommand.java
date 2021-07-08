@@ -8,8 +8,12 @@ import net.minecraft.server.command.ServerCommandSource;
 import team.bits.vanilla.fabric.BitsVanilla;
 import team.bits.vanilla.fabric.util.Colors;
 
+import java.io.File;
+import java.io.IOException;
+
 public class EndLockCommand extends Command {
-    public static boolean locked = true;
+
+    private static final File unlockEndFile = new File("unlock_end.lock");
 
     public EndLockCommand() {
         super("lockend", new CommandInformation()
@@ -20,12 +24,18 @@ public class EndLockCommand extends Command {
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        locked = !locked;
 
+        // Toggles between there beign a
         TextComponent text;
-        if (locked) {
+        if (!unlockEndFile.exists()) {
+            try {
+                unlockEndFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             text = Component.text("The end is now locked", Colors.NEUTRAL);
         } else {
+            unlockEndFile.delete();
             text = Component.text("The end is now unlocked", Colors.NEUTRAL);
         }
         BitsVanilla.audience(context.getSource().getPlayer()).sendMessage(text);
@@ -33,6 +43,6 @@ public class EndLockCommand extends Command {
     }
 
     public static boolean isEndLocked() {
-        return locked;
+        return unlockEndFile.exists();
     }
 }

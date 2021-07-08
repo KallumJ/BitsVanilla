@@ -37,8 +37,7 @@ public abstract class ServerPlayerEntityMixin {
             ServerPlayerEntity player = ServerPlayerEntity.class.cast(this);
 
             BitsVanilla.audience(player).sendMessage(Component.text("The end is currently locked", Colors.NEGATIVE));
-
-            player.teleport(player.getX() + 2, player.getY() + 1, player.getZ() + 2);
+            player.teleport(player.getX() + 1, player.getY() + 1, player.getZ() + 1);
             cir.cancel();
         }
     }
