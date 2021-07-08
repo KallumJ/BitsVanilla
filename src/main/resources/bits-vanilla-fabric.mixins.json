@@ -16,7 +16,9 @@
     "ServerInstanceMixin",
     "ServerPlayerEntityMixin",
     "SignColorMixin",
-    "SleepMixin"
+    "SleepMixin",
+    "StatisticsPacketMixin",
+    "stats.NetherPortalsUsedMixin"
   ],
   "injectors": {
     "defaultRequire": 1
