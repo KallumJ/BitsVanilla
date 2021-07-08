@@ -168,12 +168,16 @@ public class PlayerDataHandle {
         return new LiteralText(this.nickname).styled(style -> style.withColor(this.getColorRGB()));
     }
 
+    public @NotNull Text getFormattedUsername() {
+        return new LiteralText(this.getUsername()).styled(style -> style.withColor(this.getColorRGB()));
+    }
+
     public void loadCustomName(ServerPlayerEntity player) {
         if (player != null) {
-            if (nickname != null) {
+            if (this.nickname != null) {
                 player.setCustomName(this.getFormattedNickname());
             } else {
-                player.setCustomName(null);
+                player.setCustomName(this.getFormattedUsername());
             }
 
             ServerInstance.get().getPlayerManager().sendToAll(
