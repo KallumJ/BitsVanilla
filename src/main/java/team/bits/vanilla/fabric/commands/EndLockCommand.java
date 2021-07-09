@@ -17,15 +17,19 @@ public class EndLockCommand extends Command {
 
     public EndLockCommand() {
         super("lockend", new CommandInformation()
-            .setDescription("Toggles the lock on the end")
-            .setPublic(false)
+                .setDescription("Toggles the lock on the end")
+                .setPublic(false)
         );
+    }
+
+    public static boolean isEndLocked() {
+        return unlockEndFile.exists();
     }
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
 
-        // Toggles between there beign a
+        // Toggles between there being an unlock_end.lock file and not
         TextComponent text;
         if (!unlockEndFile.exists()) {
             try {
@@ -40,9 +44,5 @@ public class EndLockCommand extends Command {
         }
         BitsVanilla.audience(context.getSource().getPlayer()).sendMessage(text);
         return 1;
-    }
-
-    public static boolean isEndLocked() {
-        return unlockEndFile.exists();
     }
 }

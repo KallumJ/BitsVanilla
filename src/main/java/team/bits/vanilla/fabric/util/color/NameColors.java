@@ -21,6 +21,16 @@ public final class NameColors {
     private NameColors() {
     }
 
+    private static @NotNull Color parseColor(@NotNull String hex) {
+        int rgb;
+        try {
+            rgb = Integer.parseInt(hex.substring(1), 16);
+        } catch (NumberFormatException ex) {
+            throw new IllegalArgumentException(String.format("Illegal hex string %s", hex));
+        }
+        return new Color(rgb);
+    }
+
     public void load() {
         InputStream colorsFile = this.getClass().getClassLoader().getResourceAsStream("colours.json");
         JsonObject root = JsonParser.parseReader(new InputStreamReader(Objects.requireNonNull(colorsFile))).getAsJsonObject();
@@ -48,15 +58,5 @@ public final class NameColors {
 
     public @NotNull Collection<NameColor> getCategory(@NotNull String category) {
         return Collections.unmodifiableCollection(this.colors.get(category));
-    }
-
-    private static @NotNull Color parseColor(@NotNull String hex) {
-        int rgb;
-        try {
-            rgb = Integer.parseInt(hex.substring(1), 16);
-        } catch (NumberFormatException ex) {
-            throw new IllegalArgumentException(String.format("Illegal hex string %s", hex));
-        }
-        return new Color(rgb);
     }
 }

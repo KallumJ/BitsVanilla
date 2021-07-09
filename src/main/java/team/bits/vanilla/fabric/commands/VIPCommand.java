@@ -28,9 +28,9 @@ public class VIPCommand extends Command {
 
     public VIPCommand() {
         super("vip", new CommandInformation()
-            .setDescription("Sets the player to a vip")
-            .setPublic(false)
-            .setUsage("set <player>")
+                .setDescription("Sets the player to a vip")
+                .setPublic(false)
+                .setUsage("set <player>")
         );
     }
 
@@ -86,8 +86,9 @@ public class VIPCommand extends Command {
 
     /**
      * A method to update the VIP status of the player with the passed name
-     * @param vipStatus true if vip, false otherwise
-     * @param playerArg player's username/nickname
+     *
+     * @param vipStatus        true if vip, false otherwise
+     * @param playerArg        player's username/nickname
      * @param requestingPlayer the player making the change
      * @return true if succeeded, false if failed.
      */

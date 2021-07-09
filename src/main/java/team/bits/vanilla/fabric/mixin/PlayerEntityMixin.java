@@ -30,22 +30,18 @@ import java.util.Optional;
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
 
+    private static final int HEAD_SLOT = 39;
     private Vec3d previousPos = Vec3d.ZERO;
-
     /**
      * Last time (unix timestamp) at which the player used /rtp
      */
     private long lastRTPTime = 0;
-
     /**
      * True if the player has played on the server before, false if
      * this is the first time the player joined.
      */
     private boolean hasPlayedBefore;
-
     private PlayerEntity duelTarget;
-
-    private static final int HEAD_SLOT = 39;
 
     @Shadow
     public abstract PlayerInventory getInventory();

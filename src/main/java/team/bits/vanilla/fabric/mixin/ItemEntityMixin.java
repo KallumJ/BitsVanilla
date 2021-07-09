@@ -1,6 +1,5 @@
 package team.bits.vanilla.fabric.mixin;
 
-import net.minecraft.block.EndPortalBlock;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -19,6 +18,7 @@ public abstract class ItemEntityMixin {
 
     /**
      * Prevents entities picking up items if they are an egg
+     *
      * @return true if item can be picked up, false if not
      * @author Kallum
      */

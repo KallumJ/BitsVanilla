@@ -29,6 +29,13 @@ public class RestrictedCommandNode extends LiteralCommandNode<ServerCommandSourc
         super(literal, command, requirement, redirect, modifier, forks);
     }
 
+    public static @NotNull RestrictedCommandNode create(@NotNull LiteralArgumentBuilder<ServerCommandSource> node) {
+        return new RestrictedCommandNode(
+                node.getLiteral(), node.getCommand(), node.getRequirement(),
+                node.getRedirect(), node.getRedirectModifier(), node.isFork()
+        );
+    }
+
     @Override
     public CompletableFuture<Suggestions> listSuggestions(CommandContext<ServerCommandSource> context,
                                                           SuggestionsBuilder builder) {
@@ -37,12 +44,5 @@ public class RestrictedCommandNode extends LiteralCommandNode<ServerCommandSourc
         } else {
             return Suggestions.empty();
         }
-    }
-
-    public static @NotNull RestrictedCommandNode create(@NotNull LiteralArgumentBuilder<ServerCommandSource> node) {
-        return new RestrictedCommandNode(
-                node.getLiteral(), node.getCommand(), node.getRequirement(),
-                node.getRedirect(), node.getRedirectModifier(), node.isFork()
-        );
     }
 }

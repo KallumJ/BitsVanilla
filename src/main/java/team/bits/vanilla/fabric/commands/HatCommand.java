@@ -14,8 +14,8 @@ public class HatCommand extends Command {
 
     public HatCommand() {
         super("hat", new String[]{"h"}, new CommandInformation()
-            .setDescription("Puts the item in the users hand on their head")
-            .setPublic(true)
+                .setDescription("Puts the item in the users hand on their head")
+                .setPublic(true)
         );
     }
 

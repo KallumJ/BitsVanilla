@@ -24,6 +24,7 @@ public class Commands {
         addCommand(new HatCommand());
         addCommand(new VIPCommand());
         addCommand(new EndLockCommand());
+        addCommand(new AFKCommand());
     }
 
     public static void registerCommands() {

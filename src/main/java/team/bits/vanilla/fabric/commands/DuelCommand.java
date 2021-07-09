@@ -12,10 +12,10 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import team.bits.vanilla.fabric.util.Colors;
 import team.bits.vanilla.fabric.BitsVanilla;
 import team.bits.vanilla.fabric.database.player.PlayerUtils;
 import team.bits.vanilla.fabric.listeners.DuelHandler;
+import team.bits.vanilla.fabric.util.Colors;
 import team.bits.vanilla.fabric.util.CommandSuggestionUtils;
 import team.bits.vanilla.fabric.util.ExtendedPlayerEntity;
 

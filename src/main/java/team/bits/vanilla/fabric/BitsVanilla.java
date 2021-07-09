@@ -15,12 +15,13 @@ import team.bits.vanilla.fabric.database.player.PlayerUtils;
 import team.bits.vanilla.fabric.database.util.ServerUtils;
 import team.bits.vanilla.fabric.event.damage.PlayerDamageCallback;
 import team.bits.vanilla.fabric.event.misc.PlayerConnectEvent;
+import team.bits.vanilla.fabric.event.misc.PlayerDisconnectEvent;
 import team.bits.vanilla.fabric.event.sleep.PlayerMoveCallback;
 import team.bits.vanilla.fabric.event.sleep.PlayerSleepCallback;
 import team.bits.vanilla.fabric.event.sleep.PlayerWakeUpCallback;
-import team.bits.vanilla.fabric.listeners.NewPlayerListener;
-import team.bits.vanilla.fabric.listeners.SleepListener;
+import team.bits.vanilla.fabric.listeners.*;
 import team.bits.vanilla.fabric.teleport.Teleporter;
+import team.bits.vanilla.fabric.util.AFKManager;
 import team.bits.vanilla.fabric.util.Scheduler;
 import team.bits.vanilla.fabric.util.color.NameColors;
 
@@ -66,6 +67,11 @@ public class BitsVanilla implements ModInitializer, ServerLifecycleEvents.Server
 
         PlayerConnectEvent.EVENT.register((player, connection) -> PlayerUtils.updatePlayerUsername(player));
         PlayerConnectEvent.EVENT.register(new NewPlayerListener());
+
+        PlayerConnectEvent.EVENT.register(new PlayerConnectListener());
+        PlayerMoveCallback.EVENT.register(new PlayerMoveListener());
+        PlayerDisconnectEvent.EVENT.register(new PlayerDisconnectListener());
+        AFKManager.initAfkManager();
     }
 
     @Override
