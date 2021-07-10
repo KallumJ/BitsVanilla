@@ -37,19 +37,6 @@ public class PlayerDataHandle {
         this.playerUUID = playerUUID;
     }
 
-    public static @NotNull PlayerDataHandle get(@NotNull ServerPlayerEntity player) {
-        return get(player.getUuid());
-    }
-
-    public static @NotNull PlayerDataHandle get(@NotNull UUID uuid) {
-        Objects.requireNonNull(uuid);
-
-        PlayerDataHandle handle = new PlayerDataHandle(uuid);
-        handle.load();
-
-        return handle;
-    }
-
     public @NotNull UUID getPlayerUUID() {
         return this.playerUUID;
     }
@@ -64,6 +51,10 @@ public class PlayerDataHandle {
 
     public boolean isVIP() {
         return this.vip;
+    }
+
+    public void setVip(boolean vip) {
+        this.vip = vip;
     }
 
     public @NotNull Color getColour() {
@@ -86,10 +77,6 @@ public class PlayerDataHandle {
 
     public @NotNull String getEffectiveName() {
         return Objects.requireNonNullElseGet(this.nickname, this::getUsername);
-    }
-
-    public void setVip(boolean vip) {
-        this.vip = vip;
     }
 
     public void load() {
@@ -219,5 +206,18 @@ public class PlayerDataHandle {
             return (this.colour.getRed() << 16) | (this.colour.getGreen() << 8) | (this.colour.getBlue());
         }
         return 0xFFFFFF;
+    }
+
+    public static @NotNull PlayerDataHandle get(@NotNull ServerPlayerEntity player) {
+        return get(player.getUuid());
+    }
+
+    public static @NotNull PlayerDataHandle get(@NotNull UUID uuid) {
+        Objects.requireNonNull(uuid);
+
+        PlayerDataHandle handle = new PlayerDataHandle(uuid);
+        handle.load();
+
+        return handle;
     }
 }

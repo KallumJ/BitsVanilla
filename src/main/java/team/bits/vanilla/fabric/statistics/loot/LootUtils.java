@@ -19,10 +19,10 @@ import java.util.Objects;
 
 public final class LootUtils {
 
-    private static final Identifier STATS_LOOT_IDENTIFIER = new Identifier("bits:statistics");
-
     private LootUtils() {
     }
+
+    private static final Identifier STATS_LOOT_IDENTIFIER = new Identifier("bits:statistics");
 
     public static @NotNull Collection<ItemStack> getLoot(@NotNull ServerPlayerEntity player) {
         Objects.requireNonNull(player);

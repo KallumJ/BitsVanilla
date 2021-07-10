@@ -19,6 +19,30 @@ public class SignColorMixin {
     private static final String ALL_CODES = "0123456789AaBbCcDdEeFfKkLlMmNnOoRrXx";
 
     /**
+     * We redirect the {@link List#get(int)} call inside the onSignUpdate method,
+     * which is used to get the updated line from the list and apply it to the sign.
+     * We run the resulting line through our {@link SignColorMixin#translateColorCodes(String)}
+     * method to translate the color codes before applying.
+     *
+     * @param list  updated sign lines (received from client)
+     * @param index index in the list we want to read
+     * @return translated line from the list at the given index
+     */
+    @Redirect(
+            method = "onSignUpdate(Lnet/minecraft/network/packet/c2s/play/UpdateSignC2SPacket;Ljava/util/List;)V",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Ljava/util/List;get(I)Ljava/lang/Object;"
+            )
+    )
+    public Object getSignLine(List<TextStream.Message> list, int index) {
+        // Message.permitted simply sets the raw and filtered
+        // text to the same value. We don't use text filtering
+        // so we can simply use this method to ignore it
+        return TextStream.Message.permitted(translateColorCodes(list.get(index).getRaw()));
+    }
+
+    /**
      * Translate any color codes using the INPUT_CHAR into
      * color codes using the COLOR_CHAR.
      *
@@ -42,29 +66,5 @@ public class SignColorMixin {
             }
         }
         return new String(inputTextCharacters);
-    }
-
-    /**
-     * We redirect the {@link List#get(int)} call inside the onSignUpdate method,
-     * which is used to get the updated line from the list and apply it to the sign.
-     * We run the resulting line through our {@link SignColorMixin#translateColorCodes(String)}
-     * method to translate the color codes before applying.
-     *
-     * @param list  updated sign lines (received from client)
-     * @param index index in the list we want to read
-     * @return translated line from the list at the given index
-     */
-    @Redirect(
-            method = "onSignUpdate(Lnet/minecraft/network/packet/c2s/play/UpdateSignC2SPacket;Ljava/util/List;)V",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Ljava/util/List;get(I)Ljava/lang/Object;"
-            )
-    )
-    public Object getSignLine(List<TextStream.Message> list, int index) {
-        // Message.permitted simply sets the raw and filtered
-        // text to the same value. We don't use text filtering
-        // so we can simply use this method to ignore it
-        return TextStream.Message.permitted(translateColorCodes(list.get(index).getRaw()));
     }
 }

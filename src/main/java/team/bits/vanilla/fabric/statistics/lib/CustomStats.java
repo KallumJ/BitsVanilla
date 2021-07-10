@@ -11,10 +11,10 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class CustomStats {
 
-    public static final Identifier NETHER_PORTALS_USED = register("nether_portals_used", StatFormatter.DEFAULT);
-
     private CustomStats() {
     }
+
+    public static final Identifier NETHER_PORTALS_USED = register("nether_portals_used", StatFormatter.DEFAULT);
 
     private static @NotNull Identifier register(@NotNull String id, @NotNull StatFormatter formatter) {
         // all our custom stats need to be in the 'bits' namespace

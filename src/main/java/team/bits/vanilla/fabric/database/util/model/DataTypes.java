@@ -4,16 +4,17 @@ import org.jetbrains.annotations.NotNull;
 
 public final class DataTypes {
 
+    private DataTypes() {
+    }
+
     public static final PrimitiveDataType<Integer> INTEGER = new PrimitiveDataType(Integer.class);
     public static final PrimitiveDataType<Long> LONG = new PrimitiveDataType(Long.class);
     public static final PrimitiveDataType<Short> SHORT = new PrimitiveDataType(Short.class);
     public static final PrimitiveDataType<String> STRING = new PrimitiveDataType(String.class);
     public static final PrimitiveDataType<Float> FLOAT = new PrimitiveDataType(Float.class);
     public static final PrimitiveDataType<Boolean> BOOLEAN = new PrimitiveDataType(Boolean.class);
-    private static final IDataObjectType[] TYPES = {INTEGER, LONG, SHORT, STRING, FLOAT, BOOLEAN};
 
-    private DataTypes() {
-    }
+    private static final IDataObjectType[] TYPES = {INTEGER, LONG, SHORT, STRING, FLOAT, BOOLEAN};
 
     public static @NotNull IDataObjectType getType(Class type) {
         for (IDataObjectType dataType : TYPES) {

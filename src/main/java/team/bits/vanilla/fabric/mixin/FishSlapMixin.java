@@ -17,31 +17,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(ServerPlayerEntity.class)
 public class FishSlapMixin {
 
-    /**
-     * Get a launch vector based on the direction in which a player is looking
-     */
-    private static @NotNull Vec3d getLaunchVector(@NotNull Entity entity) {
-        final float HORIZONTAL_POWER = 0.5f;
-        final float VERTICAL_POWER = 0.2f;
-
-        // get the player's yaw
-        float yaw = entity.getYaw();
-
-        // convert the yaw and pitch to an X and Z component of a vector
-        // we don't care about the Y component since we will be replacing
-        // that with an upward force
-        double x = -Math.sin(Math.toRadians(yaw));
-        double z = Math.cos(Math.toRadians(yaw));
-
-        // create a vector with the X and Z component and scale the power
-        Vec3d horizontalLookVector = new Vec3d(x, 0, z)
-                .normalize()
-                .multiply(HORIZONTAL_POWER);
-
-        // return a vector with the scaled X and Z components and an upward Y force
-        return new Vec3d(horizontalLookVector.x, VERTICAL_POWER, horizontalLookVector.z);
-    }
-
     @Inject(
             method = "damage",
             at = @At("HEAD")
@@ -70,5 +45,30 @@ public class FishSlapMixin {
                 }
             }
         }
+    }
+
+    /**
+     * Get a launch vector based on the direction in which a player is looking
+     */
+    private static @NotNull Vec3d getLaunchVector(@NotNull Entity entity) {
+        final float HORIZONTAL_POWER = 0.5f;
+        final float VERTICAL_POWER = 0.2f;
+
+        // get the player's yaw
+        float yaw = entity.getYaw();
+
+        // convert the yaw and pitch to an X and Z component of a vector
+        // we don't care about the Y component since we will be replacing
+        // that with an upward force
+        double x = -Math.sin(Math.toRadians(yaw));
+        double z = Math.cos(Math.toRadians(yaw));
+
+        // create a vector with the X and Z component and scale the power
+        Vec3d horizontalLookVector = new Vec3d(x, 0, z)
+                .normalize()
+                .multiply(HORIZONTAL_POWER);
+
+        // return a vector with the scaled X and Z components and an upward Y force
+        return new Vec3d(horizontalLookVector.x, VERTICAL_POWER, horizontalLookVector.z);
     }
 }
