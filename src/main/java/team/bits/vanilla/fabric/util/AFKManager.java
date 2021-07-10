@@ -57,5 +57,9 @@ public class AFKManager {
         AFKCounter afkCounter = AFKManager.PLAYER_TRACKER.get(player);
         afkCounter.setAfk();
     }
+
+    public static boolean isAFK(ServerPlayerEntity player) {
+        return PLAYER_TRACKER.get(player).isAfk();
+    }
 }
 

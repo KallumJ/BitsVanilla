@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import team.bits.vanilla.fabric.BitsVanilla;
 import team.bits.vanilla.fabric.event.sleep.PlayerSleepCallback;
 import team.bits.vanilla.fabric.event.sleep.PlayerWakeUpCallback;
+import team.bits.vanilla.fabric.util.AFKManager;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -21,9 +22,9 @@ public class SleepListener implements PlayerSleepCallback, PlayerWakeUpCallback 
 
     private static int getOnlinePlayerCount(MinecraftServer server) {
         return Math.toIntExact(server.getPlayerManager().getPlayerList().stream()
-                        .filter(player -> player.interactionManager.getGameMode() == GameMode.SURVIVAL)
-//                .filter(player -> AFKDetector.INSTANCE.isNotAFK(player))
-                        .count()
+                .filter(player -> player.interactionManager.getGameMode() == GameMode.SURVIVAL)
+                .filter(player -> !AFKManager.isAFK(player))
+                .count()
         );
     }
 
