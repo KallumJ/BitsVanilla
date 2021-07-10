@@ -1,5 +1,6 @@
 package team.bits.vanilla.fabric.mixin;
 
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -10,6 +11,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -25,6 +27,9 @@ import team.bits.vanilla.fabric.event.sleep.PlayerMoveCallback;
 import team.bits.vanilla.fabric.util.ExtendedPlayerEntity;
 import team.bits.vanilla.fabric.util.Scheduler;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Mixin(PlayerEntity.class)
@@ -46,6 +51,8 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
     private boolean hasPlayedBefore;
 
     private PlayerEntity duelTarget;
+
+    private final Map<String, Integer> statLevels = new HashMap<>();
 
     @Shadow
     public abstract PlayerInventory getInventory();
@@ -108,6 +115,10 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
         if (this.lastRTPTime > 0) {
             nbt.putLong("LastRTP", this.lastRTPTime);
         }
+
+        NbtCompound stats = new NbtCompound();
+        this.statLevels.forEach(stats::putInt);
+        nbt.put("StatLevels", stats);
     }
 
     /**
@@ -122,6 +133,13 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
         if (nbt.contains("LastRTP")) {
             this.lastRTPTime = nbt.getLong("LastRTP");
         }
+
+        if (nbt.contains("StatLevels")) {
+            NbtCompound stats = nbt.getCompound("StatLevels");
+            stats.getKeys().forEach(id ->
+                    this.statLevels.put(id, stats.getInt(id))
+            );
+        }
     }
 
     @Override
@@ -129,6 +147,7 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
         PlayerEntityMixin cOldPlayer = (PlayerEntityMixin) oldPlayer;
         this.hasPlayedBefore = cOldPlayer.hasPlayedBefore;
         this.lastRTPTime = cOldPlayer.lastRTPTime;
+        this.statLevels.putAll(cOldPlayer.statLevels);
 
         Scheduler.runOffThread(() -> {
             ServerPlayerEntity self = ServerPlayerEntity.class.cast(this);
@@ -230,6 +249,16 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
             }
         }
         return -1;
+    }
+
+    @Override
+    public int getStatLevel(@NotNull Identifier statId) {
+        return this.statLevels.getOrDefault(statId.toString(), 0);
+    }
+
+    @Override
+    public void setStatLevel(@NotNull Identifier statId, int level) {
+        this.statLevels.put(statId.toString(), level);
     }
 }
 

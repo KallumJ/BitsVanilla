@@ -20,6 +20,7 @@ import team.bits.vanilla.fabric.event.sleep.PlayerMoveCallback;
 import team.bits.vanilla.fabric.event.sleep.PlayerSleepCallback;
 import team.bits.vanilla.fabric.event.sleep.PlayerWakeUpCallback;
 import team.bits.vanilla.fabric.listeners.*;
+import team.bits.vanilla.fabric.statistics.lib.StatTracker;
 import team.bits.vanilla.fabric.teleport.Teleporter;
 import team.bits.vanilla.fabric.util.AFKManager;
 import team.bits.vanilla.fabric.util.Scheduler;
@@ -71,7 +72,10 @@ public class BitsVanilla implements ModInitializer, ServerLifecycleEvents.Server
         PlayerConnectEvent.EVENT.register(new PlayerConnectListener());
         PlayerMoveCallback.EVENT.register(new PlayerMoveListener());
         PlayerDisconnectEvent.EVENT.register(new PlayerDisconnectListener());
+
         AFKManager.initAfkManager();
+
+        Scheduler.scheduleAtFixedRate(new StatTracker(), 0, 20);
     }
 
     @Override

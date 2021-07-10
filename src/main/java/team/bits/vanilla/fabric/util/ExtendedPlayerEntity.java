@@ -4,9 +4,11 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.Optional;
 
 /**
@@ -40,4 +42,8 @@ public interface ExtendedPlayerEntity {
     void insertItemAtHead(ItemStack item);
 
     int getSlotOfStack(ItemStack item);
+
+    int getStatLevel(@NotNull Identifier statId);
+
+    void setStatLevel(@NotNull Identifier statId, int level);
 }

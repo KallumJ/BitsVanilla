@@ -7,6 +7,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 import team.bits.vanilla.fabric.BitsVanilla;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -29,5 +30,9 @@ public final class ServerInstance {
         PlayerManager serverPlayerManager = ServerInstance.get().getPlayerManager();
         List<ServerPlayerEntity> onlinePlayers = serverPlayerManager.getPlayerList();
         BitsVanilla.adventure().audience(onlinePlayers).sendMessage(textComponent);
+    }
+
+    public static @NotNull Collection<ServerPlayerEntity> getOnlinePlayers() {
+        return get().getPlayerManager().getPlayerList();
     }
 }
