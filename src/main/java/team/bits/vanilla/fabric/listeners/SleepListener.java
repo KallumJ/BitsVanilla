@@ -5,13 +5,16 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.PlayerManager;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.stat.Stats;
 import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.NotNull;
 import team.bits.vanilla.fabric.BitsVanilla;
 import team.bits.vanilla.fabric.event.sleep.PlayerSleepCallback;
 import team.bits.vanilla.fabric.event.sleep.PlayerWakeUpCallback;
 import team.bits.vanilla.fabric.util.AFKManager;
+import team.bits.vanilla.fabric.util.ServerInstance;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -73,7 +76,10 @@ public class SleepListener implements PlayerSleepCallback, PlayerWakeUpCallback 
             world.setTimeOfDay(0);
             world.setWeather(12000, 0, false, false);
 
-//                Bukkit.getOnlinePlayers().forEach(player -> player.setStatistic(Statistic.TIME_SINCE_REST, 0));
+            PlayerManager playerManager = ServerInstance.get().getPlayerManager();
+            playerManager.getPlayerList().forEach(player ->
+                    player.resetStat(Stats.CUSTOM.getOrCreateStat(Stats.TIME_SINCE_REST))
+            );
 
             sendSleepingMessage(server, sleeping, online, true);
 
