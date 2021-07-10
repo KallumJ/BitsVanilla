@@ -23,6 +23,8 @@ public interface ExtendedPlayerEntity {
 
     void giveItem(@NotNull ItemStack itemStack);
 
+    void giveItems(@NotNull Collection<ItemStack> items);
+
     boolean hasItem(@NotNull Item item, int amount);
 
     boolean removeItem(@NotNull Item item, int amount);

@@ -138,15 +138,24 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
 
     @Override
     public void giveItem(@NotNull ItemStack itemStack) {
+        final ServerPlayerEntity player = ServerPlayerEntity.class.cast(this);
         final PlayerInventory inventory = this.getInventory();
 
-        int occupiedSlot = inventory.getOccupiedSlotWithRoomForStack(itemStack);
+        // try and insert the stack into their inventory
+        if (!inventory.insertStack(itemStack)) {
 
-        if (occupiedSlot != -1) {
-            inventory.insertStack(occupiedSlot, itemStack);
-        } else {
-            inventory.insertStack(inventory.getEmptySlot(), itemStack);
+            // if inserting fails, drop the stack on the ground
+            ItemEntity itemEntity = player.dropItem(itemStack, false);
+            if (itemEntity != null) {
+                itemEntity.resetPickupDelay();
+                itemEntity.setOwner(player.getUuid());
+            }
         }
+    }
+
+    @Override
+    public void giveItems(@NotNull Collection<ItemStack> items) {
+        items.forEach(this::giveItem);
     }
 
     @Override
