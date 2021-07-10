@@ -31,7 +31,11 @@ public abstract class ServerPlayerEntityMixin {
         eNewPlayer.copyFromOldPlayer(eOldPlayer);
     }
 
-    @Inject(at = @At("HEAD"), method = "moveToWorld", cancellable = true)
+    @Inject(
+            method = "moveToWorld",
+            at = @At("HEAD"),
+            cancellable = true
+    )
     private void endLockCheck(ServerWorld destination, CallbackInfoReturnable<Entity> cir) {
         if (EndLockCommand.isEndLocked() && destination.getRegistryKey().equals(World.END)) {
             ServerPlayerEntity player = ServerPlayerEntity.class.cast(this);

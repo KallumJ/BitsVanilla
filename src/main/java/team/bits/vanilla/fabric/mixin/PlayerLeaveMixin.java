@@ -28,7 +28,10 @@ public abstract class PlayerLeaveMixin {
     @Shadow
     public abstract ClientConnection getConnection();
 
-    @Inject(at = @At("HEAD"), method = "onDisconnected")
+    @Inject(
+            method = "onDisconnected",
+            at = @At("HEAD")
+    )
     public void onDisconnect(Text reason, CallbackInfo ci) {
         PlayerDisconnectEvent.EVENT.invoker().onPlayerDisconnect(this.getPlayer(), this.getConnection());
     }

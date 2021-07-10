@@ -55,7 +55,7 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
      */
     @Inject(
             method = "tickMovement",
-            at = @At(value = "TAIL")
+            at = @At("TAIL")
     )
     private void onTickMovement(CallbackInfo ci) {
         PlayerEntity player = PlayerEntity.class.cast(this);

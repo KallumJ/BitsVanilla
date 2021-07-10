@@ -9,7 +9,11 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 @Mixin(CreeperEntity.class)
 public class CreeperMixin {
 
-    @ModifyVariable(method = "explode", at = @At("STORE"), ordinal = 0)
+    @ModifyVariable(
+            method = "explode",
+            at = @At("STORE"),
+            ordinal = 0
+    )
     private Explosion.DestructionType preventDamage(Explosion.DestructionType explosionType) {
         return Explosion.DestructionType.NONE;
     }
