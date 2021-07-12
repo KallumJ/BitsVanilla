@@ -6,6 +6,7 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.fabric.FabricServerAudiences;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandOutput;
+import net.minecraft.server.command.ServerCommandSource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -40,6 +41,10 @@ public class BitsVanilla implements ModInitializer, ServerLifecycleEvents.Server
     }
 
     public static @NotNull Audience audience(@NotNull CommandOutput source) {
+        return adventure().audience(source);
+    }
+
+    public static @NotNull Audience audience(@NotNull ServerCommandSource source) {
         return adventure().audience(source);
     }
 

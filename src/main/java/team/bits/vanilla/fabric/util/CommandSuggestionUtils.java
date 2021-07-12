@@ -13,11 +13,13 @@ import java.util.concurrent.CompletableFuture;
 public class CommandSuggestionUtils {
     public static final SuggestionProvider<ServerCommandSource> ONLINE_PLAYERS;
     public static final SuggestionProvider<ServerCommandSource> ALL_PLAYERS;
+    public static final SuggestionProvider<ServerCommandSource> NICKNAMES;
     public static final SuggestionProvider<ServerCommandSource> WARPS;
 
     static {
         ONLINE_PLAYERS = (context, builder) -> filterSuggestionsByInput(builder, PlayerUtils.getOnlinePlayerNames());
         ALL_PLAYERS = (context, builder) -> filterSuggestionsByInput(builder, PlayerUtils.getAllNames());
+        NICKNAMES = (context, builder) -> filterSuggestionsByInput(builder, PlayerUtils.getNicknames());
         WARPS = (context, builder) -> filterSuggestionsByInput(builder, WarpUtils.getWarpsList());
     }
 

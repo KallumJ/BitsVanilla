@@ -31,6 +31,63 @@ public final class PlayerUtils {
     }
 
     /**
+     * Returns the username of a player with a given nickname. Result will be
+     * empty if no player with the given nickname can be found.
+     *
+     * @param nickname the nickname of the player
+     * @return the username of the player
+     */
+    public static @NotNull Optional<String> getUsername(@NotNull String nickname) {
+        final Connection databaseConnection = DatabaseConnection.getConnection();
+        try {
+            PreparedStatement getUsernameStatement = QueryHelper.prepareStatement(
+                    databaseConnection,
+                    "SELECT username FROM player_data WHERE nickname=? LIMIT 1",
+                    Collections.singleton(
+                            DataTypes.STRING.create(nickname)
+                    )
+            );
+
+            // if there is any result, return the first value
+            ResultSet resultSet = getUsernameStatement.executeQuery();
+            if (resultSet.next()) {
+                return Optional.of(resultSet.getString(1));
+            }
+
+            return Optional.empty();
+
+        } catch (SQLException ex) {
+            throw new RuntimeException("SQLException while obtaining player name", ex);
+        }
+    }
+
+    /**
+     * Get a list of nicknames of all the players that played on the server and have a nickname.
+     *
+     * @return a list of nicknames of all players that have one
+     */
+    public static @NotNull Collection<String> getNicknames() {
+        final Connection databaseConnection = DatabaseConnection.getConnection();
+        try {
+            // only get nicknames that aren't NULL
+            ResultSet resultSet = databaseConnection.prepareStatement(
+                    "SELECT nickname FROM player_data WHERE nickname IS NOT NULL"
+            ).executeQuery();
+
+            // convert the result set into a list
+            Collection<String> names = new LinkedList<>();
+            while (resultSet.next()) {
+                names.add(resultSet.getString(1));
+            }
+
+            return Collections.unmodifiableCollection(names);
+
+        } catch (SQLException ex) {
+            throw new RuntimeException("SQLException while obtaining player data", ex);
+        }
+    }
+
+    /**
      * Get a list of effective names of all the players that played on the server.
      * An effective name is a player's nickname if they have one, otherwise their username.
      *
