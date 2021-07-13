@@ -15,7 +15,7 @@ public class AFKCommand extends Command {
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        AFKManager.makePlayerAfk(context.getSource().getPlayer());
+        AFKManager.makeVisuallyAfk(context.getSource().getPlayer());
         return 1;
     }
 }

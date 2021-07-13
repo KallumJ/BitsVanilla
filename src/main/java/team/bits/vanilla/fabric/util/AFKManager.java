@@ -18,7 +18,7 @@ public class AFKManager {
         AFKCounter playersAfkCounter = PLAYER_TRACKER.get(player);
 
         // If the player is AFK when their time gets reset, announce that they are no longer AFK
-        if (playersAfkCounter.isAfk()) {
+        if (playersAfkCounter.isAfk() || playersAfkCounter.isVisuallyAfk()) {
             ServerInstance.broadcast(
                     Component.text(String.format(NO_LONGER_AFK_MSG, PlayerUtils.getEffectiveName(player)))
                             .color(NamedTextColor.GRAY)
@@ -39,7 +39,7 @@ public class AFKManager {
     public static void initAfkManager() {
         // Every 0.5 seconds, check whether we need to announce that a player has gone AFK
         Scheduler.scheduleAtFixedRate(() -> PLAYER_TRACKER.forEach((serverPlayerEntity, afkCounter) -> {
-            if (afkCounter.isAfk() && !afkCounter.isAnnounced()) {
+            if ((afkCounter.isAfk() || afkCounter.isVisuallyAfk()) && !afkCounter.isAnnounced()) {
                 afkCounter.setAnnounced(true);
                 ServerInstance.broadcast(
                         Component.text(String.format(NOW_AFK_MSG, PlayerUtils.getEffectiveName(serverPlayerEntity)))
@@ -53,13 +53,13 @@ public class AFKManager {
         PLAYER_TRACKER.remove(player);
     }
 
-    public static void makePlayerAfk(ServerPlayerEntity player) {
-        AFKCounter afkCounter = AFKManager.PLAYER_TRACKER.get(player);
-        afkCounter.setAfk();
-    }
-
     public static boolean isAFK(ServerPlayerEntity player) {
         return PLAYER_TRACKER.get(player).isAfk();
+    }
+
+    public static void makeVisuallyAfk(ServerPlayerEntity player) {
+        AFKCounter afkCounter = AFKManager.PLAYER_TRACKER.get(player);
+        afkCounter.setVisuallyAfk();
     }
 }
 

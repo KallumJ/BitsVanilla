@@ -3,6 +3,7 @@ package team.bits.vanilla.fabric.util;
 public class AFKCounter implements Runnable {
     private int timeAfk;
     private boolean announced;
+    private boolean visuallyAfk;
 
     public int getTimeAfk() {
         return timeAfk;
@@ -11,6 +12,7 @@ public class AFKCounter implements Runnable {
     public void resetTimeAfk() {
         timeAfk = 0;
         announced = false;
+        visuallyAfk = false;
     }
 
     public boolean isAnnounced() {
@@ -32,5 +34,13 @@ public class AFKCounter implements Runnable {
 
     public void setAfk() {
         timeAfk = AFKManager.AFK_THRESHOLD;
+    }
+
+    public boolean isVisuallyAfk() {
+        return visuallyAfk;
+    }
+
+    public void setVisuallyAfk() {
+        visuallyAfk = true;
     }
 }
