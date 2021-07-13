@@ -15,6 +15,15 @@
     {
       "rule": "No duplicating (except TNT duping)",
       "hover": ""
+    },
+    {
+      "rule": "No griefing or stealing",
+      "hover": "Griefing is defined as purposefully destroying things that arent yours or with the intent of upsetting another player."
+    },
+    {
+      "rule": "No cheats or hacked clients",
+      "hover": "Non cheat client side mods are allowed. Examples of which include Optifine, Sodium, Litematica, MiniHUD, etc"
     }
-  ]
+  ],
+  "note": "If any of these rules are unclear to you, please consult a guard. Serious breaking of these rules will result in a ban, and require no warning."
 }

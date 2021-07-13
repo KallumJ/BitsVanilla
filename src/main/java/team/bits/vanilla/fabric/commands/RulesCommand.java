@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Scanner;
 
 public class RulesCommand extends Command {
@@ -35,7 +36,7 @@ public class RulesCommand extends Command {
 
         try (InputStream input = BitsVanilla.class.getClassLoader().getResourceAsStream(RULES_FILE_NAME)) {
             Gson gson = new Gson();
-            Scanner s = new Scanner(input).useDelimiter("\\A");
+            Scanner s = new Scanner(Objects.requireNonNull(input)).useDelimiter("\\A");
             String jsonString = s.hasNext() ? s.next() : "";
 
             rulesJson = gson.fromJson(jsonString, JsonObject.class);
@@ -59,11 +60,14 @@ public class RulesCommand extends Command {
             TextComponent ruleComponent = Component.text(rule).hoverEvent(HoverEvent.showText(Component.text(hover))).color(NamedTextColor.WHITE);
             ruleComponents.add(ruleComponent);
         }
+        String ruleNote = rulesJson.get("note").getAsString();
 
         TextComponent message = Component.text("---Rules--- \n").color(NamedTextColor.GREEN)
-                .append(Component.text().append(ruleComponents));
+                .append(Component.text().append(ruleComponents))
+                .append(Component.text(ruleNote));
 
         BitsVanilla.audience(context.getSource().getPlayer()).sendMessage(message);
+
 
         return 0;
     }
