@@ -26,6 +26,7 @@ public class Commands {
         addCommand(new EndLockCommand());
         addCommand(new AFKCommand());
         addCommand(new WhoisCommand());
+        addCommand(new RulesCommand());
     }
 
     public static void registerCommands() {

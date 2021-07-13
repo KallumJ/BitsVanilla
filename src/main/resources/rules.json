@@ -1,0 +1,20 @@
+{
+  "rules": [
+    {
+      "rule": "Be respectful towards others",
+      "hover": "Treat others with respect, regardless of your liking towards them. Racism, harassment, sexim etc is NOT tolerated."
+    },
+    {
+      "rule": "Extreme, persistent, uncomfortable or vulgar language/content is not allowed",
+      "hover": "Swearing and vulgarity IS ALLOWED. If it is extremely common, or your using language that is making other people uncomfortable, you will be asked to stop"
+    },
+    {
+      "rule": "No spamming",
+      "hover": "Spamming of any kind (short frequent messages or extremely long copy-pastas) is not allowed."
+    },
+    {
+      "rule": "No duplicating (except TNT duping)",
+      "hover": ""
+    }
+  ]
+}
