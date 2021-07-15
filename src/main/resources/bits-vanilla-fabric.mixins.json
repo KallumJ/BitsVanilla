@@ -19,7 +19,9 @@
     "SleepMixin",
     "StatisticsPacketMixin",
     "stats.NetherPortalsUsedMixin",
-    "ServerWorldMixin"
+    "ServerWorldMixin",
+    "stats.BedsExplodedMixin",
+    "stats.CopperWaxedMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -69,6 +69,6 @@ public class RulesCommand extends Command {
         BitsVanilla.audience(context.getSource().getPlayer()).sendMessage(message);
 
 
-        return 0;
+        return 1;
     }
 }

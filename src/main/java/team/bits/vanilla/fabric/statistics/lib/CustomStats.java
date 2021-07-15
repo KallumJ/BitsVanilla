@@ -26,6 +26,17 @@ public final class CustomStats {
                     "nether portal %count% times and leveled up their nether portalling skill to %level%!"
     );
 
+    public static final Identifier BEDS_EXPLODED = register(
+            "beds_exploded", StatFormatter.DEFAULT, new int[]{5, 10, 500},//new int[]{5, 50, 500}
+    "%user% is having trouble sleeping. They have blown up %count% beds! They have leveled up their bed demolition skills to %level%"
+    );
+
+    public static final Identifier COPPER_WAXED = register(
+            "copper_waxed", StatFormatter.DEFAULT, new int[]{5, 10, 15},
+            "%user% hates oxidation. They have waxed %count% copper blocks, and levelled up their waxing copper skill to %level%"
+    );
+
+
     private static @NotNull Identifier register(@NotNull String id, @NotNull StatFormatter formatter,
                                                 int[] levelCounts, String levelupMessage) {
         // all our custom stats need to be in the 'bits' namespace
