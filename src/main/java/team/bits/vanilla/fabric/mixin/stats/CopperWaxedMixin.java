@@ -17,13 +17,12 @@ import java.util.Objects;
 public class CopperWaxedMixin {
 
     @Inject(
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/util/ActionResult;success(Z)Lnet/minecraft/util/ActionResult;"
-            ),
-            method = "useOnBlock"
+            method = "useOnBlock",
+            at = @At(value = "RETURN")
     )
     public void onCopperWaxed(ItemUsageContext context, CallbackInfoReturnable<ActionResult> cir) {
-        StatUtils.incrementStat((ServerPlayerEntity) Objects.requireNonNull(context.getPlayer()), CustomStats.COPPER_WAXED, 1);
+        if (cir.getReturnValue() == ActionResult.CONSUME) {
+            StatUtils.incrementStat((ServerPlayerEntity) Objects.requireNonNull(context.getPlayer()), CustomStats.COPPER_WAXED, 1);
+        }
     }
 }
