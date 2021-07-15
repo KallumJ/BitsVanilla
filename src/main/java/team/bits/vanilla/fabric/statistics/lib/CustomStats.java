@@ -2,6 +2,7 @@ package team.bits.vanilla.fabric.statistics.lib;
 
 import net.minecraft.stat.Stat;
 import net.minecraft.stat.StatFormatter;
+import net.minecraft.stat.StatType;
 import net.minecraft.stat.Stats;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
@@ -28,7 +29,7 @@ public final class CustomStats {
 
     public static final Identifier BEDS_EXPLODED = register(
             "beds_exploded", StatFormatter.DEFAULT, new int[]{5, 10, 500},//new int[]{5, 50, 500}
-    "%user% is having trouble sleeping. They have blown up %count% beds! They have leveled up their bed demolition skills to %level%"
+            "%user% is having trouble sleeping. They have blown up %count% beds! They have leveled up their bed demolition skills to %level%"
     );
 
     public static final Identifier COPPER_WAXED = register(
@@ -36,6 +37,12 @@ public final class CustomStats {
             "%user% hates oxidation. They have waxed %count% copper blocks, and levelled up their waxing copper skill to %level%"
     );
 
+    static {
+        registerVanillaStat(
+                Stats.CUSTOM, Stats.EAT_CAKE_SLICE, new int[]{1, 2, 3},
+                "This is such a cool message it's like magic isn't it (level %level% btw)"
+        );
+    }
 
     private static @NotNull Identifier register(@NotNull String id, @NotNull StatFormatter formatter,
                                                 int[] levelCounts, String levelupMessage) {
@@ -51,5 +58,13 @@ public final class CustomStats {
         TRACKED_STATS.put(stat, new TrackedStat(stat, levelCounts, levelupMessage));
         // return the identifier for this stat
         return identifier;
+    }
+
+    private static <T> void registerVanillaStat(@NotNull StatType<T> statType, @NotNull T statId,
+                                                int[] levelCounts, String levelupMessage) {
+        // get the stat so we can use it
+        Stat<T> stat = statType.getOrCreateStat(statId);
+        // return the identifier for this stat
+        TRACKED_STATS.put(stat, new TrackedStat(stat, levelCounts, levelupMessage));
     }
 }
