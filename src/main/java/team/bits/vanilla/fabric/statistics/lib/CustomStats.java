@@ -1,5 +1,6 @@
 package team.bits.vanilla.fabric.statistics.lib;
 
+import net.minecraft.item.Items;
 import net.minecraft.stat.Stat;
 import net.minecraft.stat.StatFormatter;
 import net.minecraft.stat.StatType;
@@ -28,19 +29,43 @@ public final class CustomStats {
     );
 
     public static final Identifier BEDS_EXPLODED = register(
-            "beds_exploded", StatFormatter.DEFAULT, new int[]{5, 10, 500},//new int[]{5, 50, 500}
+            "beds_exploded", StatFormatter.DEFAULT, new int[]{5, 50, 500},
             "%user% is having trouble sleeping. They have blown up %count% beds! They have leveled up their bed demolition skills to %level%"
     );
 
     public static final Identifier COPPER_WAXED = register(
-            "copper_waxed", StatFormatter.DEFAULT, new int[]{5, 10, 15},
+            "copper_waxed", StatFormatter.DEFAULT, new int[]{10, 200, 1000},
             "%user% hates oxidation. They have waxed %count% copper blocks, and levelled up their waxing copper skill to %level%"
     );
 
     static {
         registerVanillaStat(
-                Stats.CUSTOM, Stats.EAT_CAKE_SLICE, new int[]{1, 2, 3},
-                "This is such a cool message it's like magic isn't it (level %level% btw)"
+                Stats.CUSTOM, Stats.EAT_CAKE_SLICE, new int[]{20, 200, 2000},
+                "%user% has eaten a total of %count% slices of cake! Bob can barely keep up with the amount of cake they're eating! They're now a level %level% cake eater!"
+        );
+
+        registerVanillaStat(Stats.CUSTOM, Stats.JUMP, new int[]{1000, 10000, 75000},
+                "%user% must have fitted springs to their shoes! They have jumped %count% times! They're now jumping level %level%!"
+        );
+
+        registerVanillaStat(Stats.CUSTOM, Stats.AVIATE_ONE_CM, new int[]{1000000, 10000000, 50000000}, // TODO: too slow to catch right moment, returns cms
+                "%user% has narrowly avoided experiencing kinetic energy and has flown a whopping %count% kilometer! They leveled up their Elytra flying skills to %level%!"
+        );
+
+//        registerVanillaStat(Stats.CUSTOM, Stats.CRAFTED, new int[]{2, 8, 24},
+//                "How many status effects can one person need! %user% crafted a total of %count% beacons. They're now a level %level% beacon crafter!"
+//                );
+
+        registerVanillaStat(Stats.CUSTOM, Stats.DEATHS, new int[]{2, 25, 250},
+                "%user% pulled a Kallum and died %count% times. They've leveled up their dying skills to %level%"
+        );
+
+        registerVanillaStat(Stats.CUSTOM, Stats.TARGET_HIT, new int[]{10, 200, 2500},
+                "Call %user% Legolas because they are one sharp shooter. They have hit %count% targets, and leveled up their target hitting skill to %level%!"
+        );
+
+        registerVanillaStat(Stats.CUSTOM, Stats.PIG_ONE_CM, new int[]{1000, 100000, 500000}, // TODO: too slow to catch right moment, returns cms
+                "%user% is a lazy little piggy and has decided to ride a pig to get from A to B! The poor pig has been ridden %count% meters! %user% leveled up their pig riding skills to %level%!"
         );
     }
 
@@ -64,6 +89,7 @@ public final class CustomStats {
                                                 int[] levelCounts, String levelupMessage) {
         // get the stat so we can use it
         Stat<T> stat = statType.getOrCreateStat(statId);
+
         // return the identifier for this stat
         TRACKED_STATS.put(stat, new TrackedStat(stat, levelCounts, levelupMessage));
     }
