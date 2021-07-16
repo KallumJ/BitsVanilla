@@ -52,9 +52,9 @@ public final class CustomStats {
                 "%user% has narrowly avoided experiencing kinetic energy and has flown a whopping %count% kilometer! They leveled up their Elytra flying skills to %level%!"
         );
 
-//        registerVanillaStat(Stats.CUSTOM, Stats.CRAFTED, new int[]{2, 8, 24},
-//                "How many status effects can one person need! %user% crafted a total of %count% beacons. They're now a level %level% beacon crafter!"
-//                );
+        registerVanillaStat(Stats.CRAFTED, Items.BEACON, new int[]{2, 8, 24},
+                "How many status effects can one person need! %user% crafted a total of %count% beacons. They're now a level %level% beacon crafter!"
+        );
 
         registerVanillaStat(Stats.CUSTOM, Stats.DEATHS, new int[]{2, 25, 250},
                 "%user% pulled a Kallum and died %count% times. They've leveled up their dying skills to %level%"
