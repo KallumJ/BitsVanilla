@@ -2,9 +2,10 @@ pipeline {
     agent any
 
     stages {
-        stage('Do nothing') {
+        stage('build') {
             steps {
-                sh '/bin/true'
+                ./gradlew clean build
+                archiveArtifacts artifacts: 'build/libs/*.jar', fingerprint: true
             }
         }
     }
