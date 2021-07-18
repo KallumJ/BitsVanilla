@@ -148,7 +148,7 @@ public class BeamCommand extends Command {
         TextComponent acceptMessage = Component.text(String.format(ACCEPT_STRING, sendingPlayerName))
                 .hoverEvent(HoverEvent.showText(Component.text("Click here to accept!")))
                 .clickEvent(ClickEvent.runCommand("/beam accept"))
-                .color(Colors.NEUTRAL);
+                .color(Colors.POSITIVE);
 
         BitsVanilla.adventure().audience(receivingPlayer)
                 .sendMessage(acceptMessage);
