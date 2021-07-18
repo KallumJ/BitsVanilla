@@ -23,7 +23,7 @@ public final class NameColors {
 
     public void load() {
         InputStream colorsFile = this.getClass().getClassLoader().getResourceAsStream("colours.json");
-        JsonObject root = JsonParser.parseReader(new InputStreamReader(Objects.requireNonNull(colorsFile))).getAsJsonObject();
+        JsonObject root = new JsonParser().parse(new InputStreamReader(Objects.requireNonNull(colorsFile))).getAsJsonObject();
         root.entrySet().forEach(entry -> {
             String color = Utils.fancyFormat(entry.getKey());
             List<NameColor> shades = new LinkedList<>();
