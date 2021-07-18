@@ -89,6 +89,9 @@ public class ChunkInspectCommand extends Command {
 
 
         // Collate the per dimension information into one text component
+        if (finalMessages.isEmpty()) {
+            finalMessages.add(Component.text("No problems to report").color(NamedTextColor.RED));
+        }
         TextComponent collatedMessage = Component.text().append(finalMessages).build();
 
         // Send the message

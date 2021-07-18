@@ -72,17 +72,23 @@ public class StatsCommand extends Command {
             player = context.getSource().getPlayer();
         }
 
-        Audience audience = BitsVanilla.audience(source);
-        audience.sendMessage(
-                Component.text(String.format(STATS_HEADER, PlayerUtils.getEffectiveName(player)), Colors.HEADER)
-        );
-
         Collection<StatUtils.StatisticRecord> stats = StatUtils.getStats(player);
-        for (StatUtils.StatisticRecord record : stats) {
-            String name = Utils.fancyFormat(record.stat().customName());
+
+        if (!stats.isEmpty()) {
+            Audience audience = BitsVanilla.audience(source);
             audience.sendMessage(
-                    Component.text(String.format(STAT_LINE, name, record.count(), record.level()), Colors.NEUTRAL)
+                    Component.text(String.format(STATS_HEADER, PlayerUtils.getEffectiveName(player)), Colors.HEADER)
             );
+
+
+            for (StatUtils.StatisticRecord record : stats) {
+                String name = Utils.fancyFormat(record.stat().customName());
+                audience.sendMessage(
+                        Component.text(String.format(STAT_LINE, name, record.count(), record.level()), Colors.NEUTRAL)
+                );
+            }
+        } else {
+            BitsVanilla.audience(source).sendMessage(Component.text("The player " + player.getEntityName() + " has no statistics"));
         }
 
         return 1;
