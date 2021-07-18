@@ -46,4 +46,8 @@ public interface ExtendedPlayerEntity {
     int getStatLevel(@NotNull Identifier statId);
 
     void setStatLevel(@NotNull Identifier statId, int level);
+
+    boolean hasMigratedStats();
+
+    void markMigratedStats();
 }

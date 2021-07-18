@@ -40,31 +40,31 @@ public final class CustomStats {
 
     static {
         registerVanillaStat(
-                Stats.CUSTOM, Stats.EAT_CAKE_SLICE, new int[]{20, 200, 2000},
+                Stats.CUSTOM, Stats.EAT_CAKE_SLICE, "cake_eaten", new int[]{20, 200, 2000},
                 "%user% has eaten a total of %count% slices of cake! Bob can barely keep up with the amount of cake they're eating! They're now a level %level% cake eater!"
         );
 
-        registerVanillaStat(Stats.CUSTOM, Stats.JUMP, new int[]{1000, 10000, 75000},
+        registerVanillaStat(Stats.CUSTOM, Stats.JUMP, "times_jumped", new int[]{1000, 10000, 75000},
                 "%user% must have fitted springs to their shoes! They have jumped %count% times! They're now jumping level %level%!"
         );
 
-        registerVanillaStat(Stats.CUSTOM, Stats.AVIATE_ONE_CM, new int[]{1000000, 10000000, 50000000},
+        registerVanillaStat(Stats.CUSTOM, Stats.AVIATE_ONE_CM, "distance_flown", new int[]{1000000, 10000000, 50000000},
                 "%user% has narrowly avoided experiencing kinetic energy and has flown a whopping %count%! They leveled up their Elytra flying skills to %level%!"
         );
 
-        registerVanillaStat(Stats.CRAFTED, Items.BEACON, new int[]{2, 8, 24},
+        registerVanillaStat(Stats.CRAFTED, Items.BEACON, "beacons_crafted", new int[]{2, 8, 24},
                 "How many status effects can one person need! %user% crafted a total of %count% beacons. They're now a level %level% beacon crafter!"
         );
 
-        registerVanillaStat(Stats.CUSTOM, Stats.DEATHS, new int[]{2, 25, 250},
+        registerVanillaStat(Stats.CUSTOM, Stats.DEATHS, "deaths", new int[]{2, 25, 250},
                 "%user% pulled a Kallum and died %count% times. They've leveled up their dying skills to %level%"
         );
 
-        registerVanillaStat(Stats.CUSTOM, Stats.TARGET_HIT, new int[]{10, 200, 2500},
+        registerVanillaStat(Stats.CUSTOM, Stats.TARGET_HIT, "targets_hit", new int[]{10, 200, 2500},
                 "Call %user% Legolas because they are one sharp shooter. They have hit %count% targets, and leveled up their target hitting skill to %level%!"
         );
 
-        registerVanillaStat(Stats.CUSTOM, Stats.PIG_ONE_CM, new int[]{1000, 100000, 500000},
+        registerVanillaStat(Stats.CUSTOM, Stats.PIG_ONE_CM, "distance_by_pig", new int[]{1000, 100000, 500000},
                 "%user% is a lazy little piggy and has decided to ride a pig to get from A to B! The poor pig has been ridden %count%! %user% leveled up their pig riding skills to %level%!"
         );
     }
@@ -80,17 +80,17 @@ public final class CustomStats {
         // create the stat so we can use it
         Stat<Identifier> stat = Stats.CUSTOM.getOrCreateStat(identifier, formatter);
         // register the stat as a tracked stat
-        TRACKED_STATS.put(stat, new TrackedStat(stat, levelCounts, levelupMessage));
+        TRACKED_STATS.put(stat, new TrackedStat(stat, id, levelCounts, levelupMessage));
         // return the identifier for this stat
         return identifier;
     }
 
-    private static <T> void registerVanillaStat(@NotNull StatType<T> statType, @NotNull T statId,
+    private static <T> void registerVanillaStat(@NotNull StatType<T> statType, @NotNull T statId, @NotNull String customName,
                                                 int[] levelCounts, String levelupMessage) {
         // get the stat so we can use it
         Stat<T> stat = statType.getOrCreateStat(statId);
 
         // return the identifier for this stat
-        TRACKED_STATS.put(stat, new TrackedStat(stat, levelCounts, levelupMessage));
+        TRACKED_STATS.put(stat, new TrackedStat(stat, customName, levelCounts, levelupMessage));
     }
 }

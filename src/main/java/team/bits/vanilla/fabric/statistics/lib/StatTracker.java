@@ -42,18 +42,20 @@ public class StatTracker implements Runnable {
                     ));
 
                     ((ExtendedPlayerEntity) player).giveItems(LootUtils.getLoot(player));
+
+                    DatabaseStatHandler.enqueue(trackedStat, player, currentLevel);
                 }
             }
         }
     }
 
-    private static int getStoredLevel(@NotNull ServerPlayerEntity player, @NotNull Stat<?> stat) {
+    public static int getStoredLevel(@NotNull ServerPlayerEntity player, @NotNull Stat<?> stat) {
         ExtendedPlayerEntity ePlayer = (ExtendedPlayerEntity) player;
         Identifier statId = getStatId(stat);
         return ePlayer.getStatLevel(statId);
     }
 
-    private static void setStoredLevel(@NotNull ServerPlayerEntity player, @NotNull Stat<?> stat, int level) {
+    public static void setStoredLevel(@NotNull ServerPlayerEntity player, @NotNull Stat<?> stat, int level) {
         ExtendedPlayerEntity ePlayer = (ExtendedPlayerEntity) player;
         Identifier statId = getStatId(stat);
         ePlayer.setStatLevel(statId, level);

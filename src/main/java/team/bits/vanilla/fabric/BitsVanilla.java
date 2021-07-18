@@ -21,11 +21,15 @@ import team.bits.vanilla.fabric.event.sleep.PlayerMoveCallback;
 import team.bits.vanilla.fabric.event.sleep.PlayerSleepCallback;
 import team.bits.vanilla.fabric.event.sleep.PlayerWakeUpCallback;
 import team.bits.vanilla.fabric.listeners.*;
+import team.bits.vanilla.fabric.statistics.lib.DatabaseStatHandler;
 import team.bits.vanilla.fabric.statistics.lib.StatTracker;
 import team.bits.vanilla.fabric.teleport.Teleporter;
 import team.bits.vanilla.fabric.util.AFKManager;
 import team.bits.vanilla.fabric.util.Scheduler;
 import team.bits.vanilla.fabric.util.color.NameColors;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class BitsVanilla implements ModInitializer, ServerLifecycleEvents.ServerStopped {
 
@@ -47,6 +51,8 @@ public class BitsVanilla implements ModInitializer, ServerLifecycleEvents.Server
     public static @NotNull Audience audience(@NotNull ServerCommandSource source) {
         return adventure().audience(source);
     }
+
+    private ExecutorService executor;
 
     @Override
     public void onInitialize() {
@@ -81,10 +87,15 @@ public class BitsVanilla implements ModInitializer, ServerLifecycleEvents.Server
         AFKManager.initAfkManager();
 
         Scheduler.scheduleAtFixedRate(new StatTracker(), 0, 20);
+
+        DatabaseStatHandler.init();
+        this.executor = Executors.newSingleThreadExecutor();
+        this.executor.execute(new DatabaseStatHandler());
     }
 
     @Override
     public void onServerStopped(MinecraftServer server) {
+        this.executor.shutdownNow();
         Scheduler.stop();
         DatabaseConnection.close();
     }

@@ -53,6 +53,7 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
     private PlayerEntity duelTarget;
 
     private final Map<String, Integer> statLevels = new HashMap<>();
+    private boolean migratedStats;
 
     @Shadow
     public abstract PlayerInventory getInventory();
@@ -119,6 +120,8 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
         NbtCompound stats = new NbtCompound();
         this.statLevels.forEach(stats::putInt);
         nbt.put("StatLevels", stats);
+
+        nbt.putBoolean("MigratedStats", this.migratedStats);
     }
 
     /**
@@ -140,6 +143,10 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
                     this.statLevels.put(id, stats.getInt(id))
             );
         }
+
+        if (nbt.contains("MigratedStats")) {
+            this.migratedStats = nbt.getBoolean("MigratedStats");
+        }
     }
 
     @Override
@@ -148,6 +155,7 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
         this.hasPlayedBefore = cOldPlayer.hasPlayedBefore;
         this.lastRTPTime = cOldPlayer.lastRTPTime;
         this.statLevels.putAll(cOldPlayer.statLevels);
+        this.migratedStats = cOldPlayer.migratedStats;
 
         Scheduler.runOffThread(() -> {
             ServerPlayerEntity self = ServerPlayerEntity.class.cast(this);
@@ -259,6 +267,16 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
     @Override
     public void setStatLevel(@NotNull Identifier statId, int level) {
         this.statLevels.put(statId.toString(), level);
+    }
+
+    @Override
+    public boolean hasMigratedStats() {
+        return this.migratedStats;
+    }
+
+    @Override
+    public void markMigratedStats() {
+        this.migratedStats = true;
     }
 }
 
