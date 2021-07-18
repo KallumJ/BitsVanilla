@@ -68,7 +68,7 @@ public class DuelCommand extends Command {
         String targetName = context.getArgument("player", String.class);
         Optional<ServerPlayerEntity> target = PlayerUtils.getPlayer(targetName);
 
-        if (target.isPresent()) {
+        if (target.isPresent() && !target.get().equals(requestingPlayer)) {
             ServerPlayerEntity targetPlayer = target.get();
 
             if (eRequestingPlayer.getDuelTarget().isEmpty()) {
