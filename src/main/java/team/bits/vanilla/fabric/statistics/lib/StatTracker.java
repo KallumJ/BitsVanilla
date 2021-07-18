@@ -31,10 +31,12 @@ public class StatTracker implements Runnable {
                             1.0f, 1.0f
                     );
 
+                    int[] levelCounts = trackedStat.levelCounts();
+
                     ServerInstance.broadcast(Component.text(
                             trackedStat.levelupMessage()
                                     .replace("%user%", PlayerUtils.getEffectiveName(player))
-                                    .replace("%count%", String.valueOf(getCurrentCount(player, stat)))
+                                    .replace("%count%", stat.format(levelCounts[currentLevel - 1]))
                                     .replace("%level%", String.valueOf(currentLevel)),
                             Colors.POSITIVE
                     ));

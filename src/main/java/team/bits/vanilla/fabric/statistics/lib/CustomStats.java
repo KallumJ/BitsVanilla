@@ -48,8 +48,8 @@ public final class CustomStats {
                 "%user% must have fitted springs to their shoes! They have jumped %count% times! They're now jumping level %level%!"
         );
 
-        registerVanillaStat(Stats.CUSTOM, Stats.AVIATE_ONE_CM, new int[]{1000000, 10000000, 50000000}, // TODO: too slow to catch right moment, returns cms
-                "%user% has narrowly avoided experiencing kinetic energy and has flown a whopping %count% kilometer! They leveled up their Elytra flying skills to %level%!"
+        registerVanillaStat(Stats.CUSTOM, Stats.AVIATE_ONE_CM, new int[]{1000000, 10000000, 50000000},
+                "%user% has narrowly avoided experiencing kinetic energy and has flown a whopping %count%! They leveled up their Elytra flying skills to %level%!"
         );
 
         registerVanillaStat(Stats.CRAFTED, Items.BEACON, new int[]{2, 8, 24},
@@ -64,8 +64,8 @@ public final class CustomStats {
                 "Call %user% Legolas because they are one sharp shooter. They have hit %count% targets, and leveled up their target hitting skill to %level%!"
         );
 
-        registerVanillaStat(Stats.CUSTOM, Stats.PIG_ONE_CM, new int[]{1000, 100000, 500000}, // TODO: too slow to catch right moment, returns cms
-                "%user% is a lazy little piggy and has decided to ride a pig to get from A to B! The poor pig has been ridden %count% meters! %user% leveled up their pig riding skills to %level%!"
+        registerVanillaStat(Stats.CUSTOM, Stats.PIG_ONE_CM, new int[]{1000, 100000, 500000},
+                "%user% is a lazy little piggy and has decided to ride a pig to get from A to B! The poor pig has been ridden %count%! %user% leveled up their pig riding skills to %level%!"
         );
     }
 
