@@ -91,6 +91,8 @@ public class BitsVanilla implements ModInitializer, ServerLifecycleEvents.Server
         DatabaseStatHandler.init();
         this.executor = Executors.newSingleThreadExecutor();
         this.executor.execute(new DatabaseStatHandler());
+
+        #blamekall
     }
 
     @Override
