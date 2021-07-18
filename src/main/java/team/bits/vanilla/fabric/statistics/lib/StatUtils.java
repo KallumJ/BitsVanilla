@@ -1,32 +1,19 @@
 package team.bits.vanilla.fabric.statistics.lib;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.stat.Stat;
 import net.minecraft.stat.StatHandler;
 import net.minecraft.stat.Stats;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
-import team.bits.vanilla.fabric.util.ServerInstance;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
 
 public final class StatUtils {
 
     private StatUtils() {
-    }
-
-    /**
-     * Get the {@link StatHandler} object for a given player
-     *
-     * @see PlayerManager#createStatHandler(PlayerEntity)
-     */
-    public static @NotNull StatHandler getStatHandler(@NotNull ServerPlayerEntity player) {
-        final PlayerManager playerManager = ServerInstance.get().getPlayerManager();
-        // we can safely use `createStatHandler` because it will only create the object
-        // once, and instead return the existing object if it already exists.
-        // stat handlers are stored by uuid and access is instant, so it's safe
-        // to call this as often as we like
-        return playerManager.createStatHandler(player);
     }
 
     /**
@@ -37,8 +24,23 @@ public final class StatUtils {
      * @param amount         amount to increment by
      */
     public static void incrementStat(@NotNull ServerPlayerEntity player, @NotNull Identifier statIdentifier, int amount) {
-        final StatHandler statHandler = StatUtils.getStatHandler(player);
+        final StatHandler statHandler = player.getStatHandler();
         final Stat<Identifier> stat = Stats.CUSTOM.getOrCreateStat(statIdentifier);
         statHandler.increaseStat(player, stat, amount);
+    }
+
+    public static Collection<StatisticRecord> getStats(@NotNull ServerPlayerEntity player) {
+        Collection<StatisticRecord> stats = new LinkedList<>();
+        for (TrackedStat stat : CustomStats.TRACKED_STATS.values()) {
+            int level = StatTracker.getStoredLevel(player, stat.stat());
+            if (level > 0) {
+                int count = StatTracker.getCurrentCount(player, stat.stat());
+                stats.add(new StatisticRecord(stat, count, level));
+            }
+        }
+        return Collections.unmodifiableCollection(stats);
+    }
+
+    public static record StatisticRecord(@NotNull TrackedStat stat, int count, int level) {
     }
 }

@@ -27,6 +27,7 @@ public class Commands {
         addCommand(new AFKCommand());
         addCommand(new WhoisCommand());
         addCommand(new RulesCommand());
+        addCommand(new StatsCommand());
     }
 
     public static void registerCommands() {

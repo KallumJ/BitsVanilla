@@ -80,7 +80,7 @@ public class StatTracker implements Runnable {
         return 0;
     }
 
-    private static int getCurrentCount(@NotNull ServerPlayerEntity player, @NotNull Stat<?> stat) {
+    public static int getCurrentCount(@NotNull ServerPlayerEntity player, @NotNull Stat<?> stat) {
         return player.getStatHandler().getStat(stat);
     }
 
