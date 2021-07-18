@@ -18,6 +18,7 @@ import net.minecraft.world.dimension.DimensionType;
 import team.bits.vanilla.fabric.BitsVanilla;
 import team.bits.vanilla.fabric.database.player.PlayerUtils;
 import team.bits.vanilla.fabric.teleport.Teleporter;
+import team.bits.vanilla.fabric.util.Colors;
 import team.bits.vanilla.fabric.util.CommandSuggestionUtils;
 import team.bits.vanilla.fabric.util.Location;
 
@@ -141,7 +142,7 @@ public class BeamCommand extends Command {
         TextComponent acceptMessage = Component.text(String.format(ACCEPT_STRING, sendingPlayerName))
                 .hoverEvent(HoverEvent.showText(Component.text("Click here to accept!")))
                 .clickEvent(ClickEvent.runCommand("/beam accept"))
-                .color(NamedTextColor.GREEN);
+                .color(Colors.NEUTRAL);
 
         BitsVanilla.adventure().audience(receivingPlayer)
                 .sendMessage(acceptMessage);
@@ -158,7 +159,11 @@ public class BeamCommand extends Command {
 record Beam(ServerPlayerEntity sendingPlayer,
             ServerPlayerEntity receivingPlayer) {
 
+    private final static String ACCEPT_MSG = "Beam accepted";
+
     public void executeBeam() {
+        BitsVanilla.audience(sendingPlayer).sendMessage(Component.text(ACCEPT_MSG).color(Colors.NEUTRAL));
+        BitsVanilla.audience(receivingPlayer).sendMessage(Component.text(ACCEPT_MSG).color(Colors.NEUTRAL));
         Teleporter.queueTeleport(this.sendingPlayer, Location.get(this.receivingPlayer), false);
     }
 }
