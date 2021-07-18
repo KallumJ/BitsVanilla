@@ -133,7 +133,7 @@ public final class WarpUtils {
     private static @NotNull RegistryKey<World> nameToWorldKey(@NotNull String name) {
         return switch (name.toLowerCase()) {
             case "world" -> World.OVERWORLD;
-            case "world_the_nether" -> World.NETHER;
+            case "world_nether" -> World.NETHER;
             case "world_the_end" -> World.END;
             default -> throw new IllegalArgumentException("Cannot find world " + name);
         };
