@@ -143,7 +143,7 @@ public final class WarpUtils {
         if (key.equals(World.OVERWORLD)) {
             return "world";
         } else if (key.equals(World.NETHER)) {
-            return "world_the_nether";
+            return "world_nether";
         } else if (key.equals(World.END)) {
             return "world_the_end";
         }
