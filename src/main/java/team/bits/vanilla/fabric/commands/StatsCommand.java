@@ -28,6 +28,7 @@ public class StatsCommand extends Command {
     private static final String STATS_HEADER = "%s's Statistics:";
     private static final String STAT_LINE = "%s: %s (Level %s)";
     private static final String NO_PLAYER_ERR = "There is no player %s online";
+    private static final String NO_STATS_ERR = "The player %s has no statistics";
 
     public StatsCommand() {
         super("statistics", new String[]{"stats"}, new CommandInformation()
@@ -88,7 +89,7 @@ public class StatsCommand extends Command {
                 );
             }
         } else {
-            BitsVanilla.audience(source).sendMessage(Component.text("The player " + player.getEntityName() + " has no statistics"));
+            BitsVanilla.audience(source).sendMessage(Component.text(String.format(NO_STATS_ERR, PlayerUtils.getEffectiveName(player))).color(Colors.NEGATIVE));
         }
 
         return 1;
