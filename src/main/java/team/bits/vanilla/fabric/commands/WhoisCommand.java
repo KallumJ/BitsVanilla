@@ -35,7 +35,7 @@ public class WhoisCommand extends Command {
     public void registerCommand(CommandDispatcher<ServerCommandSource> dispatcher) {
         CommandNode<ServerCommandSource> commandNode = dispatcher.register(
                 literal(super.getName())
-                        .then(CommandManager.argument("nickname", StringArgumentType.string())
+                        .then(CommandManager.argument("nickname", StringArgumentType.greedyString())
                                 .executes(this)
                                 .suggests(CommandSuggestionUtils.NICKNAMES)
                         )

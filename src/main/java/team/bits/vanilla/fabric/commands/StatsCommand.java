@@ -43,7 +43,7 @@ public class StatsCommand extends Command {
         CommandNode<ServerCommandSource> commandNode = dispatcher.register(
                 literal(super.getName())
                         .executes(this)
-                        .then(CommandManager.argument("player", StringArgumentType.string())
+                        .then(CommandManager.argument("player", StringArgumentType.greedyString())
                                 .suggests(CommandSuggestionUtils.ONLINE_PLAYERS)
                                 .executes(this)
                         )
@@ -81,11 +81,10 @@ public class StatsCommand extends Command {
                     Component.text(String.format(STATS_HEADER, PlayerUtils.getEffectiveName(player)), Colors.HEADER)
             );
 
-
             for (StatUtils.StatisticRecord record : stats) {
                 String name = Utils.fancyFormat(record.stat().customName());
                 audience.sendMessage(
-                        Component.text(String.format(STAT_LINE, name, record.count(), record.level()), Colors.NEUTRAL)
+                        Component.text(String.format(STAT_LINE, name, record.stat().stat().format(record.count()), record.level()), Colors.NEUTRAL)
                 );
             }
         } else {

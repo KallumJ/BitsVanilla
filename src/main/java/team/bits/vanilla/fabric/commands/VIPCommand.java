@@ -40,14 +40,14 @@ public class VIPCommand extends Command {
                 literal(super.getName())
                         .then(literal("set")
                                 .requires(source -> source.hasPermissionLevel(4)) // requires permission level 4
-                                .then(CommandManager.argument("player", StringArgumentType.string())
+                                .then(CommandManager.argument("player", StringArgumentType.greedyString())
                                         .suggests(CommandSuggestionUtils.ONLINE_PLAYERS)
                                         .executes(this)
                                 ))
 
                         .then(literal("del")
                                 .requires(source -> source.hasPermissionLevel(4)) // requires permission level 4
-                                .then(CommandManager.argument("player", StringArgumentType.string())
+                                .then(CommandManager.argument("player", StringArgumentType.greedyString())
                                         .suggests(CommandSuggestionUtils.ONLINE_PLAYERS)
                                         .executes(this::delVip)
                                 )
