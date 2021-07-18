@@ -38,7 +38,7 @@ public class NewPlayerListener implements PlayerConnectEvent {
         if (!ePlayer.hasPlayedBefore()) {
 
             // give the player all the starter items
-            STARTER_ITEMS.forEach(ePlayer::giveItem);
+            STARTER_ITEMS.forEach(stack -> ePlayer.giveItem(stack.copy()));
 
             // show a welcome title
             Style style = Style.style(NamedTextColor.AQUA, TextDecoration.BOLD);

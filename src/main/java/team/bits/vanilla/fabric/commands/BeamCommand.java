@@ -49,7 +49,13 @@ public class BeamCommand extends Command {
     @Override
     public void registerCommand(CommandDispatcher<ServerCommandSource> dispatcher) {
         // Register /beam <player>
-        CommandNode<ServerCommandSource> commandNode = dispatcher.register(literal(super.getName()).then(CommandManager.argument("player", StringArgumentType.string()).suggests(CommandSuggestionUtils.ONLINE_PLAYERS).executes(this::initialiseBeamRequest)));
+        CommandNode<ServerCommandSource> commandNode = dispatcher.register(
+                literal(super.getName())
+                        .then(CommandManager.argument("player", StringArgumentType.greedyString())
+                                .suggests(CommandSuggestionUtils.ONLINE_PLAYERS)
+                                .executes(this::initialiseBeamRequest)
+                        )
+        );
 
         // Register /beam accept
         dispatcher.register(literal(super.getName())
