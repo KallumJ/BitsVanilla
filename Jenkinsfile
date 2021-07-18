@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    tools {
+        jdk 'jdk_16'
+    }
+
     stages {
         stage('build') {
             steps {
