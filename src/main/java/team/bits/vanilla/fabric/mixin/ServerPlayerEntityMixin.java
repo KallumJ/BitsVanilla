@@ -1,6 +1,7 @@
 package team.bits.vanilla.fabric.mixin;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -15,6 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import team.bits.vanilla.fabric.BitsVanilla;
 import team.bits.vanilla.fabric.commands.EndLockCommand;
+import team.bits.vanilla.fabric.util.AFKManager;
 import team.bits.vanilla.fabric.util.Colors;
 import team.bits.vanilla.fabric.util.ExtendedPlayerEntity;
 
@@ -48,7 +50,29 @@ public abstract class ServerPlayerEntityMixin {
 
     @Overwrite
     public @Nullable Text getPlayerListName() {
-        ServerPlayerEntity self = ServerPlayerEntity.class.cast(this);
-        return self.getCustomName();
+        final ServerPlayerEntity self = ServerPlayerEntity.class.cast(this);
+
+        // get the player's custom name (name/nickname + color)
+        Text customName = self.getCustomName();
+
+        if (!AFKManager.isVisuallyAfk(self)) {
+            // if the player isn't afk, we can just return the custom name
+            return customName;
+
+        } else {
+            if (customName != null) {
+
+                // take the player's custom name but restyle it to be gray and italic
+                return customName.copy().styled(style ->
+                        style.withColor(NamedTextColor.GRAY.value()).withItalic(true)
+                );
+
+            } else {
+                // customName should only be null if the name is still loading
+                // from the database so we can safely return null here
+                // (returning null means use the player's normal username)
+                return null;
+            }
+        }
     }
 }

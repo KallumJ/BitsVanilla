@@ -1,6 +1,5 @@
 package team.bits.vanilla.fabric.database.player;
 
-import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
@@ -12,6 +11,7 @@ import team.bits.vanilla.fabric.database.util.QueryHelper;
 import team.bits.vanilla.fabric.database.util.model.DataTypes;
 import team.bits.vanilla.fabric.util.MojangApiUtils;
 import team.bits.vanilla.fabric.util.ServerInstance;
+import team.bits.vanilla.fabric.util.Utils;
 
 import java.awt.*;
 import java.sql.Connection;
@@ -180,9 +180,7 @@ public class PlayerDataHandle {
                 player.setCustomName(this.getFormattedUsername());
             }
 
-            ServerInstance.get().getPlayerManager().sendToAll(
-                    new PlayerListS2CPacket(PlayerListS2CPacket.Action.UPDATE_DISPLAY_NAME, player)
-            );
+            Utils.updatePlayerDisplayName(player);
         }
     }
 

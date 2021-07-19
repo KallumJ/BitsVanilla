@@ -11,11 +11,13 @@ import java.util.Map;
 public class AFKManager {
     public static final Map<ServerPlayerEntity, AFKCounter> PLAYER_TRACKER = new HashMap<>();
     public static final int AFK_THRESHOLD = 300; // Time in seconds
-    private static final String NOW_AFK_MSG = "*%s is now AFK";
-    private static final String NO_LONGER_AFK_MSG = "*%s is no longer AFK";
+    private static final String NOW_AFK_MSG = "* %s is now AFK";
+    private static final String NO_LONGER_AFK_MSG = "* %s is no longer AFK";
 
     public static void playerMoved(ServerPlayerEntity player) {
         AFKCounter playersAfkCounter = PLAYER_TRACKER.get(player);
+
+        boolean wasAfk = false;
 
         // If the player is AFK when their time gets reset, announce that they are no longer AFK
         if (playersAfkCounter.isAfk() || playersAfkCounter.isVisuallyAfk()) {
@@ -23,9 +25,16 @@ public class AFKManager {
                     Component.text(String.format(NO_LONGER_AFK_MSG, PlayerUtils.getEffectiveName(player)))
                             .color(NamedTextColor.GRAY)
             );
+            wasAfk = true;
         }
 
         playersAfkCounter.resetTimeAfk();
+
+        // we want to update the display name after we reset the time
+        // but only if they were afk before to reduce packet traffic
+        if (wasAfk) {
+            Utils.updatePlayerDisplayName(player);
+        }
     }
 
 
@@ -44,6 +53,7 @@ public class AFKManager {
                 ServerInstance.broadcast(
                         Component.text(String.format(NOW_AFK_MSG, PlayerUtils.getEffectiveName(serverPlayerEntity)))
                                 .color(NamedTextColor.GRAY));
+                Utils.updatePlayerDisplayName(serverPlayerEntity);
             }
         }), 0, 10);
     }
@@ -54,7 +64,11 @@ public class AFKManager {
     }
 
     public static boolean isAFK(ServerPlayerEntity player) {
-        return PLAYER_TRACKER.get(player).isAfk();
+        return PLAYER_TRACKER.containsKey(player) && PLAYER_TRACKER.get(player).isAfk();
+    }
+
+    public static boolean isVisuallyAfk(ServerPlayerEntity player) {
+        return PLAYER_TRACKER.containsKey(player) && PLAYER_TRACKER.get(player).isVisuallyAfk();
     }
 
     public static void makeVisuallyAfk(ServerPlayerEntity player) {
