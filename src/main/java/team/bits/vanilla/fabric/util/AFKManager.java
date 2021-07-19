@@ -7,15 +7,16 @@ import team.bits.vanilla.fabric.database.player.PlayerUtils;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class AFKManager {
-    public static final Map<ServerPlayerEntity, AFKCounter> PLAYER_TRACKER = new HashMap<>();
+    public static final Map<UUID, AFKCounter> PLAYER_TRACKER = new HashMap<>();
     public static final int AFK_THRESHOLD = 300; // Time in seconds
     private static final String NOW_AFK_MSG = "* %s is now AFK";
     private static final String NO_LONGER_AFK_MSG = "* %s is no longer AFK";
 
     public static void playerMoved(ServerPlayerEntity player) {
-        AFKCounter playersAfkCounter = PLAYER_TRACKER.get(player);
+        AFKCounter playersAfkCounter = PLAYER_TRACKER.get(player.getUuid());
 
         boolean wasAfk = false;
 
@@ -41,38 +42,41 @@ public class AFKManager {
     public static void playerConnect(ServerPlayerEntity player) {
         // When a player joins, start tracking them
         AFKCounter afkCounter = new AFKCounter();
-        PLAYER_TRACKER.put(player, afkCounter);
+        PLAYER_TRACKER.put(player.getUuid(), afkCounter);
         Scheduler.scheduleAtFixedRate(afkCounter, 0, 20);
     }
 
     public static void initAfkManager() {
         // Every 0.5 seconds, check whether we need to announce that a player has gone AFK
-        Scheduler.scheduleAtFixedRate(() -> PLAYER_TRACKER.forEach((serverPlayerEntity, afkCounter) -> {
-            if ((afkCounter.isAfk() || afkCounter.isVisuallyAfk()) && !afkCounter.isAnnounced()) {
-                afkCounter.setAnnounced(true);
-                ServerInstance.broadcast(
-                        Component.text(String.format(NOW_AFK_MSG, PlayerUtils.getEffectiveName(serverPlayerEntity)))
-                                .color(NamedTextColor.GRAY));
-                Utils.updatePlayerDisplayName(serverPlayerEntity);
+        Scheduler.scheduleAtFixedRate(() -> PLAYER_TRACKER.forEach((playerUUID, afkCounter) -> {
+            ServerPlayerEntity player = ServerInstance.get().getPlayerManager().getPlayer(playerUUID);
+            if (player != null) {
+                if ((afkCounter.isAfk() || afkCounter.isVisuallyAfk()) && !afkCounter.isAnnounced()) {
+                    afkCounter.setAnnounced(true);
+                    ServerInstance.broadcast(
+                            Component.text(String.format(NOW_AFK_MSG, PlayerUtils.getEffectiveName(player)))
+                                    .color(NamedTextColor.GRAY));
+                    Utils.updatePlayerDisplayName(player);
+                }
             }
         }), 0, 10);
     }
 
     public static void playerDisconnect(ServerPlayerEntity player) {
         // When a player leaves, stop tracking them
-        PLAYER_TRACKER.remove(player);
+        PLAYER_TRACKER.remove(player.getUuid());
     }
 
     public static boolean isAFK(ServerPlayerEntity player) {
-        return PLAYER_TRACKER.containsKey(player) && PLAYER_TRACKER.get(player).isAfk();
+        return PLAYER_TRACKER.containsKey(player.getUuid()) && PLAYER_TRACKER.get(player.getUuid()).isAfk();
     }
 
     public static boolean isVisuallyAfk(ServerPlayerEntity player) {
-        return PLAYER_TRACKER.containsKey(player) && PLAYER_TRACKER.get(player).isVisuallyAfk();
+        return PLAYER_TRACKER.containsKey(player.getUuid()) && PLAYER_TRACKER.get(player.getUuid()).isVisuallyAfk();
     }
 
     public static void makeVisuallyAfk(ServerPlayerEntity player) {
-        AFKCounter afkCounter = AFKManager.PLAYER_TRACKER.get(player);
+        AFKCounter afkCounter = AFKManager.PLAYER_TRACKER.get(player.getUuid());
         afkCounter.setVisuallyAfk();
     }
 }
