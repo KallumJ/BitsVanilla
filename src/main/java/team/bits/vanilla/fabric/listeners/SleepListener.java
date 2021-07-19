@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import team.bits.vanilla.fabric.BitsVanilla;
 import team.bits.vanilla.fabric.event.sleep.PlayerSleepCallback;
 import team.bits.vanilla.fabric.event.sleep.PlayerWakeUpCallback;
+import team.bits.vanilla.fabric.mixin.ServerWorldInvoker;
 import team.bits.vanilla.fabric.util.AFKManager;
 import team.bits.vanilla.fabric.util.ServerInstance;
 
@@ -74,7 +75,7 @@ public class SleepListener implements PlayerSleepCallback, PlayerWakeUpCallback 
             this.sleeping.clear();
 
             world.setTimeOfDay(0);
-            world.setWeather(12000, 0, false, false);
+            ((ServerWorldInvoker) world).invokeResetWeather();
 
             PlayerManager playerManager = ServerInstance.get().getPlayerManager();
             playerManager.getPlayerList().forEach(player ->

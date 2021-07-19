@@ -21,7 +21,8 @@
     "stats.NetherPortalsUsedMixin",
     "ServerWorldMixin",
     "stats.BedsExplodedMixin",
-    "stats.CopperWaxedMixin"
+    "stats.CopperWaxedMixin",
+    "ServerWorldInvoker"
   ],
   "injectors": {
     "defaultRequire": 1
