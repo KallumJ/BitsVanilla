@@ -28,6 +28,7 @@ public class Commands {
         addCommand(new WhoisCommand());
         addCommand(new RulesCommand());
         addCommand(new StatsCommand());
+        addCommand(new VersionCommand());
     }
 
     public static void registerCommands() {

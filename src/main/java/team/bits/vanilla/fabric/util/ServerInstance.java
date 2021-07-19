@@ -6,6 +6,7 @@ import net.minecraft.server.dedicated.MinecraftDedicatedServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 import team.bits.vanilla.fabric.BitsVanilla;
+import team.bits.vanilla.fabric.commands.VersionCommand;
 
 import java.util.Collection;
 import java.util.List;
@@ -20,6 +21,7 @@ public final class ServerInstance {
 
     public static void set(@NotNull MinecraftDedicatedServer server) {
         INSTANCE = Objects.requireNonNull(server);
+        VersionCommand.init();
     }
 
     public static @NotNull MinecraftDedicatedServer get() {
