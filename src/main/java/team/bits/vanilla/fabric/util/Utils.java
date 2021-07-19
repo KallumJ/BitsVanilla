@@ -64,11 +64,11 @@ public final class Utils {
         }
 
         // teleport the player to the destination
-        if (world == player.world) {
-            player.networkHandler.requestTeleport(position.x, position.y, position.z, player.getYaw(), player.getPitch());
-        } else {
-            player.teleport(world, position.x, position.y, position.z, player.getYaw(), player.getPitch());
-        }
+        player.teleport(world, position.x, position.y, position.z, player.getYaw(), player.getPitch());
+
+        // trigger synchronization of experience and health
+        player.addExperience(0);
+        player.markHealthDirty();
     }
 
     public static @NotNull String fancyFormat(@NotNull String input) {
