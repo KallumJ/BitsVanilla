@@ -72,7 +72,12 @@ public class AFKManager {
     }
 
     public static boolean isVisuallyAfk(ServerPlayerEntity player) {
-        return PLAYER_TRACKER.containsKey(player.getUuid()) && PLAYER_TRACKER.get(player.getUuid()).isVisuallyAfk();
+        UUID playerUUID = player.getUuid();
+        if (PLAYER_TRACKER.containsKey(playerUUID)) {
+            AFKCounter counter = PLAYER_TRACKER.get(playerUUID);
+            return counter.isVisuallyAfk() || counter.isAfk();
+        }
+        return false;
     }
 
     public static void makeVisuallyAfk(ServerPlayerEntity player) {
