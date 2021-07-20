@@ -18,6 +18,7 @@ import team.bits.vanilla.fabric.util.AFKManager;
 import team.bits.vanilla.fabric.util.ServerInstance;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 public class SleepListener implements PlayerSleepCallback, PlayerWakeUpCallback {
@@ -61,7 +62,15 @@ public class SleepListener implements PlayerSleepCallback, PlayerWakeUpCallback 
 
     @Override
     public void onWakeUp(@NotNull PlayerEntity player) {
-        this.sleeping.remove(player);
+        if (!this.sleeping.isEmpty()) {
+            this.sleeping.remove(player);
+
+            MinecraftServer server = Objects.requireNonNull(player.getServer());
+            int sleeping = this.sleeping.size();
+            int online = Math.max(getOnlinePlayerCount(server), 1);
+
+            sendSleepingMessage(server, sleeping, online, false);
+        }
     }
 
     private void checkSleeping(@NotNull ServerWorld world) {
