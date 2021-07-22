@@ -33,7 +33,7 @@ public class DatabaseDriver implements IDatabaseDriver {
             throw new DatabaseDriverException("Database connection has already been established");
         }
 
-        String url = String.format("jdbc:mysql://%s:%s/%s?useSSL=false",
+        String url = String.format("jdbc:mysql://%s:%s/%s?useSSL=false&autoReconnect=true",
                 this.properties.getAddress(),
                 this.properties.getPort(),
                 this.properties.getDatabaseName()
