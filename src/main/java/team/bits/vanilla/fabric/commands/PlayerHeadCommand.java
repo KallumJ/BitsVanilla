@@ -70,11 +70,11 @@ public class PlayerHeadCommand extends Command {
 
             if (ePlayer.hasItem(Items.DIAMOND, 1)) {
                 ItemStack playerHead = new ItemStack(Items.PLAYER_HEAD, 1);
-                NbtCompound tag = playerHead.getOrCreateTag();
+                NbtCompound tag = playerHead.getOrCreateNbt();
 
                 tag.putString("SkullOwner", playerHeadString);
 
-                playerHead.setTag(tag);
+                playerHead.setNbt(tag);
 
                 ePlayer.giveItem(playerHead);
                 ePlayer.removeItem(Items.DIAMOND, 1);
