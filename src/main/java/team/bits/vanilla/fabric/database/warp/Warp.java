@@ -1,7 +1,7 @@
 package team.bits.vanilla.fabric.database.warp;
 
 import org.jetbrains.annotations.NotNull;
-import team.bits.vanilla.fabric.util.Location;
+import team.bits.nibbles.teleport.Location;
 
 import java.util.Objects;
 

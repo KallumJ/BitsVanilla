@@ -9,6 +9,8 @@ import com.mojang.brigadier.tree.CommandNode;
 import net.kyori.adventure.text.Component;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
+import team.bits.nibbles.command.Command;
+import team.bits.nibbles.command.CommandInformation;
 import team.bits.vanilla.fabric.BitsVanilla;
 import team.bits.vanilla.fabric.database.player.PlayerUtils;
 import team.bits.vanilla.fabric.util.Colors;

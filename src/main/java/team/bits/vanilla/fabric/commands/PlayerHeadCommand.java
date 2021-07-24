@@ -12,6 +12,8 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import team.bits.nibbles.command.Command;
+import team.bits.nibbles.command.CommandInformation;
 import team.bits.vanilla.fabric.database.player.PlayerDataHandle;
 import team.bits.vanilla.fabric.database.player.PlayerUtils;
 import team.bits.vanilla.fabric.util.CommandSuggestionUtils;
@@ -29,10 +31,11 @@ public class PlayerHeadCommand extends Command {
     private static final String INVALID_USERNAME_ERR = "Username %s is invalid";
 
     public PlayerHeadCommand() {
-        super("playerhead", new String[]{"ph"}, new CommandInformation()
-                .setDescription("Gives the player the specified players head, at the cost of a diamond")
-                .setUsage("<player>")
-                .setPublic(true)
+        super("playerhead", new CommandInformation()
+                        .setDescription("Gives the player the specified players head, at the cost of a diamond")
+                        .setUsage("<player>")
+                        .setPublic(true),
+                "ph"
         );
     }
 

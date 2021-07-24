@@ -2,7 +2,7 @@ package team.bits.vanilla.fabric.teleport;
 
 import net.minecraft.entity.player.PlayerEntity;
 import org.jetbrains.annotations.NotNull;
-import team.bits.vanilla.fabric.util.Location;
+import team.bits.nibbles.teleport.Location;
 
 import java.util.Objects;
 

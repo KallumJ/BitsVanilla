@@ -11,6 +11,8 @@ import net.kyori.adventure.text.Component;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import team.bits.nibbles.command.Command;
+import team.bits.nibbles.command.CommandInformation;
 import team.bits.vanilla.fabric.BitsVanilla;
 import team.bits.vanilla.fabric.database.player.PlayerUtils;
 import team.bits.vanilla.fabric.statistics.lib.StatUtils;
@@ -31,10 +33,11 @@ public class StatsCommand extends Command {
     private static final String NO_STATS_ERR = "The player %s has no statistics";
 
     public StatsCommand() {
-        super("statistics", new String[]{"stats"}, new CommandInformation()
-                .setDescription("See your statistics, or those of another player")
-                .setUsage("[player]")
-                .setPublic(true)
+        super("statistics", new CommandInformation()
+                        .setDescription("See your statistics, or those of another player")
+                        .setUsage("[player]")
+                        .setPublic(true),
+                "stats"
         );
     }
 

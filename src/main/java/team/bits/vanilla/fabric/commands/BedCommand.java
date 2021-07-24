@@ -16,8 +16,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
+import team.bits.nibbles.command.Command;
+import team.bits.nibbles.command.CommandInformation;
+import team.bits.nibbles.teleport.Location;
 import team.bits.vanilla.fabric.teleport.Teleporter;
-import team.bits.vanilla.fabric.util.Location;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -28,9 +30,10 @@ public class BedCommand extends Command {
     private static final String BED_ERR = "Could not teleport to your bed";
 
     public BedCommand() {
-        super("bed", new String[]{"b", "home"}, new CommandInformation()
-                .setDescription("Teleports you back to your bed")
-                .setPublic(true)
+        super("bed", new CommandInformation()
+                        .setDescription("Teleports you back to your bed")
+                        .setPublic(true),
+                "b", "home"
         );
     }
 

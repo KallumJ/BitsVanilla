@@ -1,6 +1,7 @@
 package team.bits.vanilla.fabric.commands;
 
-import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+import team.bits.nibbles.command.Command;
+import team.bits.nibbles.command.CommandManager;
 
 import java.util.ArrayList;
 
@@ -8,7 +9,7 @@ public class Commands {
 
     public static final ArrayList<Command> COMMANDS_LIST = new ArrayList<>();
 
-    static {
+    public static void registerCommands() {
         addCommand(new DiscordCommand());
         addCommand(new DonateCommand());
         addCommand(new HelpCommand());
@@ -31,15 +32,8 @@ public class Commands {
         addCommand(new VersionCommand());
     }
 
-    public static void registerCommands() {
-        CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> {
-            for (Command command : COMMANDS_LIST) {
-                command.registerCommand(dispatcher);
-            }
-        });
-    }
-
     private static void addCommand(Command command) {
+        CommandManager.INSTANCE.register(command);
         COMMANDS_LIST.add(command);
     }
 }

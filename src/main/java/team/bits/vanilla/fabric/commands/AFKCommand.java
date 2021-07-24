@@ -3,6 +3,8 @@ package team.bits.vanilla.fabric.commands;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.server.command.ServerCommandSource;
+import team.bits.nibbles.command.Command;
+import team.bits.nibbles.command.CommandInformation;
 import team.bits.vanilla.fabric.util.AFKManager;
 
 public class AFKCommand extends Command {

@@ -14,6 +14,8 @@ import net.kyori.adventure.text.format.TextColor;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import team.bits.nibbles.command.Command;
+import team.bits.nibbles.command.CommandInformation;
 import team.bits.vanilla.fabric.BitsVanilla;
 import team.bits.vanilla.fabric.database.player.PlayerDataHandle;
 import team.bits.vanilla.fabric.database.player.PlayerUtils;
@@ -36,10 +38,11 @@ public class ColorNameCommand extends Command {
     private static final String INVALID_COLOR_ERR = "Cannot find color %s";
 
     public ColorNameCommand() {
-        super("colorname", new String[]{"cn"}, new CommandInformation()
-                .setDescription("Change the color of your name")
-                .setUsage("<player>")
-                .setPublic(true)
+        super("colorname", new CommandInformation()
+                        .setDescription("Change the color of your name")
+                        .setUsage("<player>")
+                        .setPublic(true),
+                "cn"
         );
     }
 

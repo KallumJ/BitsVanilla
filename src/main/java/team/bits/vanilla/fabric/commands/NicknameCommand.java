@@ -9,6 +9,8 @@ import net.kyori.adventure.text.Component;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import team.bits.nibbles.command.Command;
+import team.bits.nibbles.command.CommandInformation;
 import team.bits.vanilla.fabric.BitsVanilla;
 import team.bits.vanilla.fabric.database.player.PlayerDataHandle;
 import team.bits.vanilla.fabric.util.Colors;
@@ -18,10 +20,11 @@ import static net.minecraft.server.command.CommandManager.literal;
 public class NicknameCommand extends Command {
 
     public NicknameCommand() {
-        super("nickname", new String[]{"nick"}, new CommandInformation()
-                .setDescription("Change your nickname")
-                .setUsage("<nickname>")
-                .setPublic(true)
+        super("nickname", new CommandInformation()
+                        .setDescription("Change your nickname")
+                        .setUsage("<nickname>")
+                        .setPublic(true),
+                "nick"
         );
     }
 

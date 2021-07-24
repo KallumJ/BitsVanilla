@@ -13,6 +13,8 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
+import team.bits.nibbles.command.Command;
+import team.bits.nibbles.command.CommandInformation;
 import team.bits.vanilla.fabric.BitsVanilla;
 
 import java.util.*;
@@ -29,7 +31,7 @@ public class ChunkInspectCommand extends Command {
     private final Executor executor = Executors.newSingleThreadExecutor();
 
     public ChunkInspectCommand() {
-        super("chunkinspect", new String[]{"ci"}, new CommandInformation()
+        super("chunkinspect", new CommandInformation()
                 .setDescription("Provides a list of large groups of entities across the server")
                 .setPublic(false)
         );

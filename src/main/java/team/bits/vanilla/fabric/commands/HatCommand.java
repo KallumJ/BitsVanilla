@@ -6,6 +6,8 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import team.bits.nibbles.command.Command;
+import team.bits.nibbles.command.CommandInformation;
 import team.bits.vanilla.fabric.util.ExtendedPlayerEntity;
 
 public class HatCommand extends Command {
@@ -13,9 +15,10 @@ public class HatCommand extends Command {
     private static final int HEAD_SLOT = 39;
 
     public HatCommand() {
-        super("hat", new String[]{"h"}, new CommandInformation()
-                .setDescription("Puts the item in the users hand on their head")
-                .setPublic(true)
+        super("hat", new CommandInformation()
+                        .setDescription("Puts the item in the users hand on their head")
+                        .setPublic(true),
+                "h"
         );
     }
 

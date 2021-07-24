@@ -11,11 +11,11 @@ import net.minecraft.item.Items;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
+import team.bits.nibbles.teleport.TeleportUtils;
 import team.bits.vanilla.fabric.BitsVanilla;
 import team.bits.vanilla.fabric.database.warp.WarpUtils;
 import team.bits.vanilla.fabric.event.misc.PlayerConnectEvent;
 import team.bits.vanilla.fabric.util.ExtendedPlayerEntity;
-import team.bits.vanilla.fabric.util.Utils;
 
 import java.time.Duration;
 import java.util.Arrays;
@@ -56,7 +56,7 @@ public class NewPlayerListener implements PlayerConnectEvent {
             WarpUtils.getWarp("spawn").ifPresent(spawn ->
                     // we use Utils.teleport instead of the Teleporter
                     // to bypass the teleport delay
-                    Utils.teleport(player, spawn.location())
+                    TeleportUtils.teleport(player, spawn.location())
             );
         }
     }

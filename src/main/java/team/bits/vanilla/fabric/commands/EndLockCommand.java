@@ -5,6 +5,8 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.minecraft.server.command.ServerCommandSource;
+import team.bits.nibbles.command.Command;
+import team.bits.nibbles.command.CommandInformation;
 import team.bits.vanilla.fabric.BitsVanilla;
 import team.bits.vanilla.fabric.util.Colors;
 

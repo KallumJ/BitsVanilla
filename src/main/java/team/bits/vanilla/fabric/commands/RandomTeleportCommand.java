@@ -12,6 +12,8 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.border.WorldBorder;
+import team.bits.nibbles.command.Command;
+import team.bits.nibbles.command.CommandInformation;
 import team.bits.vanilla.fabric.BitsVanilla;
 import team.bits.vanilla.fabric.util.Colors;
 import team.bits.vanilla.fabric.util.ExtendedPlayerEntity;
@@ -29,9 +31,10 @@ public class RandomTeleportCommand extends Command {
     private static final long RTP_COOLDOWN = 30 * 60 * 1000; // in milliseconds
 
     public RandomTeleportCommand() {
-        super("randomteleport", new String[]{"rtp"}, new CommandInformation()
-                .setDescription("Teleport to a random location in the world")
-                .setPublic(true)
+        super("randomteleport", new CommandInformation()
+                        .setDescription("Teleport to a random location in the world")
+                        .setPublic(true),
+                "rtp"
         );
     }
 

@@ -7,6 +7,8 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.server.command.ServerCommandSource;
+import team.bits.nibbles.command.Command;
+import team.bits.nibbles.command.CommandInformation;
 import team.bits.vanilla.fabric.BitsVanilla;
 
 import java.util.ArrayList;
@@ -28,12 +30,12 @@ public class HelpCommand extends Command {
 
         for (Command command : Commands.COMMANDS_LIST) {
             // If command is to be used by the public
-            if (command.getCommandInformation().isPublic()) {
+            if (command.getCommandInfo().isPublic()) {
                 StringBuilder cmdString = new StringBuilder();
 
                 String commandName = generateCommandString(command);
 
-                CommandInformation helpInformation = command.getCommandInformation();
+                CommandInformation helpInformation = command.getCommandInfo();
                 String helpDesc = helpInformation.getDescription();
 
                 // Generate string with name and description
