@@ -7,10 +7,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(targets = "net.minecraft.entity.mob.EndermanEntity$PickUpBlockGoal")
 public class EndermanMixin {
+
     @Inject(
             at = @At("HEAD"),
-            method = "canStart",
-            cancellable = true)
+            method = {"canStart", "method_6264"},
+            cancellable = true
+    )
     public void preventBlockPickup(CallbackInfoReturnable<Boolean> cir) {
         cir.setReturnValue(false);
     }
