@@ -6,10 +6,19 @@ pipeline {
     }
 
     stages {
-        stage('build') {
+        stage('Build') {
             steps {
                 sh "sed -i 's/%VERSION%/${BRANCH_NAME}-${BUILD_NUMBER}/' gradle.properties"
                 sh './gradlew clean build'
+            }
+        }
+        stage('Test') {
+            steps {
+                sh './test/production_server_test.sh ${BRANCH_NAME}-${BUILD_NUMBER}'
+            }
+        }
+        stage('Archive') {
+            steps {
                 archiveArtifacts artifacts: 'build/libs/*.jar', fingerprint: true
             }
         }
