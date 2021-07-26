@@ -79,6 +79,7 @@ public class BitsVanilla implements ModInitializer, ServerLifecycleEvents.Server
 
         PlayerConnectEvent.EVENT.register((player, connection) -> PlayerUtils.updatePlayerUsername(player));
         PlayerConnectEvent.EVENT.register(new NewPlayerListener());
+        PlayerConnectEvent.EVENT.register(new CustomClientHandler());
 
         PlayerConnectEvent.EVENT.register(new PlayerConnectListener());
         PlayerMoveCallback.EVENT.register(new PlayerMoveListener());

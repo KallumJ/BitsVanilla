@@ -55,6 +55,9 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
     private final Map<String, Integer> statLevels = new HashMap<>();
     private boolean migratedStats;
 
+    private boolean customClient = false;
+    private boolean sendTPS = false;
+
     @Shadow
     public abstract PlayerInventory getInventory();
 
@@ -156,6 +159,8 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
         this.lastRTPTime = cOldPlayer.lastRTPTime;
         this.statLevels.putAll(cOldPlayer.statLevels);
         this.migratedStats = cOldPlayer.migratedStats;
+        this.customClient = cOldPlayer.customClient;
+        this.sendTPS = cOldPlayer.sendTPS;
 
         Scheduler.runOffThread(() -> {
             ServerPlayerEntity self = ServerPlayerEntity.class.cast(this);
@@ -277,6 +282,26 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
     @Override
     public void markMigratedStats() {
         this.migratedStats = true;
+    }
+
+    @Override
+    public void setCustomClient(boolean customClient) {
+        this.customClient = customClient;
+    }
+
+    @Override
+    public boolean isCustomClient() {
+        return this.customClient;
+    }
+
+    @Override
+    public void setSendTPS(boolean sendTPS) {
+        this.sendTPS = sendTPS;
+    }
+
+    @Override
+    public boolean shouldSendTPS() {
+        return this.sendTPS;
     }
 }
 

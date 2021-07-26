@@ -50,4 +50,12 @@ public interface ExtendedPlayerEntity {
     boolean hasMigratedStats();
 
     void markMigratedStats();
+
+    void setCustomClient(boolean customClient);
+
+    boolean isCustomClient();
+
+    void setSendTPS(boolean sendTPS);
+
+    boolean shouldSendTPS();
 }

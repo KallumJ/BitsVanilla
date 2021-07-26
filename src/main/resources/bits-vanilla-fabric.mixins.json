@@ -23,7 +23,8 @@
     "stats.BedsExplodedMixin",
     "stats.CopperWaxedMixin",
     "ServerWorldInvoker",
-    "EndermanMixin"
+    "EndermanMixin",
+    "MetricsMixin"
   ],
   "injectors": {
     "defaultRequire": 1
