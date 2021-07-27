@@ -10,9 +10,9 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.stat.Stats;
 import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.NotNull;
+import team.bits.nibbles.event.sleep.PlayerSleepEvent;
+import team.bits.nibbles.event.sleep.PlayerWakeUpEvent;
 import team.bits.vanilla.fabric.BitsVanilla;
-import team.bits.vanilla.fabric.event.sleep.PlayerSleepCallback;
-import team.bits.vanilla.fabric.event.sleep.PlayerWakeUpCallback;
 import team.bits.vanilla.fabric.mixin.ServerWorldInvoker;
 import team.bits.vanilla.fabric.util.AFKManager;
 import team.bits.vanilla.fabric.util.ServerInstance;
@@ -21,7 +21,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-public class SleepListener implements PlayerSleepCallback, PlayerWakeUpCallback {
+public class SleepListener implements PlayerSleepEvent, PlayerWakeUpEvent {
 
     private final Set<PlayerEntity> sleeping = new HashSet<>();
 

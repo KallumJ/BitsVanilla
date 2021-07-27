@@ -1,7 +1,6 @@
 package team.bits.vanilla.fabric.mixin;
 
 import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
@@ -12,7 +11,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -22,8 +20,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import team.bits.vanilla.fabric.database.player.PlayerDataHandle;
-import team.bits.vanilla.fabric.event.damage.PlayerDamageCallback;
-import team.bits.vanilla.fabric.event.sleep.PlayerMoveCallback;
 import team.bits.vanilla.fabric.util.ExtendedPlayerEntity;
 import team.bits.vanilla.fabric.util.Scheduler;
 
@@ -36,8 +32,6 @@ import java.util.Optional;
 public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
 
     private static final int HEAD_SLOT = 39;
-
-    private Vec3d previousPos = Vec3d.ZERO;
 
     /**
      * Last time (unix timestamp) at which the player used /rtp
@@ -60,41 +54,6 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
 
     @Shadow
     public abstract PlayerInventory getInventory();
-
-    /**
-     * Caller for the {@link PlayerMoveCallback}
-     */
-    @Inject(
-            method = "tickMovement",
-            at = @At("TAIL")
-    )
-    private void onTickMovement(CallbackInfo ci) {
-        PlayerEntity player = PlayerEntity.class.cast(this);
-        Vec3d currentPos = player.getPos();
-        Vec3d moveVector = this.previousPos.subtract(currentPos);
-
-        // only trigger if the player moved more than 1/10'th of a block
-        if (moveVector.length() > 0.1) {
-            PlayerMoveCallback.EVENT.invoker().onPlayerMove(player, moveVector);
-        }
-
-        this.previousPos = currentPos;
-    }
-
-    /**
-     * Caller for the {@link PlayerDamageCallback}
-     */
-    @Inject(
-            method = "applyDamage",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/entity/player/PlayerEntity;addExhaustion(F)V"
-            )
-    )
-    private void onDamage(DamageSource source, float amount, CallbackInfo ci) {
-        PlayerEntity player = PlayerEntity.class.cast(this);
-        PlayerDamageCallback.EVENT.invoker().onPlayerDamage(player, source, amount);
-    }
 
     @Redirect(
             method = "getDisplayName",

@@ -11,10 +11,10 @@ import net.minecraft.item.Items;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
+import team.bits.nibbles.event.misc.PlayerConnectEvent;
 import team.bits.nibbles.teleport.TeleportUtils;
 import team.bits.vanilla.fabric.BitsVanilla;
 import team.bits.vanilla.fabric.database.warp.WarpUtils;
-import team.bits.vanilla.fabric.event.misc.PlayerConnectEvent;
 import team.bits.vanilla.fabric.util.ExtendedPlayerEntity;
 
 import java.time.Duration;

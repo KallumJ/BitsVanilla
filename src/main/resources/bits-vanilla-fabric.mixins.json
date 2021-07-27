@@ -16,7 +16,6 @@
     "ServerInstanceMixin",
     "ServerPlayerEntityMixin",
     "SignColorMixin",
-    "SleepMixin",
     "StatisticsPacketMixin",
     "stats.NetherPortalsUsedMixin",
     "ServerWorldMixin",

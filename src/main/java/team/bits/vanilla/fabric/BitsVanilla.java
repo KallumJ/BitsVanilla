@@ -10,16 +10,16 @@ import net.minecraft.server.command.ServerCommandSource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import team.bits.nibbles.event.damage.PlayerDamageEvent;
+import team.bits.nibbles.event.misc.PlayerConnectEvent;
+import team.bits.nibbles.event.misc.PlayerDisconnectEvent;
+import team.bits.nibbles.event.misc.PlayerMoveEvent;
+import team.bits.nibbles.event.sleep.PlayerSleepEvent;
+import team.bits.nibbles.event.sleep.PlayerWakeUpEvent;
 import team.bits.vanilla.fabric.commands.Commands;
 import team.bits.vanilla.fabric.database.driver.DatabaseConnection;
 import team.bits.vanilla.fabric.database.player.PlayerUtils;
 import team.bits.vanilla.fabric.database.util.ServerUtils;
-import team.bits.vanilla.fabric.event.damage.PlayerDamageCallback;
-import team.bits.vanilla.fabric.event.misc.PlayerConnectEvent;
-import team.bits.vanilla.fabric.event.misc.PlayerDisconnectEvent;
-import team.bits.vanilla.fabric.event.sleep.PlayerMoveCallback;
-import team.bits.vanilla.fabric.event.sleep.PlayerSleepCallback;
-import team.bits.vanilla.fabric.event.sleep.PlayerWakeUpCallback;
 import team.bits.vanilla.fabric.listeners.*;
 import team.bits.vanilla.fabric.statistics.lib.DatabaseStatHandler;
 import team.bits.vanilla.fabric.statistics.lib.StatTracker;
@@ -68,12 +68,12 @@ public class BitsVanilla implements ModInitializer, ServerLifecycleEvents.Server
         Commands.registerCommands();
 
         SleepListener sleepListener = new SleepListener();
-        PlayerSleepCallback.EVENT.register(sleepListener);
-        PlayerWakeUpCallback.EVENT.register(sleepListener);
+        PlayerSleepEvent.EVENT.register(sleepListener);
+        PlayerWakeUpEvent.EVENT.register(sleepListener);
 
         Teleporter teleporter = new Teleporter();
-        PlayerMoveCallback.EVENT.register(teleporter);
-        PlayerDamageCallback.EVENT.register(teleporter);
+        PlayerMoveEvent.EVENT.register(teleporter);
+        PlayerDamageEvent.EVENT.register(teleporter);
 
         ServerLifecycleEvents.SERVER_STOPPED.register(this);
 
@@ -82,7 +82,7 @@ public class BitsVanilla implements ModInitializer, ServerLifecycleEvents.Server
         PlayerConnectEvent.EVENT.register(new CustomClientHandler());
 
         PlayerConnectEvent.EVENT.register(new PlayerConnectListener());
-        PlayerMoveCallback.EVENT.register(new PlayerMoveListener());
+        PlayerMoveEvent.EVENT.register(new PlayerMoveListener());
         PlayerDisconnectEvent.EVENT.register(new PlayerDisconnectListener());
 
         AFKManager.initAfkManager();

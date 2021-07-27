@@ -14,19 +14,19 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
+import team.bits.nibbles.event.damage.PlayerDamageEvent;
+import team.bits.nibbles.event.misc.PlayerMoveEvent;
 import team.bits.nibbles.teleport.Location;
 import team.bits.nibbles.teleport.TeleportUtils;
 import team.bits.vanilla.fabric.BitsVanilla;
 import team.bits.vanilla.fabric.database.player.PlayerUtils;
-import team.bits.vanilla.fabric.event.damage.PlayerDamageCallback;
-import team.bits.vanilla.fabric.event.sleep.PlayerMoveCallback;
 import team.bits.vanilla.fabric.util.Colors;
 import team.bits.vanilla.fabric.util.ParticleUtils;
 import team.bits.vanilla.fabric.util.Scheduler;
 
 import java.util.*;
 
-public final class Teleporter implements PlayerMoveCallback, PlayerDamageCallback {
+public final class Teleporter implements PlayerMoveEvent, PlayerDamageEvent {
 
     private static final TextComponent TELEPORT_START = Component.text("Teleporting...", Colors.NEUTRAL);
     private static final TextComponent TELEPORT_CANCEL = Component.text("Teleport cancelled", Colors.NEGATIVE);

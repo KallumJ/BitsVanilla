@@ -14,8 +14,8 @@ import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import team.bits.nibbles.event.misc.PlayerConnectEvent;
 import team.bits.vanilla.fabric.database.player.PlayerUtils;
-import team.bits.vanilla.fabric.event.misc.PlayerConnectEvent;
 import team.bits.vanilla.fabric.util.ExtendedPlayerEntity;
 
 public class CustomClientHandler implements PlayerConnectEvent {

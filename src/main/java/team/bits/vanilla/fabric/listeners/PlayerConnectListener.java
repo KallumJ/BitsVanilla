@@ -3,7 +3,7 @@ package team.bits.vanilla.fabric.listeners;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
-import team.bits.vanilla.fabric.event.misc.PlayerConnectEvent;
+import team.bits.nibbles.event.misc.PlayerConnectEvent;
 import team.bits.vanilla.fabric.statistics.lib.DatabaseStatHandler;
 import team.bits.vanilla.fabric.util.AFKManager;
 
