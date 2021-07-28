@@ -33,7 +33,7 @@ import team.bits.vanilla.fabric.util.color.NameColors;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class BitsVanilla implements ModInitializer, ServerLifecycleEvents.ServerStopped {
+public class BitsVanilla implements ModInitializer, ServerLifecycleEvents.ServerStopping {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -79,7 +79,7 @@ public class BitsVanilla implements ModInitializer, ServerLifecycleEvents.Server
         PlayerMoveEvent.EVENT.register(teleporter);
         PlayerDamageEvent.EVENT.register(teleporter);
 
-        ServerLifecycleEvents.SERVER_STOPPED.register(this);
+        ServerLifecycleEvents.SERVER_STOPPING.register(this);
 
         PlayerConnectEvent.EVENT.register((player, connection) -> PlayerUtils.updatePlayerUsername(player));
         PlayerConnectEvent.EVENT.register(new NewPlayerListener());
@@ -99,7 +99,7 @@ public class BitsVanilla implements ModInitializer, ServerLifecycleEvents.Server
     }
 
     @Override
-    public void onServerStopped(MinecraftServer server) {
+    public void onServerStopping(MinecraftServer server) {
         this.executor.shutdownNow();
         Scheduler.stop();
         DatabaseConnection.close();

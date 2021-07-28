@@ -21,7 +21,9 @@
     "stats.CopperWaxedMixin",
     "ServerWorldInvoker",
     "EndermanMixin",
-    "MetricsMixin"
+    "MetricsMixin",
+    "shutdown.MinecraftServerMixin",
+    "shutdown.DedicatedServerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
