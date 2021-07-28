@@ -12,10 +12,10 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import team.bits.nibbles.command.Command;
 import team.bits.nibbles.command.CommandInformation;
+import team.bits.nibbles.utils.Colors;
 import team.bits.vanilla.fabric.BitsVanilla;
 import team.bits.vanilla.fabric.database.player.PlayerDataHandle;
 import team.bits.vanilla.fabric.database.player.PlayerUtils;
-import team.bits.vanilla.fabric.util.Colors;
 import team.bits.vanilla.fabric.util.CommandSuggestionUtils;
 
 import java.util.Optional;

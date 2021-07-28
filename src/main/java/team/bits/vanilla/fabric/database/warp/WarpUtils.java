@@ -7,11 +7,11 @@ import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import team.bits.nibbles.teleport.Location;
+import team.bits.nibbles.utils.ServerInstance;
 import team.bits.vanilla.fabric.database.driver.DatabaseConnection;
 import team.bits.vanilla.fabric.database.util.QueryHelper;
 import team.bits.vanilla.fabric.database.util.ServerUtils;
 import team.bits.vanilla.fabric.database.util.model.DataTypes;
-import team.bits.vanilla.fabric.util.ServerInstance;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

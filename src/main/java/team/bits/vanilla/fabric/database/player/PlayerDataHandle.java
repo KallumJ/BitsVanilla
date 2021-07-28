@@ -6,11 +6,11 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import team.bits.nibbles.utils.MojangApiUtils;
+import team.bits.nibbles.utils.ServerInstance;
 import team.bits.vanilla.fabric.database.driver.DatabaseConnection;
 import team.bits.vanilla.fabric.database.util.QueryHelper;
 import team.bits.vanilla.fabric.database.util.model.DataTypes;
-import team.bits.vanilla.fabric.util.MojangApiUtils;
-import team.bits.vanilla.fabric.util.ServerInstance;
 import team.bits.vanilla.fabric.util.Utils;
 
 import java.awt.*;

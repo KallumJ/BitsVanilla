@@ -18,10 +18,10 @@ import net.minecraft.world.dimension.DimensionType;
 import team.bits.nibbles.command.Command;
 import team.bits.nibbles.command.CommandInformation;
 import team.bits.nibbles.teleport.Location;
+import team.bits.nibbles.utils.Colors;
 import team.bits.vanilla.fabric.BitsVanilla;
 import team.bits.vanilla.fabric.database.player.PlayerUtils;
 import team.bits.vanilla.fabric.teleport.Teleporter;
-import team.bits.vanilla.fabric.util.Colors;
 import team.bits.vanilla.fabric.util.CommandSuggestionUtils;
 
 import java.util.HashMap;
@@ -140,7 +140,7 @@ public class BeamCommand extends Command {
 
         // Send success message
         TextComponent requestMessage = Component.text(REQUEST_STRING)
-                .color(NamedTextColor.GREEN);
+                .color(Colors.POSITIVE);
 
         BitsVanilla.adventure().audience(sendingPlayer)
                 .sendMessage(requestMessage);

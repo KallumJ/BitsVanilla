@@ -19,11 +19,11 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import team.bits.nibbles.command.Command;
 import team.bits.nibbles.command.CommandInformation;
 import team.bits.nibbles.teleport.Location;
+import team.bits.nibbles.utils.Colors;
 import team.bits.vanilla.fabric.BitsVanilla;
 import team.bits.vanilla.fabric.database.warp.Warp;
 import team.bits.vanilla.fabric.database.warp.WarpUtils;
 import team.bits.vanilla.fabric.teleport.Teleporter;
-import team.bits.vanilla.fabric.util.Colors;
 import team.bits.vanilla.fabric.util.CommandSuggestionUtils;
 
 import java.util.Collection;

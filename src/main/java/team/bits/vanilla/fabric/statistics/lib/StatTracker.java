@@ -7,11 +7,11 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.stat.Stat;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
+import team.bits.nibbles.utils.Colors;
+import team.bits.nibbles.utils.ServerInstance;
 import team.bits.vanilla.fabric.database.player.PlayerUtils;
 import team.bits.vanilla.fabric.statistics.loot.LootUtils;
-import team.bits.vanilla.fabric.util.Colors;
 import team.bits.vanilla.fabric.util.ExtendedPlayerEntity;
-import team.bits.vanilla.fabric.util.ServerInstance;
 
 public class StatTracker implements Runnable {
 

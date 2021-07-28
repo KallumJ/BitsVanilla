@@ -1,7 +1,7 @@
 package team.bits.vanilla.fabric.database.util;
 
 import org.jetbrains.annotations.NotNull;
-import team.bits.vanilla.fabric.util.PropertiesFileUtils;
+import team.bits.nibbles.utils.PropertiesFileUtils;
 
 import java.io.File;
 import java.sql.*;

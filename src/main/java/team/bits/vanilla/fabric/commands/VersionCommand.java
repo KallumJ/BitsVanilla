@@ -7,9 +7,9 @@ import net.kyori.adventure.text.Component;
 import net.minecraft.server.command.ServerCommandSource;
 import team.bits.nibbles.command.Command;
 import team.bits.nibbles.command.CommandInformation;
+import team.bits.nibbles.utils.Colors;
+import team.bits.nibbles.utils.ServerInstance;
 import team.bits.vanilla.fabric.BitsVanilla;
-import team.bits.vanilla.fabric.util.Colors;
-import team.bits.vanilla.fabric.util.ServerInstance;
 
 public class VersionCommand extends Command {
 

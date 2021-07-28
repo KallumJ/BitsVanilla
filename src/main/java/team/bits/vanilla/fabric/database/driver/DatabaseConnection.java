@@ -1,8 +1,8 @@
 package team.bits.vanilla.fabric.database.driver;
 
 import org.jetbrains.annotations.NotNull;
+import team.bits.nibbles.utils.PropertiesFileUtils;
 import team.bits.vanilla.fabric.database.util.ServerUtils;
-import team.bits.vanilla.fabric.util.PropertiesFileUtils;
 
 import java.sql.Connection;
 import java.util.Objects;

@@ -16,6 +16,7 @@ import team.bits.nibbles.event.misc.PlayerDisconnectEvent;
 import team.bits.nibbles.event.misc.PlayerMoveEvent;
 import team.bits.nibbles.event.sleep.PlayerSleepEvent;
 import team.bits.nibbles.event.sleep.PlayerWakeUpEvent;
+import team.bits.nibbles.utils.Scheduler;
 import team.bits.vanilla.fabric.commands.Commands;
 import team.bits.vanilla.fabric.database.driver.DatabaseConnection;
 import team.bits.vanilla.fabric.database.player.PlayerUtils;
@@ -25,7 +26,6 @@ import team.bits.vanilla.fabric.statistics.lib.DatabaseStatHandler;
 import team.bits.vanilla.fabric.statistics.lib.StatTracker;
 import team.bits.vanilla.fabric.teleport.Teleporter;
 import team.bits.vanilla.fabric.util.AFKManager;
-import team.bits.vanilla.fabric.util.Scheduler;
 import team.bits.vanilla.fabric.util.color.NameColors;
 
 import java.util.concurrent.ExecutorService;

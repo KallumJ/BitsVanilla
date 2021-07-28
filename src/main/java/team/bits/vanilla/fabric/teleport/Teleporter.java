@@ -18,11 +18,11 @@ import team.bits.nibbles.event.damage.PlayerDamageEvent;
 import team.bits.nibbles.event.misc.PlayerMoveEvent;
 import team.bits.nibbles.teleport.Location;
 import team.bits.nibbles.teleport.TeleportUtils;
+import team.bits.nibbles.utils.Colors;
+import team.bits.nibbles.utils.ParticleUtils;
+import team.bits.nibbles.utils.Scheduler;
 import team.bits.vanilla.fabric.BitsVanilla;
 import team.bits.vanilla.fabric.database.player.PlayerUtils;
-import team.bits.vanilla.fabric.util.Colors;
-import team.bits.vanilla.fabric.util.ParticleUtils;
-import team.bits.vanilla.fabric.util.Scheduler;
 
 import java.util.*;
 

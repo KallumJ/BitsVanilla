@@ -10,6 +10,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.server.command.ServerCommandSource;
 import team.bits.nibbles.command.Command;
 import team.bits.nibbles.command.CommandInformation;
+import team.bits.nibbles.utils.Colors;
 import team.bits.vanilla.fabric.BitsVanilla;
 
 public class DonateCommand extends Command {
@@ -25,7 +26,7 @@ public class DonateCommand extends Command {
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         TextComponent message = Component.text("Donate here! Thank you very much for your generosity!: " + DONATE_LINK)
-                .color(NamedTextColor.GREEN)
+                .color(Colors.POSITIVE)
                 .hoverEvent(HoverEvent.showText(Component.text("Click here to donate!")))
                 .clickEvent(ClickEvent.openUrl(DONATE_LINK));
 

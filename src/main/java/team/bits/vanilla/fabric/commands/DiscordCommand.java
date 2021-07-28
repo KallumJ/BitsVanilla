@@ -10,6 +10,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.server.command.ServerCommandSource;
 import team.bits.nibbles.command.Command;
 import team.bits.nibbles.command.CommandInformation;
+import team.bits.nibbles.utils.Colors;
 import team.bits.vanilla.fabric.BitsVanilla;
 
 public class DiscordCommand extends Command {
@@ -26,7 +27,7 @@ public class DiscordCommand extends Command {
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         TextComponent message = Component.text("Join our discord here: " + DISCORD_INVITE)
-                .color(NamedTextColor.GREEN)
+                .color(Colors.POSITIVE)
                 .hoverEvent(HoverEvent.showText(Component.text("Click here to join!")))
                 .clickEvent(ClickEvent.openUrl(DISCORD_INVITE));
 

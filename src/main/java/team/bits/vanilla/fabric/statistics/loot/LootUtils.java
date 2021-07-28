@@ -11,7 +11,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
-import team.bits.vanilla.fabric.util.ServerInstance;
+import team.bits.nibbles.utils.ServerInstance;
 
 import java.util.Collection;
 import java.util.Collections;

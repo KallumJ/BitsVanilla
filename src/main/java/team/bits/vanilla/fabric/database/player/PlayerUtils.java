@@ -5,10 +5,10 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import team.bits.nibbles.utils.ServerInstance;
 import team.bits.vanilla.fabric.database.driver.DatabaseConnection;
 import team.bits.vanilla.fabric.database.util.QueryHelper;
 import team.bits.vanilla.fabric.database.util.model.DataTypes;
-import team.bits.vanilla.fabric.util.ServerInstance;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

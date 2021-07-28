@@ -19,9 +19,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import team.bits.nibbles.utils.Scheduler;
 import team.bits.vanilla.fabric.database.player.PlayerDataHandle;
 import team.bits.vanilla.fabric.util.ExtendedPlayerEntity;
-import team.bits.vanilla.fabric.util.Scheduler;
 
 import java.util.Collection;
 import java.util.HashMap;

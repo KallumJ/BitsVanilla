@@ -12,10 +12,10 @@ import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.NotNull;
 import team.bits.nibbles.event.sleep.PlayerSleepEvent;
 import team.bits.nibbles.event.sleep.PlayerWakeUpEvent;
+import team.bits.nibbles.utils.ServerInstance;
 import team.bits.vanilla.fabric.BitsVanilla;
 import team.bits.vanilla.fabric.mixin.ServerWorldInvoker;
 import team.bits.vanilla.fabric.util.AFKManager;
-import team.bits.vanilla.fabric.util.ServerInstance;
 
 import java.util.HashSet;
 import java.util.Objects;

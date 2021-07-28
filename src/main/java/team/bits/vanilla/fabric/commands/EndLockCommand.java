@@ -7,8 +7,8 @@ import net.kyori.adventure.text.TextComponent;
 import net.minecraft.server.command.ServerCommandSource;
 import team.bits.nibbles.command.Command;
 import team.bits.nibbles.command.CommandInformation;
+import team.bits.nibbles.utils.Colors;
 import team.bits.vanilla.fabric.BitsVanilla;
-import team.bits.vanilla.fabric.util.Colors;
 
 import java.io.File;
 import java.io.IOException;

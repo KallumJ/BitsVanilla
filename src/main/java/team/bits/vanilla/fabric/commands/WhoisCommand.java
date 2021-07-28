@@ -11,9 +11,9 @@ import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import team.bits.nibbles.command.Command;
 import team.bits.nibbles.command.CommandInformation;
+import team.bits.nibbles.utils.Colors;
 import team.bits.vanilla.fabric.BitsVanilla;
 import team.bits.vanilla.fabric.database.player.PlayerUtils;
-import team.bits.vanilla.fabric.util.Colors;
 import team.bits.vanilla.fabric.util.CommandSuggestionUtils;
 
 import java.util.Optional;

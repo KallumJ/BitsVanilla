@@ -13,12 +13,12 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import team.bits.nibbles.command.Command;
 import team.bits.nibbles.command.CommandInformation;
+import team.bits.nibbles.utils.Colors;
+import team.bits.nibbles.utils.TextUtils;
 import team.bits.vanilla.fabric.BitsVanilla;
 import team.bits.vanilla.fabric.database.player.PlayerUtils;
 import team.bits.vanilla.fabric.statistics.lib.StatUtils;
-import team.bits.vanilla.fabric.util.Colors;
 import team.bits.vanilla.fabric.util.CommandSuggestionUtils;
-import team.bits.vanilla.fabric.util.Utils;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -85,7 +85,7 @@ public class StatsCommand extends Command {
             );
 
             for (StatUtils.StatisticRecord record : stats) {
-                String name = Utils.fancyFormat(record.stat().customName());
+                String name = TextUtils.fancyFormat(record.stat().customName());
                 audience.sendMessage(
                         Component.text(String.format(STAT_LINE, name, record.stat().stat().format(record.count()), record.level()), Colors.NEUTRAL)
                 );

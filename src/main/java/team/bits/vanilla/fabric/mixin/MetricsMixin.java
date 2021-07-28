@@ -6,9 +6,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import team.bits.nibbles.utils.ServerInstance;
 import team.bits.vanilla.fabric.listeners.CustomClientHandler;
 import team.bits.vanilla.fabric.util.ExtendedPlayerEntity;
-import team.bits.vanilla.fabric.util.ServerInstance;
 
 @Mixin(MetricsData.class)
 public class MetricsMixin {

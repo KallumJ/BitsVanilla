@@ -12,8 +12,6 @@
     "PlayerJoinMixin",
     "PlayerLeaveMixin",
     "PvPMixin",
-    "SchedulerHandler",
-    "ServerInstanceMixin",
     "ServerPlayerEntityMixin",
     "SignColorMixin",
     "StatisticsPacketMixin",

@@ -14,10 +14,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import team.bits.nibbles.utils.Colors;
 import team.bits.vanilla.fabric.BitsVanilla;
 import team.bits.vanilla.fabric.commands.EndLockCommand;
 import team.bits.vanilla.fabric.util.AFKManager;
-import team.bits.vanilla.fabric.util.Colors;
 import team.bits.vanilla.fabric.util.ExtendedPlayerEntity;
 
 @Mixin(ServerPlayerEntity.class)

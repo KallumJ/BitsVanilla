@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.jetbrains.annotations.NotNull;
+import team.bits.nibbles.utils.TextUtils;
 import team.bits.vanilla.fabric.util.Utils;
 
 import java.awt.*;
@@ -25,7 +26,7 @@ public final class NameColors {
         InputStream colorsFile = this.getClass().getClassLoader().getResourceAsStream("colours.json");
         JsonObject root = new JsonParser().parse(new InputStreamReader(Objects.requireNonNull(colorsFile))).getAsJsonObject();
         root.entrySet().forEach(entry -> {
-            String color = Utils.fancyFormat(entry.getKey());
+            String color = TextUtils.fancyFormat(entry.getKey());
             List<NameColor> shades = new LinkedList<>();
             entry.getValue().getAsJsonArray().forEach(shadeEntry -> {
                 JsonObject shade = shadeEntry.getAsJsonObject();

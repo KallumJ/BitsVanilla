@@ -14,11 +14,11 @@ import net.minecraft.world.World;
 import net.minecraft.world.border.WorldBorder;
 import team.bits.nibbles.command.Command;
 import team.bits.nibbles.command.CommandInformation;
+import team.bits.nibbles.utils.Colors;
+import team.bits.nibbles.utils.ServerInstance;
+import team.bits.nibbles.utils.TextUtils;
 import team.bits.vanilla.fabric.BitsVanilla;
-import team.bits.vanilla.fabric.util.Colors;
 import team.bits.vanilla.fabric.util.ExtendedPlayerEntity;
-import team.bits.vanilla.fabric.util.ServerInstance;
-import team.bits.vanilla.fabric.util.Utils;
 
 import java.util.Date;
 
@@ -51,7 +51,7 @@ public class RandomTeleportCommand extends Command {
         // check if the rtp cooldown has elapsed already
         long elapsed = currentTime - lastTime;
         if (elapsed < RTP_COOLDOWN) {
-            String cooldown = Utils.formatTimeRemaining(lastTime, currentTime, RTP_COOLDOWN);
+            String cooldown = TextUtils.formatTimeRemaining(lastTime, currentTime, RTP_COOLDOWN);
             throw new SimpleCommandExceptionType(() -> String.format(RTP_COOLDOWN_ERR, cooldown)).create();
         }
 
