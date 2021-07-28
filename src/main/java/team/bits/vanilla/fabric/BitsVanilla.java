@@ -14,10 +14,12 @@ import team.bits.nibbles.event.damage.PlayerDamageEvent;
 import team.bits.nibbles.event.misc.PlayerConnectEvent;
 import team.bits.nibbles.event.misc.PlayerDisconnectEvent;
 import team.bits.nibbles.event.misc.PlayerMoveEvent;
+import team.bits.nibbles.event.misc.ServerInstanceReadyEvent;
 import team.bits.nibbles.event.sleep.PlayerSleepEvent;
 import team.bits.nibbles.event.sleep.PlayerWakeUpEvent;
 import team.bits.nibbles.utils.Scheduler;
 import team.bits.vanilla.fabric.commands.Commands;
+import team.bits.vanilla.fabric.commands.VersionCommand;
 import team.bits.vanilla.fabric.database.driver.DatabaseConnection;
 import team.bits.vanilla.fabric.database.player.PlayerUtils;
 import team.bits.vanilla.fabric.database.util.ServerUtils;
@@ -58,6 +60,8 @@ public class BitsVanilla implements ModInitializer, ServerLifecycleEvents.Server
     public void onInitialize() {
         ServerLifecycleEvents.SERVER_STARTING.register(server -> adventure = FabricServerAudiences.of(server));
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> adventure = null);
+
+        ServerInstanceReadyEvent.EVENT.register(minecraftDedicatedServer -> VersionCommand.init());
 
         LOGGER.info(String.format("Server name is '%s'", ServerUtils.getServerName()));
 
