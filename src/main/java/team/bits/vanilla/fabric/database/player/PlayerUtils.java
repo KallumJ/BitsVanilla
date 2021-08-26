@@ -6,7 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import team.bits.nibbles.utils.ServerInstance;
-import team.bits.vanilla.fabric.database.driver.DatabaseConnection;
+import team.bits.vanilla.fabric.database.DatabaseConnection;
 import team.bits.vanilla.fabric.database.util.QueryHelper;
 import team.bits.vanilla.fabric.database.util.model.DataTypes;
 

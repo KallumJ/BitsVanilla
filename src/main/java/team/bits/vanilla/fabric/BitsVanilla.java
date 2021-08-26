@@ -19,7 +19,7 @@ import team.bits.nibbles.event.misc.ServerInstanceReadyEvent;
 import team.bits.nibbles.utils.Scheduler;
 import team.bits.vanilla.fabric.commands.Commands;
 import team.bits.vanilla.fabric.commands.VersionCommand;
-import team.bits.vanilla.fabric.database.driver.DatabaseConnection;
+import team.bits.vanilla.fabric.database.DatabaseConnection;
 import team.bits.vanilla.fabric.database.player.PlayerUtils;
 import team.bits.vanilla.fabric.database.util.ServerUtils;
 import team.bits.vanilla.fabric.listeners.*;

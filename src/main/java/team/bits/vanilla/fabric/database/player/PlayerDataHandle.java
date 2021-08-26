@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import team.bits.nibbles.utils.MojangApiUtils;
 import team.bits.nibbles.utils.ServerInstance;
-import team.bits.vanilla.fabric.database.driver.DatabaseConnection;
+import team.bits.vanilla.fabric.database.DatabaseConnection;
 import team.bits.vanilla.fabric.database.util.QueryHelper;
 import team.bits.vanilla.fabric.database.util.model.DataTypes;
 import team.bits.vanilla.fabric.util.Utils;
