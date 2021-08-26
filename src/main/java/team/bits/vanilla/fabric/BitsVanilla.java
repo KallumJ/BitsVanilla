@@ -1,6 +1,7 @@
 package team.bits.vanilla.fabric;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.entity.event.v1.EntitySleepEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.fabric.FabricServerAudiences;
@@ -15,8 +16,6 @@ import team.bits.nibbles.event.misc.PlayerConnectEvent;
 import team.bits.nibbles.event.misc.PlayerDisconnectEvent;
 import team.bits.nibbles.event.misc.PlayerMoveEvent;
 import team.bits.nibbles.event.misc.ServerInstanceReadyEvent;
-import team.bits.nibbles.event.sleep.PlayerSleepEvent;
-import team.bits.nibbles.event.sleep.PlayerWakeUpEvent;
 import team.bits.nibbles.utils.Scheduler;
 import team.bits.vanilla.fabric.commands.Commands;
 import team.bits.vanilla.fabric.commands.VersionCommand;
@@ -72,8 +71,8 @@ public class BitsVanilla implements ModInitializer, ServerLifecycleEvents.Server
         Commands.registerCommands();
 
         SleepListener sleepListener = new SleepListener();
-        PlayerSleepEvent.EVENT.register(sleepListener);
-        PlayerWakeUpEvent.EVENT.register(sleepListener);
+        EntitySleepEvents.START_SLEEPING.register(sleepListener);
+        EntitySleepEvents.STOP_SLEEPING.register(sleepListener);
 
         Teleporter teleporter = new Teleporter();
         PlayerMoveEvent.EVENT.register(teleporter);

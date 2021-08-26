@@ -1,17 +1,19 @@
 package team.bits.vanilla.fabric.listeners;
 
+import net.fabricmc.fabric.api.entity.event.v1.EntitySleepEvents;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.stat.Stats;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.NotNull;
-import team.bits.nibbles.event.sleep.PlayerSleepEvent;
-import team.bits.nibbles.event.sleep.PlayerWakeUpEvent;
 import team.bits.nibbles.utils.ServerInstance;
 import team.bits.vanilla.fabric.BitsVanilla;
 import team.bits.vanilla.fabric.mixin.ServerWorldInvoker;
@@ -21,7 +23,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-public class SleepListener implements PlayerSleepEvent, PlayerWakeUpEvent {
+public class SleepListener implements EntitySleepEvents.StartSleeping, EntitySleepEvents.StopSleeping {
 
     private final Set<PlayerEntity> sleeping = new HashSet<>();
 
@@ -53,23 +55,27 @@ public class SleepListener implements PlayerSleepEvent, PlayerWakeUpEvent {
     }
 
     @Override
-    public void onSleep(@NotNull PlayerEntity player) {
-        ServerWorld world = (ServerWorld) player.world;
+    public void onStartSleeping(LivingEntity entity, BlockPos sleepingPos) {
+        if (entity instanceof ServerPlayerEntity player) {
+            ServerWorld world = player.getServerWorld();
 
-        this.sleeping.add(player);
-        this.checkSleeping(world);
+            this.sleeping.add(player);
+            this.checkSleeping(world);
+        }
     }
 
     @Override
-    public void onWakeUp(@NotNull PlayerEntity player) {
-        if (!this.sleeping.isEmpty()) {
-            this.sleeping.remove(player);
+    public void onStopSleeping(LivingEntity entity, BlockPos sleepingPos) {
+        if (entity instanceof ServerPlayerEntity player) {
+            if (!this.sleeping.isEmpty()) {
+                this.sleeping.remove(player);
 
-            MinecraftServer server = Objects.requireNonNull(player.getServer());
-            int sleeping = this.sleeping.size();
-            int online = Math.max(getOnlinePlayerCount(server), 1);
+                MinecraftServer server = Objects.requireNonNull(player.getServer());
+                int sleeping = this.sleeping.size();
+                int online = Math.max(getOnlinePlayerCount(server), 1);
 
-            sendSleepingMessage(server, sleeping, online, false);
+                sendSleepingMessage(server, sleeping, online, false);
+            }
         }
     }
 
