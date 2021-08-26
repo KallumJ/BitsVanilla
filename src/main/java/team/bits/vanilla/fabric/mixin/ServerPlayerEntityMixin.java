@@ -24,16 +24,6 @@ import team.bits.vanilla.fabric.util.ExtendedPlayerEntity;
 public abstract class ServerPlayerEntityMixin {
 
     @Inject(
-            method = "copyFrom",
-            at = @At("TAIL")
-    )
-    public void onPlayerCopy(ServerPlayerEntity oldPlayer, boolean alive, CallbackInfo ci) {
-        ExtendedPlayerEntity eOldPlayer = (ExtendedPlayerEntity) oldPlayer;
-        ExtendedPlayerEntity eNewPlayer = (ExtendedPlayerEntity) this;
-        eNewPlayer.copyFromOldPlayer(eOldPlayer);
-    }
-
-    @Inject(
             method = "moveToWorld",
             at = @At("HEAD"),
             cancellable = true

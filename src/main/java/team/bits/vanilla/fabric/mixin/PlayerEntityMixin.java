@@ -1,11 +1,6 @@
 package team.bits.vanilla.fabric.mixin;
 
-import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Style;
@@ -14,16 +9,16 @@ import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import team.bits.nibbles.player.CopyPlayerDataEvent;
+import team.bits.nibbles.player.INibblesPlayer;
 import team.bits.nibbles.utils.Scheduler;
 import team.bits.vanilla.fabric.database.player.PlayerDataHandle;
 import team.bits.vanilla.fabric.util.ExtendedPlayerEntity;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -31,18 +26,10 @@ import java.util.Optional;
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
 
-    private static final int HEAD_SLOT = 39;
-
     /**
      * Last time (unix timestamp) at which the player used /rtp
      */
     private long lastRTPTime = 0;
-
-    /**
-     * True if the player has played on the server before, false if
-     * this is the first time the player joined.
-     */
-    private boolean hasPlayedBefore;
 
     private PlayerEntity duelTarget;
 
@@ -51,9 +38,6 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
 
     private boolean customClient = false;
     private boolean sendTPS = false;
-
-    @Shadow
-    public abstract PlayerInventory getInventory();
 
     @Redirect(
             method = "getDisplayName",
@@ -94,7 +78,6 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
             at = @At("TAIL")
     )
     public void readCustomDataFromNBt(NbtCompound nbt, CallbackInfo ci) {
-        this.hasPlayedBefore = true;
         if (nbt.contains("LastRTP")) {
             this.lastRTPTime = nbt.getLong("LastRTP");
         }
@@ -111,70 +94,17 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
         }
     }
 
-    @Override
-    public void copyFromOldPlayer(@NotNull ExtendedPlayerEntity oldPlayer) {
-        PlayerEntityMixin cOldPlayer = (PlayerEntityMixin) oldPlayer;
-        this.hasPlayedBefore = cOldPlayer.hasPlayedBefore;
-        this.lastRTPTime = cOldPlayer.lastRTPTime;
-        this.statLevels.putAll(cOldPlayer.statLevels);
-        this.migratedStats = cOldPlayer.migratedStats;
-        this.customClient = cOldPlayer.customClient;
-        this.sendTPS = cOldPlayer.sendTPS;
+    public void bitsVanillaCopyFromOldPlayer(@NotNull PlayerEntityMixin oldPlayer) {
+        this.lastRTPTime = oldPlayer.lastRTPTime;
+        this.statLevels.putAll(oldPlayer.statLevels);
+        this.migratedStats = oldPlayer.migratedStats;
+        this.customClient = oldPlayer.customClient;
+        this.sendTPS = oldPlayer.sendTPS;
 
         Scheduler.runOffThread(() -> {
             ServerPlayerEntity self = ServerPlayerEntity.class.cast(this);
             PlayerDataHandle.get(self).loadCustomName(self);
         });
-    }
-
-    @Override
-    public void giveItem(@NotNull ItemStack itemStack) {
-        final ServerPlayerEntity player = ServerPlayerEntity.class.cast(this);
-        final PlayerInventory inventory = this.getInventory();
-
-        // try and insert the stack into their inventory
-        if (!inventory.insertStack(itemStack)) {
-
-            // if inserting fails, drop the stack on the ground
-            ItemEntity itemEntity = player.dropItem(itemStack, false);
-            if (itemEntity != null) {
-                itemEntity.resetPickupDelay();
-                itemEntity.setOwner(player.getUuid());
-            }
-        }
-    }
-
-    @Override
-    public void giveItems(@NotNull Collection<ItemStack> items) {
-        items.forEach(this::giveItem);
-    }
-
-    @Override
-    public boolean hasItem(@NotNull Item item, int amount) {
-        final PlayerInventory inventory = this.getInventory();
-
-        for (int slot = 0; slot < inventory.size(); slot++) {
-            ItemStack stack = inventory.getStack(slot);
-            if (stack.isOf(item) && stack.getCount() >= amount) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    @Override
-    public boolean removeItem(@NotNull Item item, int amount) {
-        final PlayerInventory inventory = this.getInventory();
-
-        for (int slot = 0; slot < inventory.size(); slot++) {
-            if (inventory.getStack(slot).isOf(item)) {
-                inventory.removeStack(slot, amount);
-                return true;
-            }
-        }
-
-        return false;
     }
 
     @Override
@@ -195,32 +125,6 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
     @Override
     public void setLastRTPTime(long time) {
         this.lastRTPTime = time;
-    }
-
-    @Override
-    public boolean hasPlayedBefore() {
-        return this.hasPlayedBefore;
-    }
-
-    @Override
-    public void insertItemAtHead(ItemStack item) {
-        Inventory inventory = getInventory();
-        ItemStack itemAtHead = inventory.getStack(HEAD_SLOT);
-
-        inventory.setStack(HEAD_SLOT, item);
-        giveItem(itemAtHead);
-    }
-
-    @Override
-    public int getSlotOfStack(ItemStack item) {
-        final PlayerInventory inventory = this.getInventory();
-
-        for (int slot = 0; slot < inventory.size(); slot++) {
-            if (inventory.getStack(slot).equals(item)) {
-                return slot;
-            }
-        }
-        return -1;
     }
 
     @Override
@@ -261,6 +165,18 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
     @Override
     public boolean shouldSendTPS() {
         return this.sendTPS;
+    }
+
+    /*
+     * This is a little static event handler for passing the CopyPlayerData
+     * event through to the right PlayerEntityMixin instance
+     */
+    static {
+        CopyPlayerDataEvent.EVENT.register(PlayerEntityMixin::_bitsVanillaCopyPlayerData);
+    }
+
+    private static void _bitsVanillaCopyPlayerData(@NotNull INibblesPlayer oldPlayer, @NotNull INibblesPlayer newPlayer) {
+        ((PlayerEntityMixin) newPlayer).bitsVanillaCopyFromOldPlayer((PlayerEntityMixin) oldPlayer);
     }
 }
 

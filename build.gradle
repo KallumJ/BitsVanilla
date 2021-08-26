@@ -45,7 +45,7 @@ dependencies {
     modImplementation include("com.google.code.gson:gson:${project.gson_version}")
     modImplementation include("mysql:mysql-connector-java:${project.mysql_cj_version}")
     modImplementation include("team.bits:nibbles:${project.nibbles_version}")
-//    modImplementation include("team.bits.nibbles.dev:nibbles-commands:2")
+//    modImplementation include("team.bits.nibbles.dev:nibbles-custom-player-object:4")
 
     // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
     // You may need to force-disable transitiveness on them.

@@ -2,17 +2,15 @@ package team.bits.vanilla.fabric.commands;
 
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.inventory.Inventory;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import team.bits.nibbles.command.Command;
 import team.bits.nibbles.command.CommandInformation;
-import team.bits.vanilla.fabric.util.ExtendedPlayerEntity;
 
 public class HatCommand extends Command {
-
-    private static final int HEAD_SLOT = 39;
 
     public HatCommand() {
         super("hat", new CommandInformation()
@@ -25,23 +23,20 @@ public class HatCommand extends Command {
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         ServerPlayerEntity player = context.getSource().getPlayer();
-        ExtendedPlayerEntity ePlayer = (ExtendedPlayerEntity) player;
-        Inventory inventory = player.getInventory();
-        ItemStack itemInMainHand = player.getMainHandStack();
+        ItemStack stackInMainHand = player.getMainHandStack();
+        PlayerInventory inventory = player.getInventory();
 
         // If the player is holding something
-        if (itemInMainHand != null) {
-            // Add a copy of the item theyre holding to the head slot
-            ePlayer.insertItemAtHead(itemInMainHand);
+        if (stackInMainHand != null) {
 
-            // Get the slot of the item theyre holding
-            int slotOfItemInMainHand = ePlayer.getSlotOfStack(itemInMainHand);
+            // get a copy of the item on the player's head
+            ItemStack oldHat = player.getEquippedStack(EquipmentSlot.HEAD).copy();
 
-            // If the found slot is not the one we just inserted at the head
-            if (slotOfItemInMainHand != HEAD_SLOT) {
-                // Remove the original item stack
-                inventory.removeStack(slotOfItemInMainHand);
-            }
+            // Add the stack they're holding to the head slot
+            player.equipStack(EquipmentSlot.HEAD, stackInMainHand);
+
+            // replace the item in the selected slot (main hand) with their old hat
+            inventory.setStack(inventory.selectedSlot, oldHat);
         }
         return 1;
     }
