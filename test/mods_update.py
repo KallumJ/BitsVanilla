@@ -1,7 +1,7 @@
 import requests
 import requests as req
 
-MODS = ['lithium', 'hydrogen', 'fabric-api']
+MODS = ['lithium', 'hydrogen', 'fabric-api', 'fabric-language-kotlin', 'ledger']
 MC_VERSIONS = ['1.17.1', '1.17.1-rc2']
 
 
