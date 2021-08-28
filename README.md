@@ -1,11 +1,23 @@
-# BitsVanilla
+# BitsVanilla [![Build Status](https://jenkins.bits.team/buildStatus/icon?job=Bits%2FBitsVanilla%2Fmaster)](https://jenkins.bits.team/job/Bits/job/BitsVanilla/job/master/)
 
 A fabric reimplementation of the Bits Vanilla plugin
 
+In order to use this plugin, the `server.properties` file of your server must include a `server-name` property.
+
+Additionally, the `resources/database.properties` should contain credentials pointing to a valid database in the following format.
+```
+db.driver_class=
+db.address=
+db.port=
+db.username=
+db.password=
+db.name=
+```
+
 To be used in conjunction with:
 
-- Spark
-- Hydrogen
-- Lithium
-- Ledger
-- Fabric Language Kotlin
+- [Spark](https://spark.lucko.me/download)
+- [Lithium](https://modrinth.com/mod/lithium)
+- [Hydrogen](https://modrinth.com/mod/hydrogen)
+- [Ledger](https://modrinth.com/mod/ledger)
+- [Fabric Language Kotlin](https://modrinth.com/mod/fabric-language-kotlin)
