@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    environment {
+        DISCORD_WEBHOOK = credentials('discord-webhook')
+    }
+
     tools {
         jdk 'jdk_16'
     }
@@ -29,7 +33,7 @@ pipeline {
 
     post {
         always {
-            discordSend link: env.BUILD_URL, result: currentBuild.currentResult, title: JOB_NAME, webhookURL: "https://discord.com/api/webhooks/861942609063706634/q7Hk_M2XtH2negfiYGws9EZuQEpUEw8FbCKhvy3PXl59a8qg_knBxsGfr8bP3LZORSkb"
+            discordSend link: env.BUILD_URL, result: currentBuild.currentResult, title: JOB_NAME, webhookURL: "$DISCORD_WEBHOOK"
         }
     }
 }
