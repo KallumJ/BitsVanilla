@@ -14,7 +14,10 @@ pipeline {
         }
         stage('Test') {
             steps {
-                sh './test/production_server_test.sh ${BRANCH_NAME}-${BUILD_NUMBER}'
+                sh 'rm -rf test/'
+                sh 'git clone https://hogwarts.bits.team/git/Bits/TestServer.git test/'
+                sh 'chmod +x test/production_server_test.sh'
+                sh 'test/production_server_test.sh "${JAVA_HOME}" "bits-vanilla-fabric-${BRANCH_NAME}-${BUILD_NUMBER}"'
             }
         }
         stage('Archive') {
