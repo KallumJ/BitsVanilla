@@ -20,6 +20,12 @@ public class AFKManager {
     public static void playerMoved(ServerPlayerEntity player) {
         AFKCounter playersAfkCounter = PLAYER_TRACKER.get(player.getUuid());
 
+        // if the afk counter is null it means the player hasn't fully
+        // logged in yet, so we don't want to do anything.
+        if (playersAfkCounter == null) {
+            return;
+        }
+
         boolean wasAfk = false;
 
         // If the player is AFK when their time gets reset, announce that they are no longer AFK
