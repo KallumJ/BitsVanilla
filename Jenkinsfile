@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         DISCORD_WEBHOOK = credentials('discord-webhook')
+        CONFIG_FILE = credentials('config')
     }
 
     tools {
@@ -21,6 +22,8 @@ pipeline {
                 sh 'rm -rf test/'
                 sh 'git clone https://hogwarts.bits.team/git/Bits/TestServer.git test/'
                 sh 'chmod +x test/production_server_test.sh'
+                sh 'rm -rf prod-server/ && mkdir -p prod-server/config'
+                sh 'cp $CONFIG_FILE prod-server/config/bits-vanilla.cfg'
                 sh 'test/production_server_test.sh "${JAVA_HOME}" "bits-vanilla-fabric-${BRANCH_NAME}-${BUILD_NUMBER}"'
             }
         }
@@ -33,7 +36,7 @@ pipeline {
 
     post {
         always {
-            discordSend link: env.BUILD_URL, result: currentBuild.currentResult, title: JOB_NAME, webhookURL: "$DISCORD_WEBHOOK"
+            discordSend link: env.BUILD_URL, result: currentBuild.currentResult, title: JOB_NAME, webhookURL: DISCORD_WEBHOOK
         }
     }
 }

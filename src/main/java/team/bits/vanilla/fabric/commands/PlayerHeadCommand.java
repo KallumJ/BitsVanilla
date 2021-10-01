@@ -15,13 +15,11 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import team.bits.nibbles.command.Command;
 import team.bits.nibbles.command.CommandInformation;
 import team.bits.nibbles.utils.MojangApiUtils;
-import team.bits.vanilla.fabric.database.player.PlayerDataHandle;
 import team.bits.vanilla.fabric.database.player.PlayerUtils;
 import team.bits.vanilla.fabric.util.CommandSuggestionUtils;
 import team.bits.vanilla.fabric.util.ExtendedPlayerEntity;
 
 import java.util.Optional;
-import java.util.UUID;
 
 import static net.minecraft.server.command.CommandManager.literal;
 
@@ -61,9 +59,9 @@ public class PlayerHeadCommand extends Command {
         String userInput = playerHeadString;
 
         try {
-            Optional<UUID> uuid = PlayerUtils.nameToUUID(playerHeadString);
-            if (uuid.isPresent()) {
-                playerHeadString = PlayerDataHandle.get(uuid.get()).getUsername();
+            Optional<String> username = PlayerUtils.getUsername(playerHeadString);
+            if (username.isPresent()) {
+                playerHeadString = username.get();
 
             } else {
                 if (!MojangApiUtils.checkUsernameIsValid(playerHeadString)) {

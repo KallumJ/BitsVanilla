@@ -1,33 +1,35 @@
 package team.bits.vanilla.fabric.database.player;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.rabbitmq.client.Connection;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import team.bits.nibbles.utils.ServerInstance;
-import team.bits.vanilla.fabric.database.DatabaseConnection;
-import team.bits.vanilla.fabric.database.util.QueryHelper;
-import team.bits.vanilla.fabric.database.util.model.DataTypes;
+import team.bits.servicelib.client.GraphQLRPCClient;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.awt.*;
+import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
-/**
- * Most of these operations can be done with the {@link PlayerDataHandle} class,
- * but these functions have been specifically optimized to only use one SQL query
- * and return the minimum amount of data. If you need to use more than one of these
- * functions at the same time, it's better to use {@link PlayerDataHandle} instead.
- */
 public final class PlayerUtils {
 
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static GraphQLRPCClient rpcClient;
 
     private PlayerUtils() {
+    }
+
+    public static void init(@NotNull Connection connection) {
+        try {
+            rpcClient = new GraphQLRPCClient(connection, "player-api");
+        } catch (IOException ex) {
+            throw new RuntimeException("Error while creating RPC client", ex);
+        }
     }
 
     /**
@@ -38,27 +40,21 @@ public final class PlayerUtils {
      * @return the username of the player
      */
     public static @NotNull Optional<String> getUsername(@NotNull String nickname) {
-        final Connection databaseConnection = DatabaseConnection.getConnection();
+        JsonObject response;
         try {
-            PreparedStatement getUsernameStatement = QueryHelper.prepareStatement(
-                    databaseConnection,
-                    "SELECT username FROM player_data WHERE nickname=? LIMIT 1",
-                    Collections.singleton(
-                            DataTypes.STRING.create(nickname)
-                    )
-            );
-
-            // if there is any result, return the first value
-            ResultSet resultSet = getUsernameStatement.executeQuery();
-            if (resultSet.next()) {
-                return Optional.of(resultSet.getString(1));
-            }
-
-            return Optional.empty();
-
-        } catch (SQLException ex) {
-            throw new RuntimeException("SQLException while obtaining player name", ex);
+            response = rpcClient.call(
+                    "query($name: String!) { player(name: $name) { username } }",
+                    Map.of("name", nickname)
+            ).get();
+        } catch (InterruptedException | ExecutionException | IOException ex) {
+            throw new RuntimeException("Error while getting player data", ex);
         }
+
+        if (response.size() > 0) {
+            return Optional.of(response.getAsJsonObject("player").get("username").getAsString());
+        }
+
+        return Optional.empty();
     }
 
     /**
@@ -66,24 +62,15 @@ public final class PlayerUtils {
      *
      * @return a list of nicknames of all players that have one
      */
-    public static @NotNull Collection<String> getNicknames() {
-        final Connection databaseConnection = DatabaseConnection.getConnection();
+    public static @NotNull CompletableFuture<Collection<String>> getNicknamesAsync() {
         try {
-            // only get nicknames that aren't NULL
-            ResultSet resultSet = databaseConnection.prepareStatement(
-                    "SELECT nickname FROM player_data WHERE nickname IS NOT NULL"
-            ).executeQuery();
-
-            // convert the result set into a list
-            Collection<String> names = new LinkedList<>();
-            while (resultSet.next()) {
-                names.add(resultSet.getString(1));
-            }
-
-            return Collections.unmodifiableCollection(names);
-
-        } catch (SQLException ex) {
-            throw new RuntimeException("SQLException while obtaining player data", ex);
+            return rpcClient.call(
+                            "query { players { nickname } }",
+                            Map.of()
+                    )
+                    .thenApply(PlayerUtils::readEffectiveNames);
+        } catch (IOException ex) {
+            throw new RuntimeException("Error while getting player data", ex);
         }
     }
 
@@ -93,26 +80,15 @@ public final class PlayerUtils {
      *
      * @return a list of effective names of all players that have ever played
      */
-    public static @NotNull Collection<String> getAllNames() {
-        final Connection databaseConnection = DatabaseConnection.getConnection();
+    public static @NotNull CompletableFuture<Collection<String>> getAllNamesAsync() {
         try {
-            // the SQL COALESCE function will get the first non-null
-            // value in a list. So if the player has a nickname, it will
-            // be used, otherwise the username will be used
-            ResultSet resultSet = databaseConnection.prepareStatement(
-                    "SELECT COALESCE(nickname, username) AS name FROM player_data"
-            ).executeQuery();
-
-            // convert the result set into a list
-            Collection<String> names = new LinkedList<>();
-            while (resultSet.next()) {
-                names.add(resultSet.getString(1));
-            }
-
-            return Collections.unmodifiableCollection(names);
-
-        } catch (SQLException ex) {
-            throw new RuntimeException("SQLException while obtaining player data", ex);
+            return rpcClient.call(
+                            "query { players { nickname, username } }",
+                            Map.of()
+                    )
+                    .thenApply(PlayerUtils::readEffectiveNames);
+        } catch (IOException ex) {
+            throw new RuntimeException("Error while getting player data", ex);
         }
     }
 
@@ -122,45 +98,36 @@ public final class PlayerUtils {
      *
      * @return a list of effective names of all players on the server
      */
-    public static @NotNull Collection<String> getOnlinePlayerNames() {
+    public static @NotNull CompletableFuture<Collection<String>> getOnlinePlayerNamesAsync() {
         final PlayerManager playerManager = ServerInstance.get().getPlayerManager();
 
-        // in order to only get online players, get the list of all online players
-        // and create a template string with the same number of question marks
-        // as online players. These will be replaced by the usernames in the SQL query.
-        int playerCount = playerManager.getCurrentPlayerCount();
-        String[] playerNamesArray = playerManager.getPlayerNames();
-        String playerNamesTemplate = ",?".repeat(playerCount).substring(1);
-
-        // as an example, if the players 'Koenn' and 'KallumJ' are on the server,
-        // the playerNamesTemplate will become '?, ?' and the final SQL query will
-        // look like "SELECT ... WHERE username IN ('Koenn', 'KallumJ');
-
-        final Connection databaseConnection = DatabaseConnection.getConnection();
         try {
-            // we use the COALESCE function just like above to get
-            // a player's effective name.
-            PreparedStatement getNamesStatement = QueryHelper.prepareStatement(
-                    databaseConnection,
-                    String.format("SELECT COALESCE(nickname, username) AS name FROM player_data WHERE username IN (%s)", playerNamesTemplate),
-                    Arrays.stream(playerNamesArray)
-                            .map(DataTypes.STRING::create)
-                            .collect(Collectors.toUnmodifiableList())
-            );
-
-            ResultSet resultSet = getNamesStatement.executeQuery();
-
-            // convert the result set into a list
-            Collection<String> names = new LinkedList<>();
-            while (resultSet.next()) {
-                names.add(resultSet.getString(1));
-            }
-
-            return Collections.unmodifiableCollection(names);
-
-        } catch (SQLException ex) {
-            throw new RuntimeException("SQLException while obtaining player data", ex);
+            return rpcClient.call(
+                            "query($names: [String!]!) { players(usernames: $names) { nickname, username } }",
+                            Map.of("names", Arrays.asList(playerManager.getPlayerNames()))
+                    )
+                    .thenApply(PlayerUtils::readEffectiveNames);
+        } catch (IOException ex) {
+            throw new RuntimeException("Error while getting player data", ex);
         }
+    }
+
+    private static @NotNull Collection<String> readEffectiveNames(@NotNull JsonObject response) {
+        if (response.size() > 0) {
+            Collection<String> nicknames = new LinkedList<>();
+            JsonArray players = response.getAsJsonArray("players");
+            for (JsonElement player : players) {
+                JsonObject playerObject = player.getAsJsonObject();
+                if (playerObject.has("nickname")) {
+                    nicknames.add(playerObject.get("nickname").getAsString());
+                } else {
+                    nicknames.add(playerObject.get("username").getAsString());
+                }
+            }
+            return Collections.unmodifiableCollection(nicknames);
+        }
+
+        return Collections.emptySet();
     }
 
     /**
@@ -171,31 +138,26 @@ public final class PlayerUtils {
      * @return the effective name of that player
      */
     public static @NotNull String getEffectiveName(@NotNull ServerPlayerEntity player) {
-        final Connection databaseConnection = DatabaseConnection.getConnection();
+        JsonObject response;
         try {
-            // we use the COALESCE function just like above to get
-            // a player's effective name.
-            PreparedStatement getEffectiveNameStatement = QueryHelper.prepareStatement(
-                    databaseConnection,
-                    "SELECT COALESCE(nickname, username) AS name FROM player_data WHERE uuid=(SELECT id FROM uuid WHERE uuid=?)",
-                    Collections.singleton(
-                            DataTypes.STRING.create(player.getUuidAsString())
-                    )
-            );
-
-            // if there is any result, return the first value
-            ResultSet resultSet = getEffectiveNameStatement.executeQuery();
-            if (resultSet.next()) {
-                return resultSet.getString(1);
-
-            } else {
-                // return the player's username if there are no results
-                return player.getName().getString();
-            }
-
-        } catch (SQLException ex) {
-            throw new RuntimeException("SQLException while obtaining player name", ex);
+            response = rpcClient.call(
+                    "query($uuid: ID!) { player(uuid: $uuid) { nickname, username } }",
+                    Map.of("uuid", player.getUuidAsString())
+            ).get();
+        } catch (InterruptedException | ExecutionException | IOException ex) {
+            throw new RuntimeException("Error while getting player data", ex);
         }
+
+        if (response.size() > 0) {
+            JsonObject playerObject = response.getAsJsonObject("player");
+            if (playerObject.has("nickname")) {
+                return playerObject.get("nickname").getAsString();
+            } else {
+                return playerObject.get("username").getAsString();
+            }
+        }
+
+        return player.getName().getString();
     }
 
     /**
@@ -205,25 +167,21 @@ public final class PlayerUtils {
      * @return true if the player has VIP status
      */
     public static boolean isVIP(@NotNull ServerPlayerEntity player) {
-        final Connection databaseConnection = DatabaseConnection.getConnection();
+        JsonObject response;
         try {
-            // We select the vip column for the given player, but only
-            // if the value of vip is true. That way if there is any result
-            // at all, we know the player is a VIP
-            PreparedStatement isVIPStatement = QueryHelper.prepareStatement(
-                    databaseConnection,
-                    "SELECT vip FROM player_data WHERE uuid=(SELECT id FROM uuid WHERE uuid=?) AND vip=1",
-                    Collections.singleton(
-                            DataTypes.STRING.create(player.getUuidAsString())
-                    )
-            );
-
-            // return true if the query gave any results
-            return isVIPStatement.executeQuery().next();
-
-        } catch (SQLException ex) {
-            throw new RuntimeException("SQLException while obtaining player name", ex);
+            response = rpcClient.call(
+                    "query($uuid: ID!) { player(uuid: $uuid) { vip } }",
+                    Map.of("uuid", player.getUuidAsString())
+            ).get();
+        } catch (InterruptedException | ExecutionException | IOException ex) {
+            throw new RuntimeException("Error while getting player data", ex);
         }
+
+        if (response.size() > 0) {
+            return response.getAsJsonObject("player").get("vip").getAsBoolean();
+        }
+
+        return false;
     }
 
     /**
@@ -234,32 +192,22 @@ public final class PlayerUtils {
      * @return the uuid of that player (if found)
      */
     public static Optional<UUID> nameToUUID(@NotNull String name) {
-        final Connection databaseConnection = DatabaseConnection.getConnection();
+        JsonObject response;
         try {
-            // select the uuid from any player which matches the nickname or the username
-            PreparedStatement getPlayerDataStatement = QueryHelper.prepareStatement(
-                    databaseConnection,
-                    "SELECT uuid FROM player_data WHERE nickname=? OR username=?",
-                    Arrays.asList(
-                            DataTypes.STRING.create(name),
-                            DataTypes.STRING.create(name)
-                    )
-            );
-
-            ResultSet resultSet = getPlayerDataStatement.executeQuery();
-            if (resultSet.next()) {
-
-                // convert the uuid ID into an actual uuid
-                int uuidID = resultSet.getInt(1);
-                return Optional.of(UUIDHelper.getUUID(uuidID, databaseConnection));
-
-            } else {
-                return Optional.empty();
-            }
-
-        } catch (SQLException ex) {
-            throw new RuntimeException("SQLException while obtaining player data", ex);
+            response = rpcClient.call(
+                    "query($name: String!) { player(name: $name) { uuid } }",
+                    Map.of("name", name)
+            ).get();
+        } catch (InterruptedException | ExecutionException | IOException ex) {
+            throw new RuntimeException("Error while getting player data", ex);
         }
+
+        if (response.size() > 0) {
+            String uuidString = response.getAsJsonObject("player").get("uuid").getAsString();
+            return Optional.of(UUID.fromString(uuidString));
+        }
+
+        return Optional.empty();
     }
 
     /**
@@ -284,12 +232,74 @@ public final class PlayerUtils {
     }
 
     /**
+     * Get the data needed in order to format a player's name (username, nickname, color)
+     *
+     * @param player the player to get the name data for
+     * @return username, nickname and color for the player
+     */
+    public static @NotNull CompletableFuture<Optional<PlayerNameLoader.PlayerNameData>> getNameDataAsync(@NotNull ServerPlayerEntity player) {
+        try {
+            // make an RPC to query a player's username, nickname, and color
+            return rpcClient.call(
+                            "query($uuid: ID!) { player(uuid: $uuid) { username, nickname, color } }",
+                            Map.of("uuid", player.getUuidAsString())
+                    )
+                    // when the response is received, put the data into a record for ease of use
+                    .thenApply(response -> {
+                        if (response.size() > 0) { // only do this if we actually have data
+                            JsonObject playerData = response.getAsJsonObject("player");
+                            return Optional.of(new PlayerNameLoader.PlayerNameData(
+                                    playerData.get("username").getAsString(),
+                                    // nickname and color are both optional and may be null
+                                    playerData.has("nickname") ? playerData.get("nickname").getAsString() : null,
+                                    playerData.has("color") ? playerData.get("color").getAsInt() : null
+                            ));
+                        }
+
+                        return Optional.empty();
+                    });
+        } catch (IOException ex) {
+            throw new RuntimeException("Error while getting player data", ex);
+        }
+    }
+
+    /**
      * This function will update a player's username in the database.
      * Usually this will do nothing, but it handles player name changes.
      */
     public static void updatePlayerUsername(@NotNull ServerPlayerEntity player) {
-        PlayerDataHandle dataHandle = PlayerDataHandle.get(player);
-        LOGGER.info(String.format("Player '%s' updated in database", dataHandle.getEffectiveName()));
-        dataHandle.save();
+        updatePlayer(player, Map.of("username", player.getName().getString()));
+    }
+
+    public static void setColor(@NotNull ServerPlayerEntity player, @NotNull Color color) {
+        int rgb = (color.getRed() << 16) | (color.getGreen() << 8) | (color.getBlue());
+
+        updatePlayer(player, Map.of("color", rgb));
+    }
+
+    public static void setNickname(@NotNull ServerPlayerEntity player, @Nullable String nickname) {
+        if (nickname == null) {
+            nickname = "";
+        }
+
+        updatePlayer(player, Map.of("nickname", nickname));
+    }
+
+    public static void setVIP(@NotNull ServerPlayerEntity player, boolean vip) {
+        updatePlayer(player, Map.of("vip", vip));
+    }
+
+    private static void updatePlayer(@NotNull ServerPlayerEntity player, @NotNull Map playerData) {
+        try {
+            rpcClient.call(
+                    "mutation($uuid: ID!, $player: PlayerInput!) { player(uuid: $uuid, player: $player) { uuid } }",
+                    Map.of(
+                            "uuid", player.getUuidAsString(),
+                            "player", playerData
+                    )
+            );
+        } catch (IOException ex) {
+            throw new RuntimeException("Error while updating player data", ex);
+        }
     }
 }

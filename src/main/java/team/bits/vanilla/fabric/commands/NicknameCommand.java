@@ -13,7 +13,8 @@ import team.bits.nibbles.command.Command;
 import team.bits.nibbles.command.CommandInformation;
 import team.bits.nibbles.utils.Colors;
 import team.bits.vanilla.fabric.BitsVanilla;
-import team.bits.vanilla.fabric.database.player.PlayerDataHandle;
+import team.bits.vanilla.fabric.database.player.PlayerNameLoader;
+import team.bits.vanilla.fabric.database.player.PlayerUtils;
 
 import static net.minecraft.server.command.CommandManager.literal;
 
@@ -51,9 +52,8 @@ public class NicknameCommand extends Command {
         final ServerPlayerEntity player = context.getSource().getPlayer();
         final String nickname = context.getArgument("nickname", String.class);
 
-        PlayerDataHandle dataHandle = PlayerDataHandle.get(player);
-        dataHandle.setNickname(nickname);
-        dataHandle.save();
+        PlayerUtils.setNickname(player, nickname);
+        PlayerNameLoader.loadNameData(player);
 
         BitsVanilla.adventure().audience(context.getSource())
                 .sendMessage(Component.text(String.format("Changed your nickname to '%s'", nickname), Colors.POSITIVE));
@@ -64,9 +64,8 @@ public class NicknameCommand extends Command {
     private int clearNickname(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         final ServerPlayerEntity player = context.getSource().getPlayer();
 
-        PlayerDataHandle dataHandle = PlayerDataHandle.get(player);
-        dataHandle.setNickname(null);
-        dataHandle.save();
+        PlayerUtils.setNickname(player, null);
+        PlayerNameLoader.loadNameData(player);
 
         BitsVanilla.adventure().audience(context.getSource())
                 .sendMessage(Component.text("Cleared your nickname", Colors.POSITIVE));

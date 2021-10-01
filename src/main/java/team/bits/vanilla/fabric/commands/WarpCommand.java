@@ -26,7 +26,6 @@ import team.bits.vanilla.fabric.database.warp.WarpUtils;
 import team.bits.vanilla.fabric.teleport.Teleporter;
 import team.bits.vanilla.fabric.util.CommandSuggestionUtils;
 
-import java.util.Collection;
 import java.util.Optional;
 
 import static net.minecraft.server.command.CommandManager.literal;
@@ -115,18 +114,19 @@ public class WarpCommand extends Command {
                         .append(Component.text(WARP_SUBHEADER, Style.style(Colors.NEUTRAL, TextDecoration.ITALIC)))
         );
 
-        Collection<String> warps = WarpUtils.getWarpsList();
-        for (String warpName : warps) {
-            audience.sendMessage(
-                    Component.text(warpName, NamedTextColor.WHITE)
-                            .hoverEvent(HoverEvent.showText(
-                                    Component.text(String.format(WARP_LIST_TOOLTIP, warpName))
-                            ))
-                            .clickEvent(ClickEvent.runCommand(
-                                    String.format(WARP_COMMAND, warpName)
-                            ))
-            );
-        }
+        WarpUtils.getWarpsListAsync().thenAccept(warps -> {
+            for (String warpName : warps) {
+                audience.sendMessage(
+                        Component.text(warpName, NamedTextColor.WHITE)
+                                .hoverEvent(HoverEvent.showText(
+                                        Component.text(String.format(WARP_LIST_TOOLTIP, warpName))
+                                ))
+                                .clickEvent(ClickEvent.runCommand(
+                                        String.format(WARP_COMMAND, warpName)
+                                ))
+                );
+            }
+        });
 
         return 1;
     }

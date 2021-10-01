@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import team.bits.nibbles.player.CopyPlayerDataEvent;
 import team.bits.nibbles.player.INibblesPlayer;
 import team.bits.nibbles.utils.Scheduler;
-import team.bits.vanilla.fabric.database.player.PlayerDataHandle;
+import team.bits.vanilla.fabric.database.player.PlayerNameLoader;
 import team.bits.vanilla.fabric.util.ExtendedPlayerEntity;
 
 import java.util.HashMap;
@@ -101,10 +101,7 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
         this.customClient = oldPlayer.customClient;
         this.sendTPS = oldPlayer.sendTPS;
 
-        Scheduler.runOffThread(() -> {
-            ServerPlayerEntity self = ServerPlayerEntity.class.cast(this);
-            PlayerDataHandle.get(self).loadCustomName(self);
-        });
+        Scheduler.runOffThread(() -> PlayerNameLoader.loadNameData((ServerPlayerEntity) (Object) this));
     }
 
     @Override

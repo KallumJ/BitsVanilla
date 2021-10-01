@@ -17,15 +17,25 @@ public class CommandSuggestionUtils {
     public static final SuggestionProvider<ServerCommandSource> WARPS;
 
     static {
-        ONLINE_PLAYERS = (context, builder) -> filterSuggestionsByInput(builder, PlayerUtils.getOnlinePlayerNames());
-        ALL_PLAYERS = (context, builder) -> filterSuggestionsByInput(builder, PlayerUtils.getAllNames());
-        NICKNAMES = (context, builder) -> filterSuggestionsByInput(builder, PlayerUtils.getNicknames());
-        WARPS = (context, builder) -> filterSuggestionsByInput(builder, WarpUtils.getWarpsList());
+        ONLINE_PLAYERS = (context, builder) -> filterSuggestionsByInputAsync(builder, PlayerUtils.getOnlinePlayerNamesAsync());
+        ALL_PLAYERS = (context, builder) -> filterSuggestionsByInputAsync(builder, PlayerUtils.getAllNamesAsync());
+        NICKNAMES = (context, builder) -> filterSuggestionsByInputAsync(builder, PlayerUtils.getNicknamesAsync());
+        WARPS = (context, builder) -> filterSuggestionsByInputAsync(builder, WarpUtils.getWarpsListAsync());
     }
 
-    private static CompletableFuture<Suggestions> filterSuggestionsByInput(SuggestionsBuilder builder, Collection<String> values) {
-        String start = builder.getRemaining().toLowerCase();
-        values.stream().filter(s -> s.toLowerCase().startsWith(start)).forEach(builder::suggest);
-        return builder.buildFuture();
+    // instead of running the queries for suggestions on the server thread
+    // and causing mini lag spikes, we can pass the suggestions in as a
+    // future, transform that future into the desired suggestions object
+    // and then return it, still as a future. This way we never block
+    // the server thread and prevent unneeded lag.
+    private static CompletableFuture<Suggestions> filterSuggestionsByInputAsync(SuggestionsBuilder builder,
+                                                                                CompletableFuture<Collection<String>> futureSuggestions) {
+        final String userInput = builder.getRemaining().toLowerCase();
+        return futureSuggestions.thenApply(suggestions -> {
+            suggestions.stream()
+                    .filter(suggestion -> suggestion.toLowerCase().startsWith(userInput))
+                    .forEach(builder::suggest);
+            return builder.build();
+        });
     }
 }

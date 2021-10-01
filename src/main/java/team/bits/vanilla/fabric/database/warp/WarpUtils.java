@@ -1,5 +1,9 @@
 package team.bits.vanilla.fabric.database.warp;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.rabbitmq.client.Connection;
 import net.minecraft.server.dedicated.MinecraftDedicatedServer;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Vec3d;
@@ -8,79 +12,61 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import team.bits.nibbles.teleport.Location;
 import team.bits.nibbles.utils.ServerInstance;
-import team.bits.vanilla.fabric.database.DatabaseConnection;
-import team.bits.vanilla.fabric.database.util.QueryHelper;
+import team.bits.servicelib.client.GraphQLRPCClient;
 import team.bits.vanilla.fabric.database.util.ServerUtils;
-import team.bits.vanilla.fabric.database.util.model.DataTypes;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.*;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 public final class WarpUtils {
+
+    private static GraphQLRPCClient rpcClient;
 
     private WarpUtils() {
     }
 
-    public static @NotNull Collection<String> getWarpsList() {
-        final Connection databaseConnection = DatabaseConnection.getConnection();
+    public static void init(@NotNull Connection connection) {
         try {
-            PreparedStatement getWarpsStatement = QueryHelper.prepareStatement(
-                    databaseConnection,
-                    "SELECT name FROM warp WHERE server=(SELECT id FROM server WHERE name=?)",
-                    Collections.singleton(
-                            DataTypes.STRING.create(ServerUtils.getServerName())
+            rpcClient = new GraphQLRPCClient(connection, "warp-api");
+        } catch (IOException ex) {
+            throw new RuntimeException("Error while creating RPC client", ex);
+        }
+    }
+
+    public static @NotNull CompletableFuture<Collection<String>> getWarpsListAsync() {
+        try {
+            return rpcClient.call(
+                            "query($server: String!) { warps(server: $server) { name } }",
+                            Map.of("server", ServerUtils.getServerName())
                     )
-            );
-
-            ResultSet resultSet = getWarpsStatement.executeQuery();
-
-            Collection<String> names = new LinkedList<>();
-            while (resultSet.next()) {
-                names.add(resultSet.getString(1));
-            }
-
-            return Collections.unmodifiableCollection(names);
-
-        } catch (SQLException ex) {
-            throw new RuntimeException("SQLException while getting warps list", ex);
+                    .thenApply(response -> response.getAsJsonArray("warps"))
+                    .thenApply(WarpUtils::readWarpNames);
+        } catch (IOException ex) {
+            throw new RuntimeException("Error while getting player data", ex);
         }
     }
 
     public static @NotNull Optional<Warp> getWarp(@NotNull String name) {
-        final MinecraftDedicatedServer server = ServerInstance.get();
-        final Connection databaseConnection = DatabaseConnection.getConnection();
         try {
-            PreparedStatement getWarpStatement = QueryHelper.prepareStatement(
-                    databaseConnection,
-                    "SELECT world, x, y, z FROM warp WHERE server=(SELECT id FROM server WHERE name=?) AND name=?",
-                    Arrays.asList(
-                            DataTypes.STRING.create(ServerUtils.getServerName()),
-                            DataTypes.STRING.create(name)
+            return rpcClient.call(
+                            "query($server: String!, $name: String!) {" +
+                                    "   warp(server: $server, name: $name) { name, location { world, x, y, z } }" +
+                                    "}",
+                            Map.of(
+                                    "server", ServerUtils.getServerName(),
+                                    "name", name
+                            )
                     )
-            );
-
-            ResultSet resultSet = getWarpStatement.executeQuery();
-            if (resultSet.next()) {
-
-                String worldName = resultSet.getString("world");
-                int x = resultSet.getInt("x");
-                int y = resultSet.getInt("y");
-                int z = resultSet.getInt("z");
-
-                ServerWorld world = server.getWorld(nameToWorldKey(worldName));
-                Location location = new Location(new Vec3d(x + 0.5f, y + 0.5f, z + 0.5f), world);
-
-                return Optional.of(new Warp(name, location));
-
-            } else {
-                return Optional.empty();
-            }
-
-        } catch (SQLException ex) {
-            throw new RuntimeException("SQLException while getting warp", ex);
+                    .thenApply(response -> Optional.ofNullable(response.getAsJsonObject("warp")))
+                    .thenApply(warp -> warp.map(WarpUtils::readWarp))
+                    .get();
+        } catch (InterruptedException | ExecutionException | IOException ex) {
+            throw new RuntimeException("Error while getting warp data", ex);
         }
     }
 
@@ -89,45 +75,65 @@ public final class WarpUtils {
         final Vec3d pos = location.position();
         final World world = location.world();
 
-        final Connection databaseConnection = DatabaseConnection.getConnection();
         try {
-            PreparedStatement addWarpStatement = QueryHelper.prepareStatement(
-                    databaseConnection,
-                    "INSERT INTO warp (name, world, x, y, z, server) VALUES (?, ?, ?, ?, ?, (SELECT id FROM server WHERE name=?))",
-                    Arrays.asList(
-                            DataTypes.STRING.create(warp.name()),
-                            DataTypes.STRING.create(worldKeyToName(world.getRegistryKey())),
-                            DataTypes.INTEGER.create((int) pos.x),
-                            DataTypes.INTEGER.create((int) pos.y),
-                            DataTypes.INTEGER.create((int) pos.z),
-                            DataTypes.STRING.create(ServerUtils.getServerName())
+            rpcClient.call(
+                    "mutation($server: String!, $name: String!, $location: LocationInput!) {" +
+                            "   addWarp(server: $server, name: $name, location: $location) { name }" +
+                            "}",
+                    Map.of(
+                            "server", ServerUtils.getServerName(),
+                            "name", warp.name(),
+                            "location", Map.of(
+                                    "world", worldKeyToName(world.getRegistryKey()),
+                                    "x", (int) pos.x,
+                                    "y", (int) pos.y,
+                                    "z", (int) pos.z
+                            )
                     )
             );
-
-            addWarpStatement.executeUpdate();
-
-        } catch (SQLException ex) {
-            throw new RuntimeException("SQLException while adding warp", ex);
+        } catch (IOException ex) {
+            throw new RuntimeException("Error while adding warp", ex);
         }
     }
 
     public static void deleteWarp(@NotNull Warp warp) {
-        final Connection databaseConnection = DatabaseConnection.getConnection();
         try {
-            PreparedStatement addWarpStatement = QueryHelper.prepareStatement(
-                    databaseConnection,
-                    "DELETE FROM warp WHERE server=(SELECT id FROM server WHERE name=?) AND name=?",
-                    Arrays.asList(
-                            DataTypes.STRING.create(ServerUtils.getServerName()),
-                            DataTypes.STRING.create(warp.name())
+            rpcClient.call(
+                    "mutation($server: String!, $name: String!) {" +
+                            "   deleteWarp(server: $server, name: $name)" +
+                            "}",
+                    Map.of(
+                            "server", ServerUtils.getServerName(),
+                            "name", warp.name()
                     )
             );
-
-            addWarpStatement.executeUpdate();
-
-        } catch (SQLException ex) {
-            throw new RuntimeException("SQLException while adding warp", ex);
+        } catch (IOException ex) {
+            throw new RuntimeException("Error while deleting warp", ex);
         }
+    }
+
+    private static @NotNull Collection<String> readWarpNames(@NotNull JsonArray json) {
+        Collection<String> warps = new LinkedList<>();
+        for (JsonElement warp : json) {
+            warps.add(warp.getAsJsonObject().get("name").getAsString());
+        }
+        return warps;
+    }
+
+    private static @NotNull Warp readWarp(@NotNull JsonObject json) {
+        final MinecraftDedicatedServer server = ServerInstance.get();
+
+        String warpName = json.get("name").getAsString();
+        JsonObject locationJson = json.getAsJsonObject("location");
+        String worldName = locationJson.get("world").getAsString();
+        int x = locationJson.get("x").getAsInt();
+        int y = locationJson.get("y").getAsInt();
+        int z = locationJson.get("z").getAsInt();
+
+        ServerWorld world = server.getWorld(nameToWorldKey(worldName));
+        Location location = new Location(new Vec3d(x + 0.5f, y + 0.5f, z + 0.5f), world);
+
+        return new Warp(warpName, location);
     }
 
     private static @NotNull RegistryKey<World> nameToWorldKey(@NotNull String name) {

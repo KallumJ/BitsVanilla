@@ -14,7 +14,6 @@ import team.bits.nibbles.command.Command;
 import team.bits.nibbles.command.CommandInformation;
 import team.bits.nibbles.utils.Colors;
 import team.bits.vanilla.fabric.BitsVanilla;
-import team.bits.vanilla.fabric.database.player.PlayerDataHandle;
 import team.bits.vanilla.fabric.database.player.PlayerUtils;
 import team.bits.vanilla.fabric.util.CommandSuggestionUtils;
 
@@ -101,11 +100,7 @@ public class VIPCommand extends Command {
             ServerPlayerEntity player = playerToChange.get();
 
             // Update the passed player with the passed status, and inform the requesting player
-            PlayerDataHandle playerDataHandle = PlayerDataHandle.get(player);
-
-            playerDataHandle.setVip(vipStatus);
-            playerDataHandle.save();
-
+            PlayerUtils.setVIP(player, vipStatus);
 
             BitsVanilla.audience(requestingPlayer).sendMessage(
                     Component.text(String.format(UPDATE_SUCCESS, player.getEntityName()), Colors.POSITIVE)

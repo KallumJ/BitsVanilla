@@ -18,7 +18,7 @@ import team.bits.nibbles.command.Command;
 import team.bits.nibbles.command.CommandInformation;
 import team.bits.nibbles.utils.Colors;
 import team.bits.vanilla.fabric.BitsVanilla;
-import team.bits.vanilla.fabric.database.player.PlayerDataHandle;
+import team.bits.vanilla.fabric.database.player.PlayerNameLoader;
 import team.bits.vanilla.fabric.database.player.PlayerUtils;
 import team.bits.vanilla.fabric.util.color.NameColor;
 import team.bits.vanilla.fabric.util.color.NameColors;
@@ -120,8 +120,8 @@ public class ColorNameCommand extends Command {
             audience.sendMessage(
                     Component.text(shade.name(), textColor)
                             .hoverEvent(HoverEvent.showText(
-                                    Component.text("Click to change your color to ")
-                                            .append(Component.text(shade.name(), textColor))
+                                            Component.text("Click to change your color to ")
+                                                    .append(Component.text(shade.name(), textColor))
                                     )
                             )
                             .clickEvent(ClickEvent.runCommand(
@@ -145,9 +145,8 @@ public class ColorNameCommand extends Command {
 
             Optional<NameColor> color = NameColors.INSTANCE.getColour(category, colorName);
             if (color.isPresent()) {
-                PlayerDataHandle playerData = PlayerDataHandle.get(player);
-                playerData.setColour(color.get().color());
-                playerData.save();
+                PlayerUtils.setColor(player, color.get().color());
+                PlayerNameLoader.loadNameData(player);
 
                 audience.sendMessage(
                         Component.text(String.format(COLOR_CHANGED_MSG, colorName), Colors.POSITIVE)
