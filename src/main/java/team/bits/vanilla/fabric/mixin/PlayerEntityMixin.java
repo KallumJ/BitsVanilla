@@ -17,6 +17,7 @@ import team.bits.nibbles.player.CopyPlayerDataEvent;
 import team.bits.nibbles.player.INibblesPlayer;
 import team.bits.nibbles.utils.Scheduler;
 import team.bits.vanilla.fabric.database.player.PlayerNameLoader;
+import team.bits.vanilla.fabric.statistics.lib.StatRecord;
 import team.bits.vanilla.fabric.util.ExtendedPlayerEntity;
 
 import java.util.HashMap;
@@ -33,7 +34,7 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
 
     private PlayerEntity duelTarget;
 
-    private final Map<String, Integer> statLevels = new HashMap<>();
+    private final Map<String, StatRecord> statLevels = new HashMap<>();
     private boolean migratedStats;
 
     private boolean customClient = false;
@@ -64,7 +65,7 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
         }
 
         NbtCompound stats = new NbtCompound();
-        this.statLevels.forEach(stats::putInt);
+        this.statLevels.forEach((key, record) -> stats.putInt(key, record.level()));
         nbt.put("StatLevels", stats);
 
         nbt.putBoolean("MigratedStats", this.migratedStats);
@@ -85,7 +86,7 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
         if (nbt.contains("StatLevels")) {
             NbtCompound stats = nbt.getCompound("StatLevels");
             stats.getKeys().forEach(id ->
-                    this.statLevels.put(id, stats.getInt(id))
+                    this.statLevels.put(id, new StatRecord(stats.getInt(id), 0))
             );
         }
 
@@ -125,13 +126,13 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
     }
 
     @Override
-    public int getStatLevel(@NotNull Identifier statId) {
-        return this.statLevels.getOrDefault(statId.toString(), 0);
+    public @NotNull StatRecord getStatRecord(@NotNull Identifier statId) {
+        return this.statLevels.getOrDefault(statId.toString(), new StatRecord(0, 0));
     }
 
     @Override
-    public void setStatLevel(@NotNull Identifier statId, int level) {
-        this.statLevels.put(statId.toString(), level);
+    public void setStatRecord(@NotNull Identifier statId, @NotNull StatRecord record) {
+        this.statLevels.put(statId.toString(), record);
     }
 
     @Override

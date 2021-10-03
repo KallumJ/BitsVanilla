@@ -29,10 +29,10 @@ public final class StatUtils {
         statHandler.increaseStat(player, stat, amount);
     }
 
-    public static Collection<StatisticRecord> getStats(@NotNull ServerPlayerEntity player) {
+    public static @NotNull Collection<StatisticRecord> getStats(@NotNull ServerPlayerEntity player) {
         Collection<StatisticRecord> stats = new LinkedList<>();
         for (TrackedStat stat : CustomStats.TRACKED_STATS.values()) {
-            int level = StatTracker.getStoredLevel(player, stat.stat());
+            int level = StatTracker.getStoredRecord(player, stat.stat()).level();
             if (level > 0) {
                 int count = StatTracker.getCurrentCount(player, stat.stat());
                 stats.add(new StatisticRecord(stat, count, level));

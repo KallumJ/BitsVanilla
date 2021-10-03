@@ -20,45 +20,59 @@ public class StatTracker implements Runnable {
         for (ServerPlayerEntity player : ServerInstance.getOnlinePlayers()) {
             for (TrackedStat trackedStat : CustomStats.TRACKED_STATS.values()) {
                 Stat<?> stat = trackedStat.stat();
+
+                // get this player's current values for this statistic
                 int currentLevel = getCurrentLevel(player, stat);
-                int storedLevel = getStoredLevel(player, stat);
-                if (currentLevel > storedLevel) {
-                    setStoredLevel(player, stat, currentLevel);
+                int currentCount = getCurrentCount(player, stat);
+                // get this player's stored values for this statistic
+                StatRecord storedRecord = getStoredRecord(player, stat);
 
-                    player.getServerWorld().playSound(
-                            player, player.getBlockPos(),
-                            SoundEvents.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS,
-                            1.0f, 1.0f
-                    );
+                // check if either the level or the count increased
+                if (currentCount > storedRecord.count() || currentLevel > storedRecord.level()) {
 
-                    int[] levelCounts = trackedStat.levelCounts();
+                    // create an updated record and store it in the player data
+                    StatRecord updatedRecord = new StatRecord(currentLevel, currentCount);
+                    setStoredRecord(player, stat, updatedRecord);
 
-                    ServerInstance.broadcast(Component.text(
-                            trackedStat.levelupMessage()
-                                    .replace("%user%", PlayerUtils.getEffectiveName(player))
-                                    .replace("%count%", stat.format(levelCounts[currentLevel - 1]))
-                                    .replace("%level%", String.valueOf(currentLevel)),
-                            Colors.POSITIVE
-                    ));
+                    // enqueue an update to the player API
+                    PlayerAPIStatsSyncHandler.enqueue(trackedStat, player, updatedRecord);
 
-                    ((ExtendedPlayerEntity) player).giveItems(LootUtils.getLoot(player));
+                    // check if the player levelled up
+                    if (currentLevel > storedRecord.level()) {
 
-                    DatabaseStatHandler.enqueue(trackedStat, player, currentLevel);
+                        // play a sound and send a message
+                        player.getServerWorld().playSound(
+                                player, player.getBlockPos(),
+                                SoundEvents.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS,
+                                1.0f, 1.0f
+                        );
+                        int[] levelCounts = trackedStat.levelCounts();
+                        ServerInstance.broadcast(Component.text(
+                                trackedStat.levelupMessage()
+                                        .replace("%user%", PlayerUtils.getEffectiveName(player))
+                                        .replace("%count%", stat.format(levelCounts[currentLevel - 1]))
+                                        .replace("%level%", String.valueOf(currentLevel)),
+                                Colors.POSITIVE
+                        ));
+
+                        // give the player their reward
+                        ((ExtendedPlayerEntity) player).giveItems(LootUtils.getLoot(player));
+                    }
                 }
             }
         }
     }
 
-    public static int getStoredLevel(@NotNull ServerPlayerEntity player, @NotNull Stat<?> stat) {
+    public static @NotNull StatRecord getStoredRecord(@NotNull ServerPlayerEntity player, @NotNull Stat<?> stat) {
         ExtendedPlayerEntity ePlayer = (ExtendedPlayerEntity) player;
         Identifier statId = getStatId(stat);
-        return ePlayer.getStatLevel(statId);
+        return ePlayer.getStatRecord(statId);
     }
 
-    public static void setStoredLevel(@NotNull ServerPlayerEntity player, @NotNull Stat<?> stat, int level) {
+    public static void setStoredRecord(@NotNull ServerPlayerEntity player, @NotNull Stat<?> stat, @NotNull StatRecord record) {
         ExtendedPlayerEntity ePlayer = (ExtendedPlayerEntity) player;
         Identifier statId = getStatId(stat);
-        ePlayer.setStatLevel(statId, level);
+        ePlayer.setStatRecord(statId, record);
     }
 
     private static int getCurrentLevel(@NotNull ServerPlayerEntity player, @NotNull Stat<?> stat) {

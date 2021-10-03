@@ -1,15 +1,12 @@
 package team.bits.vanilla.fabric.util;
 
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import team.bits.nibbles.player.INibblesPlayer;
+import team.bits.vanilla.fabric.statistics.lib.StatRecord;
 
-import java.util.Collection;
 import java.util.Optional;
 
 /**
@@ -26,9 +23,9 @@ public interface ExtendedPlayerEntity extends INibblesPlayer {
 
     void setDuelTarget(@Nullable PlayerEntity player);
 
-    int getStatLevel(@NotNull Identifier statId);
+    @NotNull StatRecord getStatRecord(@NotNull Identifier statId);
 
-    void setStatLevel(@NotNull Identifier statId, int level);
+    void setStatRecord(@NotNull Identifier statId, @NotNull StatRecord record);
 
     boolean hasMigratedStats();
 

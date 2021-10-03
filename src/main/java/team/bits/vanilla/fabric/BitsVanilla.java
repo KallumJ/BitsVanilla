@@ -22,13 +22,12 @@ import team.bits.nibbles.utils.PropertiesFileUtils;
 import team.bits.nibbles.utils.Scheduler;
 import team.bits.vanilla.fabric.commands.Commands;
 import team.bits.vanilla.fabric.commands.VersionCommand;
-import team.bits.vanilla.fabric.database.DatabaseConnection;
 import team.bits.vanilla.fabric.database.player.PlayerNameLoader;
 import team.bits.vanilla.fabric.database.player.PlayerUtils;
 import team.bits.vanilla.fabric.database.util.ServerUtils;
 import team.bits.vanilla.fabric.database.warp.WarpUtils;
 import team.bits.vanilla.fabric.listeners.*;
-import team.bits.vanilla.fabric.statistics.lib.DatabaseStatHandler;
+import team.bits.vanilla.fabric.statistics.lib.PlayerAPIStatsSyncHandler;
 import team.bits.vanilla.fabric.statistics.lib.StatTracker;
 import team.bits.vanilla.fabric.teleport.Teleporter;
 import team.bits.vanilla.fabric.util.AFKManager;
@@ -37,8 +36,6 @@ import team.bits.vanilla.fabric.util.color.NameColors;
 import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
 
 public class BitsVanilla implements ModInitializer, ServerLifecycleEvents.ServerStopping {
@@ -46,6 +43,8 @@ public class BitsVanilla implements ModInitializer, ServerLifecycleEvents.Server
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static FabricServerAudiences adventure;
+
+    private Connection apiConnection;
 
     public static FabricServerAudiences adventure() {
         if (adventure == null) {
@@ -62,8 +61,6 @@ public class BitsVanilla implements ModInitializer, ServerLifecycleEvents.Server
         return adventure().audience(source);
     }
 
-    private ExecutorService executor;
-
     @Override
     public void onInitialize() {
         ServerLifecycleEvents.SERVER_STARTING.register(server -> adventure = FabricServerAudiences.of(server));
@@ -78,17 +75,14 @@ public class BitsVanilla implements ModInitializer, ServerLifecycleEvents.Server
         connectionFactory.setHost(config.getProperty("hostname"));
         connectionFactory.setUsername(config.getProperty("username"));
         connectionFactory.setPassword(config.getProperty("password"));
-        Connection connection;
         try {
-            connection = connectionFactory.newConnection(ServerUtils.getServerName());
+            this.apiConnection = connectionFactory.newConnection(ServerUtils.getServerName());
         } catch (IOException | TimeoutException ex) {
             throw new RuntimeException("Error while connecting to RabbitMQ", ex);
         }
 
-        PlayerUtils.init(connection);
-        WarpUtils.init(connection);
-
-        DatabaseConnection.open();
+        PlayerUtils.init(this.apiConnection);
+        WarpUtils.init(this.apiConnection);
 
         NameColors.INSTANCE.load();
 
@@ -117,17 +111,20 @@ public class BitsVanilla implements ModInitializer, ServerLifecycleEvents.Server
 
         AFKManager.initAfkManager();
 
-        Scheduler.scheduleAtFixedRate(new StatTracker(), 0, 20);
+        Scheduler.scheduleAtFixedRate(new StatTracker(), 0, 200);
 
-        DatabaseStatHandler.init();
-        this.executor = Executors.newSingleThreadExecutor();
-        this.executor.execute(new DatabaseStatHandler());
+        PlayerAPIStatsSyncHandler.init(this.apiConnection);
     }
 
     @Override
     public void onServerStopping(MinecraftServer server) {
-        this.executor.shutdownNow();
+        PlayerAPIStatsSyncHandler.stop();
         Scheduler.stop();
-        DatabaseConnection.close();
+
+        try {
+            this.apiConnection.close();
+        } catch (IOException ex) {
+            LOGGER.error("Error while closing RabbitMQ connection", ex);
+        }
     }
 }
