@@ -53,11 +53,11 @@ public class NewPlayerListener implements PlayerConnectEvent {
             ));
 
             // teleport the player to spawn
-            WarpUtils.getWarp("spawn").ifPresent(spawn ->
+            WarpUtils.getWarpAsync("spawn").thenAccept(warp -> warp.ifPresent(spawn ->
                     // we use Utils.teleport instead of the Teleporter
                     // to bypass the teleport delay
                     TeleportUtils.teleport(player, spawn.location())
-            );
+            ));
         }
     }
 }

@@ -4,7 +4,6 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mojang.brigadier.tree.CommandNode;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
@@ -16,6 +15,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import org.jetbrains.annotations.NotNull;
 import team.bits.nibbles.command.Command;
 import team.bits.nibbles.command.CommandInformation;
 import team.bits.nibbles.teleport.Location;
@@ -25,8 +25,6 @@ import team.bits.vanilla.fabric.database.warp.Warp;
 import team.bits.vanilla.fabric.database.warp.WarpUtils;
 import team.bits.vanilla.fabric.teleport.Teleporter;
 import team.bits.vanilla.fabric.util.CommandSuggestionUtils;
-
-import java.util.Optional;
 
 import static net.minecraft.server.command.CommandManager.literal;
 
@@ -39,7 +37,9 @@ public class WarpCommand extends Command {
     private static final String WARP_SUBHEADER = "Click on a warp to go there!";
     private static final String WARP_EXISTS = "Warp already exists";
     private static final String WARP_SET = "Warp set!";
+    private static final String WARP_SET_FAIL = "Warp set failed!";
     private static final String WARP_DELETED = "Warp deleted!";
+    private static final String WARP_DELETE_FAIL = "Warp delete failed!";
 
     public WarpCommand() {
         super("warp", new CommandInformation()
@@ -89,23 +89,26 @@ public class WarpCommand extends Command {
     }
 
     @Override
-    public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+    public int run(@NotNull CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         final ServerPlayerEntity player = context.getSource().getPlayer();
         final String warpName = context.getArgument("warp", String.class);
 
-        Optional<Warp> warp = WarpUtils.getWarp(warpName);
-        if (warp.isPresent()) {
-            Location location = warp.get().location();
-            Teleporter.queueTeleport(player, location, true);
+        WarpUtils.getWarpAsync(warpName).thenAccept(warp -> {
+            if (warp.isPresent()) {
+                Location location = warp.get().location();
+                Teleporter.queueTeleport(player, location, true);
 
-        } else {
-            throw new SimpleCommandExceptionType(() -> String.format(WARP_NOT_FOUND_ERR, warpName)).create();
-        }
+            } else {
+                BitsVanilla.audience(player).sendMessage(
+                        Component.text(String.format(WARP_NOT_FOUND_ERR, warpName), Colors.NEGATIVE)
+                );
+            }
+        });
 
         return 1;
     }
 
-    public int listWarps(CommandContext<ServerCommandSource> context) {
+    public int listWarps(@NotNull CommandContext<ServerCommandSource> context) {
         final Audience audience = BitsVanilla.adventure().audience(context.getSource());
 
         audience.sendMessage(
@@ -131,42 +134,55 @@ public class WarpCommand extends Command {
         return 1;
     }
 
-    public int setWarp(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+    public int setWarp(@NotNull CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         final ServerPlayerEntity player = context.getSource().getPlayer();
         final String warpName = context.getArgument("name", String.class);
         final Location location = Location.get(player);
 
-        if (WarpUtils.getWarp(warpName).isEmpty()) {
+        WarpUtils.getWarpAsync(warpName).thenAccept(existingWarp -> {
+            if (existingWarp.isEmpty()) {
 
-            Warp warp = new Warp(warpName, location);
-            WarpUtils.addWarp(warp);
+                Warp warp = new Warp(warpName, location);
+                WarpUtils.addWarpAsync(warp).thenAccept(success -> {
+                    if (success) {
+                        BitsVanilla.adventure().audience(context.getSource())
+                                .sendMessage(Component.text(WARP_SET, Colors.POSITIVE));
+                    } else {
+                        BitsVanilla.adventure().audience(context.getSource())
+                                .sendMessage(Component.text(WARP_SET_FAIL, Colors.NEGATIVE));
+                    }
+                });
 
-            BitsVanilla.adventure().audience(context.getSource())
-                    .sendMessage(Component.text(WARP_SET, Colors.POSITIVE));
-
-        } else {
-            throw new SimpleCommandExceptionType(() -> WARP_EXISTS).create();
-        }
-
+            } else {
+                BitsVanilla.audience(player).sendMessage(Component.text(WARP_EXISTS, Colors.NEGATIVE));
+            }
+        });
 
         return 1;
     }
 
-    public int delWarp(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+    public int delWarp(@NotNull CommandContext<ServerCommandSource> context) {
         final String warpName = context.getArgument("warp", String.class);
 
-        Optional<Warp> warp = WarpUtils.getWarp(warpName);
-        if (warp.isPresent()) {
+        WarpUtils.getWarpAsync(warpName).thenAccept(warp -> {
+            if (warp.isPresent()) {
 
-            WarpUtils.deleteWarp(warp.get());
+                WarpUtils.deleteWarpAsync(warp.get()).thenAccept(success -> {
+                    if (success) {
+                        BitsVanilla.adventure().audience(context.getSource())
+                                .sendMessage(Component.text(WARP_DELETED, Colors.POSITIVE));
+                    } else {
+                        BitsVanilla.adventure().audience(context.getSource())
+                                .sendMessage(Component.text(WARP_DELETE_FAIL, Colors.NEGATIVE));
+                    }
+                });
 
-            BitsVanilla.adventure().audience(context.getSource())
-                    .sendMessage(Component.text(WARP_DELETED, Colors.POSITIVE));
-
-        } else {
-            throw new SimpleCommandExceptionType(() -> String.format(WARP_NOT_FOUND_ERR, warpName)).create();
-        }
-
+            } else {
+                BitsVanilla.audience(context.getSource()).sendMessage(
+                        Component.text(String.format(WARP_NOT_FOUND_ERR, warpName), Colors.NEGATIVE)
+                );
+            }
+        });
 
         return 1;
     }
