@@ -12,6 +12,7 @@ import team.bits.vanilla.fabric.BitsVanilla;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
 public class EndLockCommand extends Command {
 
@@ -35,14 +36,18 @@ public class EndLockCommand extends Command {
         TextComponent text;
         if (!unlockEndFile.exists()) {
             try {
-                unlockEndFile.createNewFile();
+                Files.createFile(unlockEndFile.toPath());
+                text = Component.text("The end is now locked", Colors.NEUTRAL);
             } catch (IOException e) {
-                e.printStackTrace();
+                text = Component.text("Could not lock the end", Colors.NEGATIVE);
             }
-            text = Component.text("The end is now locked", Colors.NEUTRAL);
         } else {
-            unlockEndFile.delete();
-            text = Component.text("The end is now unlocked", Colors.NEUTRAL);
+            try {
+                Files.delete(unlockEndFile.toPath());
+                text = Component.text("The end is now unlocked", Colors.NEUTRAL);
+            } catch (IOException e) {
+                text = Component.text("Could not unlock the end", Colors.NEGATIVE);
+            }
         }
         BitsVanilla.audience(context.getSource().getPlayer()).sendMessage(text);
         return 1;

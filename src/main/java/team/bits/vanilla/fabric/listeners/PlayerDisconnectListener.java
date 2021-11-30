@@ -1,14 +1,13 @@
 package team.bits.vanilla.fabric.listeners;
 
-import net.minecraft.network.ClientConnection;
-import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 import team.bits.nibbles.event.misc.PlayerDisconnectEvent;
 import team.bits.vanilla.fabric.util.AFKManager;
 
-public class PlayerDisconnectListener implements PlayerDisconnectEvent {
+public class PlayerDisconnectListener implements PlayerDisconnectEvent.Listener {
+
     @Override
-    public void onPlayerDisconnect(@NotNull ServerPlayerEntity player, @NotNull ClientConnection connection) {
-        AFKManager.playerDisconnect(player);
+    public void onPlayerDisonnect(@NotNull PlayerDisconnectEvent event) {
+        AFKManager.playerDisconnect(event.getPlayer());
     }
 }

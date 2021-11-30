@@ -42,10 +42,10 @@ public class ChunkInspectCommand extends Command {
 
         for (EntityRecord entityRecord : entityRecords) {
 
-            // If theres enough entities in this chunk to scare us
+            // If there's enough entities in this chunk to scare us
             if (entityRecord.getCount() >= YELLOW_THRESHOLD) {
 
-                // If theres a lot of entities, make the text red
+                // If there's a lot of entities, make the text red
                 NamedTextColor color = entityRecord.getCount() >= RED_THRESHOLD ? NamedTextColor.RED : NamedTextColor.YELLOW;
 
                 // Gather entity information
@@ -56,11 +56,11 @@ public class ChunkInspectCommand extends Command {
 
                 // Add it to text component
                 TextComponent textComponent = Component.text(
-                        String.format(ENTITY_RECORD_STRING,
-                                getEntityStringFromKey(entityKey),
-                                entityChunkPos,
-                                entityCount
-                        ), color)
+                                String.format(ENTITY_RECORD_STRING,
+                                        getEntityStringFromKey(entityKey),
+                                        entityChunkPos,
+                                        entityCount
+                                ), color)
                         .clickEvent(ClickEvent.runCommand(String.format(TELEPORT_COMMAND,
                                 dimension.getValue(),
                                 source.getName(),
@@ -146,7 +146,7 @@ public class ChunkInspectCommand extends Command {
                     if (matchingEntityRecord.isPresent()) {
                         matchingEntityRecord.get().incrementCount();
 
-                        //...if we haven't, create a new record
+                        //...if we haven't, create a new statRecord
                     } else {
                         entityRecords.add(new EntityRecord(entityType, entityChunkPos, worldRegKey));
                     }

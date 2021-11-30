@@ -3,21 +3,15 @@ package team.bits.vanilla.fabric;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.entity.event.v1.EntitySleepEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.fabric.FabricServerAudiences;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandOutput;
 import net.minecraft.server.command.ServerCommandSource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import team.bits.nibbles.event.damage.PlayerDamageEvent;
-import team.bits.nibbles.event.misc.PlayerConnectEvent;
-import team.bits.nibbles.event.misc.PlayerDisconnectEvent;
-import team.bits.nibbles.event.misc.PlayerMoveEvent;
-import team.bits.nibbles.event.misc.ServerInstanceReadyEvent;
+import team.bits.nibbles.event.base.EventManager;
+import team.bits.nibbles.event.misc.*;
 import team.bits.nibbles.utils.PropertiesFileUtils;
 import team.bits.nibbles.utils.Scheduler;
 import team.bits.vanilla.fabric.commands.Commands;
@@ -31,6 +25,7 @@ import team.bits.vanilla.fabric.statistics.lib.PlayerAPIStatsSyncHandler;
 import team.bits.vanilla.fabric.statistics.lib.StatTracker;
 import team.bits.vanilla.fabric.teleport.Teleporter;
 import team.bits.vanilla.fabric.util.AFKManager;
+import team.bits.vanilla.fabric.util.SpawnPreventionHandler;
 import team.bits.vanilla.fabric.util.color.NameColors;
 
 import java.io.File;
@@ -38,7 +33,7 @@ import java.io.IOException;
 import java.util.Properties;
 import java.util.concurrent.TimeoutException;
 
-public class BitsVanilla implements ModInitializer, ServerLifecycleEvents.ServerStopping {
+public class BitsVanilla implements ModInitializer, ServerStoppingEvent.Listener {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -63,10 +58,10 @@ public class BitsVanilla implements ModInitializer, ServerLifecycleEvents.Server
 
     @Override
     public void onInitialize() {
-        ServerLifecycleEvents.SERVER_STARTING.register(server -> adventure = FabricServerAudiences.of(server));
-        ServerLifecycleEvents.SERVER_STOPPED.register(server -> adventure = null);
+        EventManager.INSTANCE.registerEvents((ServerStartingEvent.Listener) event -> adventure = FabricServerAudiences.of(event.getServer()));
+        EventManager.INSTANCE.registerEvents((ServerStoppedEvent.Listener) event -> adventure = null);
 
-        ServerInstanceReadyEvent.EVENT.register(minecraftDedicatedServer -> VersionCommand.init());
+        EventManager.INSTANCE.registerEvents((ServerInstanceReadyEvent.Listener) serverInstanceReadyEvent -> VersionCommand.init());
 
         LOGGER.info(String.format("Server name is '%s'", ServerUtils.getServerName()));
 
@@ -84,30 +79,30 @@ public class BitsVanilla implements ModInitializer, ServerLifecycleEvents.Server
         PlayerUtils.init(this.apiConnection);
         WarpUtils.init(this.apiConnection);
 
+        int spawnProtectionRadius = Integer.parseInt(config.getProperty("spawn-radius", "32"));
+        // we want to initialize this after the first tick, because we have to wait for
+        // the world to be loaded before we can do this.
+        Scheduler.runAfterTick(() -> SpawnPreventionHandler.INSTANCE.init(spawnProtectionRadius));
+
         NameColors.INSTANCE.load();
 
         Commands.registerCommands();
 
-        SleepListener sleepListener = new SleepListener();
-        EntitySleepEvents.START_SLEEPING.register(sleepListener);
-        EntitySleepEvents.STOP_SLEEPING.register(sleepListener);
+        EventManager.INSTANCE.registerEvents(this);
+        EventManager.INSTANCE.registerEvents(new SleepListener());
+        EventManager.INSTANCE.registerEvents(new Teleporter());
 
-        Teleporter teleporter = new Teleporter();
-        PlayerMoveEvent.EVENT.register(teleporter);
-        PlayerDamageEvent.EVENT.register(teleporter);
-
-        ServerLifecycleEvents.SERVER_STOPPING.register(this);
-
-        PlayerConnectEvent.EVENT.register((player, conn) -> {
-            PlayerUtils.updatePlayerUsername(player);
-            PlayerNameLoader.loadNameData(player);
+        EventManager.INSTANCE.registerEvents((PlayerConnectEvent.Listener) event -> {
+            PlayerUtils.updatePlayerUsername(event.getPlayer());
+            PlayerNameLoader.loadNameData(event.getPlayer());
         });
-        PlayerConnectEvent.EVENT.register(new NewPlayerListener());
-        PlayerConnectEvent.EVENT.register(new CustomClientHandler());
 
-        PlayerConnectEvent.EVENT.register(new PlayerConnectListener());
-        PlayerMoveEvent.EVENT.register(new PlayerMoveListener());
-        PlayerDisconnectEvent.EVENT.register(new PlayerDisconnectListener());
+        EventManager.INSTANCE.registerEvents(new NewPlayerListener());
+//        EventManager.INSTANCE.registerEvents(new CustomClientHandler());
+
+        EventManager.INSTANCE.registerEvents(new PlayerConnectListener());
+        EventManager.INSTANCE.registerEvents(new PlayerMoveListener());
+        EventManager.INSTANCE.registerEvents(new PlayerDisconnectListener());
 
         AFKManager.initAfkManager();
 
@@ -117,7 +112,7 @@ public class BitsVanilla implements ModInitializer, ServerLifecycleEvents.Server
     }
 
     @Override
-    public void onServerStopping(MinecraftServer server) {
+    public void onServerStopping(@NotNull ServerStoppingEvent event) {
         PlayerAPIStatsSyncHandler.stop();
         Scheduler.stop();
 

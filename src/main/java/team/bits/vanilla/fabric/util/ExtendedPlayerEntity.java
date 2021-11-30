@@ -25,7 +25,7 @@ public interface ExtendedPlayerEntity extends INibblesPlayer {
 
     @NotNull StatRecord getStatRecord(@NotNull Identifier statId);
 
-    void setStatRecord(@NotNull Identifier statId, @NotNull StatRecord record);
+    void setStatRecord(@NotNull Identifier statId, @NotNull StatRecord statRecord);
 
     boolean hasMigratedStats();
 
@@ -38,4 +38,8 @@ public interface ExtendedPlayerEntity extends INibblesPlayer {
     void setSendTPS(boolean sendTPS);
 
     boolean shouldSendTPS();
+
+    void setAFK(boolean afk);
+
+    long getTimePlayed();
 }

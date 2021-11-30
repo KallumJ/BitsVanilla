@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import team.bits.nibbles.event.base.EventManager;
 import team.bits.nibbles.player.CopyPlayerDataEvent;
 import team.bits.nibbles.player.INibblesPlayer;
 import team.bits.nibbles.utils.Scheduler;
@@ -40,6 +41,9 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
     private boolean customClient = false;
     private boolean sendTPS = false;
 
+    private long timePlayed = 0;
+    private boolean afk = false;
+
     @Redirect(
             method = "getDisplayName",
             at = @At(
@@ -50,6 +54,16 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
     public Text getCustomName(PlayerEntity playerEntity) {
         Text customName = playerEntity.getCustomName();
         return customName != null ? customName.copy().setStyle(Style.EMPTY) : playerEntity.getName();
+    }
+
+    @Inject(
+            method = "tick",
+            at = @At("HEAD")
+    )
+    public void incrementPlayTime(CallbackInfo ci) {
+        if (!this.afk) {
+            this.timePlayed++;
+        }
     }
 
     /**
@@ -65,10 +79,12 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
         }
 
         NbtCompound stats = new NbtCompound();
-        this.statLevels.forEach((key, record) -> stats.putInt(key, record.level()));
+        this.statLevels.forEach((key, statRecord) -> stats.putInt(key, statRecord.level()));
         nbt.put("StatLevels", stats);
 
         nbt.putBoolean("MigratedStats", this.migratedStats);
+
+        nbt.putBoolean("Afk", this.afk);
     }
 
     /**
@@ -93,6 +109,10 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
         if (nbt.contains("MigratedStats")) {
             this.migratedStats = nbt.getBoolean("MigratedStats");
         }
+
+        if (nbt.contains("Afk")) {
+            this.afk = nbt.getBoolean("Afk");
+        }
     }
 
     public void bitsVanillaCopyFromOldPlayer(@NotNull PlayerEntityMixin oldPlayer) {
@@ -101,6 +121,7 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
         this.migratedStats = oldPlayer.migratedStats;
         this.customClient = oldPlayer.customClient;
         this.sendTPS = oldPlayer.sendTPS;
+        this.afk = false;
 
         Scheduler.runOffThread(() -> PlayerNameLoader.loadNameData((ServerPlayerEntity) (Object) this));
     }
@@ -131,8 +152,8 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
     }
 
     @Override
-    public void setStatRecord(@NotNull Identifier statId, @NotNull StatRecord record) {
-        this.statLevels.put(statId.toString(), record);
+    public void setStatRecord(@NotNull Identifier statId, @NotNull StatRecord statRecord) {
+        this.statLevels.put(statId.toString(), statRecord);
     }
 
     @Override
@@ -165,12 +186,24 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
         return this.sendTPS;
     }
 
+    @Override
+    public void setAFK(boolean afk) {
+        this.afk = afk;
+    }
+
+    @Override
+    public long getTimePlayed() {
+        return this.timePlayed;
+    }
+
     /*
      * This is a little static event handler for passing the CopyPlayerData
      * event through to the right PlayerEntityMixin instance
      */
     static {
-        CopyPlayerDataEvent.EVENT.register(PlayerEntityMixin::_bitsVanillaCopyPlayerData);
+        EventManager.INSTANCE.registerEvents((CopyPlayerDataEvent.Listener) event ->
+                _bitsVanillaCopyPlayerData(event.getOldPlayer(), event.getNewPlayer())
+        );
     }
 
     private static void _bitsVanillaCopyPlayerData(@NotNull INibblesPlayer oldPlayer, @NotNull INibblesPlayer newPlayer) {

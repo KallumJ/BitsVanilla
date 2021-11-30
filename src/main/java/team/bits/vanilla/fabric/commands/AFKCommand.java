@@ -8,6 +8,7 @@ import team.bits.nibbles.command.CommandInformation;
 import team.bits.vanilla.fabric.util.AFKManager;
 
 public class AFKCommand extends Command {
+
     public AFKCommand() {
         super("afk", new CommandInformation()
                 .setDescription("Sets the players status to AFK")

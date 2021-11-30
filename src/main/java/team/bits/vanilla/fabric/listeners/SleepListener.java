@@ -1,19 +1,18 @@
 package team.bits.vanilla.fabric.listeners;
 
-import net.fabricmc.fabric.api.entity.event.v1.EntitySleepEvents;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.stat.Stats;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.NotNull;
+import team.bits.nibbles.event.sleep.PlayerSleepEvent;
+import team.bits.nibbles.event.sleep.PlayerWakeUpEvent;
 import team.bits.nibbles.utils.ServerInstance;
 import team.bits.vanilla.fabric.BitsVanilla;
 import team.bits.vanilla.fabric.mixin.ServerWorldInvoker;
@@ -23,7 +22,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-public class SleepListener implements EntitySleepEvents.StartSleeping, EntitySleepEvents.StopSleeping {
+public class SleepListener implements PlayerSleepEvent.Listener, PlayerWakeUpEvent.Listener {
 
     private final Set<PlayerEntity> sleeping = new HashSet<>();
 
@@ -55,9 +54,9 @@ public class SleepListener implements EntitySleepEvents.StartSleeping, EntitySle
     }
 
     @Override
-    public void onStartSleeping(LivingEntity entity, BlockPos sleepingPos) {
-        if (entity instanceof ServerPlayerEntity player) {
-            ServerWorld world = player.getServerWorld();
+    public void onPlayerSleep(@NotNull PlayerSleepEvent event) {
+        if (event.getPlayer() instanceof ServerPlayerEntity player) {
+            ServerWorld world = player.getWorld();
 
             this.sleeping.add(player);
             this.checkSleeping(world);
@@ -65,27 +64,25 @@ public class SleepListener implements EntitySleepEvents.StartSleeping, EntitySle
     }
 
     @Override
-    public void onStopSleeping(LivingEntity entity, BlockPos sleepingPos) {
-        if (entity instanceof ServerPlayerEntity player) {
-            if (!this.sleeping.isEmpty()) {
-                this.sleeping.remove(player);
+    public void onPlayerWakeUp(@NotNull PlayerWakeUpEvent event) {
+        if (event.getPlayer() instanceof ServerPlayerEntity player && !this.sleeping.isEmpty()) {
+            this.sleeping.remove(player);
 
-                MinecraftServer server = Objects.requireNonNull(player.getServer());
-                int sleeping = this.sleeping.size();
-                int online = Math.max(getOnlinePlayerCount(server), 1);
+            MinecraftServer server = Objects.requireNonNull(player.getServer());
+            int sleepingCount = this.sleeping.size();
+            int online = Math.max(getOnlinePlayerCount(server), 1);
 
-                sendSleepingMessage(server, sleeping, online, false);
-            }
+            sendSleepingMessage(server, sleepingCount, online, false);
         }
     }
 
     private void checkSleeping(@NotNull ServerWorld world) {
         MinecraftServer server = world.getServer();
 
-        int sleeping = this.sleeping.size();
+        int sleepingCount = this.sleeping.size();
         int online = Math.max(getOnlinePlayerCount(server), 1);
 
-        if ((double) sleeping / online >= 0.5) {
+        if ((double) sleepingCount / online >= 0.5) {
 
             this.sleeping.clear();
 
@@ -97,10 +94,10 @@ public class SleepListener implements EntitySleepEvents.StartSleeping, EntitySle
                     player.resetStat(Stats.CUSTOM.getOrCreateStat(Stats.TIME_SINCE_REST))
             );
 
-            sendSleepingMessage(server, sleeping, online, true);
+            sendSleepingMessage(server, sleepingCount, online, true);
 
         } else {
-            sendSleepingMessage(server, sleeping, online, false);
+            sendSleepingMessage(server, sleepingCount, online, false);
         }
     }
 }

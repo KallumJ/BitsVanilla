@@ -2,7 +2,6 @@ package team.bits.vanilla.fabric.teleport;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
-import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
@@ -23,10 +22,12 @@ import team.bits.nibbles.utils.ParticleUtils;
 import team.bits.nibbles.utils.Scheduler;
 import team.bits.vanilla.fabric.BitsVanilla;
 import team.bits.vanilla.fabric.database.player.PlayerUtils;
+import team.bits.vanilla.fabric.statistics.lib.CustomStats;
+import team.bits.vanilla.fabric.statistics.lib.StatUtils;
 
 import java.util.*;
 
-public final class Teleporter implements PlayerMoveEvent, PlayerDamageEvent {
+public final class Teleporter implements PlayerMoveEvent.Listener, PlayerDamageEvent.Listener {
 
     private static final TextComponent TELEPORT_START = Component.text("Teleporting...", Colors.NEUTRAL);
     private static final TextComponent TELEPORT_CANCEL = Component.text("Teleport cancelled", Colors.NEGATIVE);
@@ -93,6 +94,8 @@ public final class Teleporter implements PlayerMoveEvent, PlayerDamageEvent {
                 )
         );
 
+        StatUtils.incrementStat(player, CustomStats.TIMES_TELEPORTED, 1);
+
         // teleport the player to the destination
         TeleportUtils.teleport(player, destination);
 
@@ -134,9 +137,9 @@ public final class Teleporter implements PlayerMoveEvent, PlayerDamageEvent {
 
     public static void teleportTask() {
         for (Teleport teleport : new ArrayList<>(TELEPORTS)) {
-            teleport.cooldown -= TASK_INTERVAL;
+            teleport.setCooldown(teleport.getCooldown() - TASK_INTERVAL);
 
-            if (teleport.cooldown <= 0) {
+            if (teleport.getCooldown() <= 0) {
                 TELEPORTS.remove(teleport);
                 teleport(teleport);
             }
@@ -144,14 +147,16 @@ public final class Teleporter implements PlayerMoveEvent, PlayerDamageEvent {
     }
 
     @Override
-    public void onPlayerMove(@NotNull PlayerEntity player, @NotNull Vec3d moveVector) {
+    public void onPlayerMove(@NotNull PlayerMoveEvent event) {
+        final PlayerEntity player = event.getPlayer();
         if (TELEPORTING.contains(player)) {
             cancelTeleport(player);
         }
     }
 
     @Override
-    public void onPlayerDamage(@NotNull PlayerEntity player, @NotNull DamageSource source, float amount) {
+    public void onPlayerDamage(@NotNull PlayerDamageEvent event) {
+        final PlayerEntity player = event.getPlayer();
         if (NO_MOVE.contains(player)) {
             cancelTeleport(player);
         }

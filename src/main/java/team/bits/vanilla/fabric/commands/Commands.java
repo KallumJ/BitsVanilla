@@ -1,13 +1,19 @@
 package team.bits.vanilla.fabric.commands;
 
+import org.jetbrains.annotations.NotNull;
 import team.bits.nibbles.command.Command;
 import team.bits.nibbles.command.CommandManager;
 
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
 
 public class Commands {
 
-    public static final ArrayList<Command> COMMANDS_LIST = new ArrayList<>();
+    private static final Collection<Command> COMMANDS_LIST = new LinkedList<>();
+
+    private Commands() {
+    }
 
     public static void registerCommands() {
         addCommand(new DiscordCommand());
@@ -30,6 +36,11 @@ public class Commands {
         addCommand(new RulesCommand());
         addCommand(new StatsCommand());
         addCommand(new VersionCommand());
+        addCommand(new PlaytimeCommand());
+    }
+
+    public static @NotNull Collection<Command> getCommands() {
+        return Collections.unmodifiableCollection(COMMANDS_LIST);
     }
 
     private static void addCommand(Command command) {

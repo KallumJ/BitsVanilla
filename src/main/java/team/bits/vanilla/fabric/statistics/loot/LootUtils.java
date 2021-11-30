@@ -32,7 +32,7 @@ public final class LootUtils {
         final LootTable lootTable = lootManager.getTable(STATS_LOOT_IDENTIFIER);
 
         // get the player's world and position
-        final ServerWorld world = player.getServerWorld();
+        final ServerWorld world = player.getWorld();
         final Vec3d position = player.getPos();
 
         // create a loot context

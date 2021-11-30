@@ -28,7 +28,7 @@ public class RandomTeleportCommand extends Command {
     private static final String OVERWORLD_ONLY_ERR = "You can only use this command in the Overworld";
     private static final String TELEPORTING_MSG = "Teleporting...";
 
-    private static final long RTP_COOLDOWN = 30 * 60 * 1000; // in milliseconds
+    private static final long RTP_COOLDOWN = 30L * 60L * 1000L; // in milliseconds
 
     public RandomTeleportCommand() {
         super("randomteleport", new CommandInformation()
@@ -56,7 +56,7 @@ public class RandomTeleportCommand extends Command {
         }
 
         // make sure the player is in the overworld
-        ServerWorld world = player.getServerWorld();
+        ServerWorld world = player.getWorld();
         if (!world.getRegistryKey().equals(World.OVERWORLD)) {
             throw new SimpleCommandExceptionType(() -> OVERWORLD_ONLY_ERR).create();
         }

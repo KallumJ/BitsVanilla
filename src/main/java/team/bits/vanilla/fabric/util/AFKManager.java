@@ -12,10 +12,15 @@ import java.util.Map;
 import java.util.UUID;
 
 public class AFKManager {
+
     public static final Map<UUID, AFKCounter> PLAYER_TRACKER = new HashMap<>();
     public static final int AFK_THRESHOLD = 300; // Time in seconds
+
     private static final String NOW_AFK_MSG = "* %s is now AFK";
     private static final String NO_LONGER_AFK_MSG = "* %s is no longer AFK";
+
+    private AFKManager() {
+    }
 
     public static void playerMoved(ServerPlayerEntity player) {
         AFKCounter playersAfkCounter = PLAYER_TRACKER.get(player.getUuid());
@@ -34,6 +39,7 @@ public class AFKManager {
                     Component.text(String.format(NO_LONGER_AFK_MSG, PlayerUtils.getEffectiveName(player)))
                             .color(NamedTextColor.GRAY)
             );
+            ((ExtendedPlayerEntity) player).setAFK(false);
             wasAfk = true;
         }
 
@@ -65,6 +71,8 @@ public class AFKManager {
                             Component.text(String.format(NOW_AFK_MSG, PlayerUtils.getEffectiveName(player)))
                                     .color(NamedTextColor.GRAY));
                     Utils.updatePlayerDisplayName(player);
+
+                    ((ExtendedPlayerEntity) player).setAFK(true);
                 }
             }
         }), 0, 10);

@@ -91,7 +91,7 @@ public final class WarpUtils {
                                     )
                             )
                     )
-                    .thenApply(response -> response.has("warp"));
+                    .thenApply(response -> response.has("addWarp"));
         } catch (IOException ex) {
             throw new RuntimeException("Error while adding warp", ex);
         }

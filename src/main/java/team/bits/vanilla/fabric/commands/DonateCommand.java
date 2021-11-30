@@ -6,7 +6,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.server.command.ServerCommandSource;
 import team.bits.nibbles.command.Command;
 import team.bits.nibbles.command.CommandInformation;
@@ -14,7 +13,8 @@ import team.bits.nibbles.utils.Colors;
 import team.bits.vanilla.fabric.BitsVanilla;
 
 public class DonateCommand extends Command {
-    private static final String DONATE_LINK = "http://bits.team/donate";
+
+    private static final String DONATE_LINK = "https://bits.team/donate";
 
     public DonateCommand() {
         super("donate", new CommandInformation()

@@ -11,7 +11,7 @@ public class Teleport {
     private final PlayerEntity player;
     private final Location destination;
 
-    public int cooldown;
+    private int cooldown;
 
     public Teleport(@NotNull PlayerEntity player, @NotNull Location destination, int cooldown) {
         this.player = Objects.requireNonNull(player);
@@ -25,5 +25,13 @@ public class Teleport {
 
     public @NotNull Location getDestination() {
         return this.destination;
+    }
+
+    public int getCooldown() {
+        return cooldown;
+    }
+
+    public void setCooldown(int cooldown) {
+        this.cooldown = cooldown;
     }
 }

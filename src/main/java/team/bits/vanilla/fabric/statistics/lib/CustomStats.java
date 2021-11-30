@@ -1,6 +1,6 @@
 package team.bits.vanilla.fabric.statistics.lib;
 
-import net.minecraft.item.Items;
+import net.minecraft.entity.EntityType;
 import net.minecraft.stat.Stat;
 import net.minecraft.stat.StatFormatter;
 import net.minecraft.stat.StatType;
@@ -22,50 +22,54 @@ public final class CustomStats {
 
     public static final Map<Stat<?>, TrackedStat> TRACKED_STATS = new HashMap<>();
 
-    public static final Identifier NETHER_PORTALS_USED = register(
-            "nether_portals_used", StatFormatter.DEFAULT, new int[]{50, 200, 500},
-            "%user% must feel dizzy after all that inter-dimensionary travel... They have used a " +
-                    "nether portal %count% times and leveled up their nether portalling skill to %level%!"
+    public static final Identifier DRIPLEAFS_TILTED = register(
+            "dripleafs_tilted", StatFormatter.DEFAULT, new int[]{10, 200, 5000},
+            "%user% has just taken up residence at Tilted Towers! They have tilted %count% dripleaves, and reached level %level%."
     );
 
-    public static final Identifier BEDS_EXPLODED = register(
-            "beds_exploded", StatFormatter.DEFAULT, new int[]{5, 50, 500},
-            "%user% is having trouble sleeping. They have blown up %count% beds! They have leveled up their bed demolition skills to %level%"
+    public static final Identifier TIMES_TELEPORTED = register(
+            "times_teleported", StatFormatter.DEFAULT, new int[]{1, 500, 5000},
+            "%user%? Are you ok? Have all your atoms been been put back to the right place? They have teleported %count% times, and reached level %level%."
     );
 
-    public static final Identifier COPPER_WAXED = register(
-            "copper_waxed", StatFormatter.DEFAULT, new int[]{10, 200, 1000},
-            "%user% hates oxidation. They have waxed %count% copper blocks, and levelled up their waxing copper skill to %level%"
+    public static final Identifier GLOWBERRIES_FED = register(
+            "glowberries_fed", StatFormatter.DEFAULT, new int[]{10, 200, 5000},
+            "%user% likes their foxes SHINY! They have fed %count% glowberries to their fox, and reached level %level%."
+    );
+
+    public static final Identifier FREEZING_DAMAGE_TAKEN = register(
+            "freezing_damage_taken", StatFormatter.DEFAULT, new int[]{25, 250, 2500},
+            "%user% is cold as ice! And seemingly willing to sacrifice their LIFE!. They have taken %count% points of freezing damage, and reached level %level%."
+    );
+
+    public static final Identifier PIGS_CONVERTED = register(
+            "pigs_converted", StatFormatter.DEFAULT, new int[]{10, 50, 2500},
+            "Dr Franken%user% has been doing some monster experiments! They have converted %count% pigs into Piglins, reaching level %level%."
+    );
+
+    public static final Identifier CANDLES_LIT_WITH_SNOWBALLS = register(
+            "candles_lit_with_snowballs", StatFormatter.DEFAULT, new int[]{2, 100, 5000},
+            "%user% doesn't play by the rules, and they will light their candles how they like. They have lit %count% candles with a snowball... reaching level %level%."
+    );
+
+    public static final Identifier KELP_TRIMMED = register(
+            "kelp_sheared", StatFormatter.DEFAULT, new int[]{50, 1000, 10000},
+            "%user% has been giving their bush a trim! They have trimmed %count% kelp, reaching level %level%."
+    );
+
+    public static final Identifier CANDLE_CAKES_MADE = register(
+            "candle_cakes_made", StatFormatter.DEFAULT, new int[]{10, 200, 5000},
+            "It must be %user%'s birthday, and they must be OLDDDDD. They have added %count% candles to their cake, reaching level %level%."
+    );
+
+    public static final Identifier GLOW_INK_REMOVED = register(
+            "glow_ink_removed", StatFormatter.DEFAULT, new int[]{5, 200, 5000},
+            "%user% has gone dark mode. They have removed %count% glow ink sac's from their signs, reaching level %level%."
     );
 
     static {
-        registerVanillaStat(
-                Stats.CUSTOM, Stats.EAT_CAKE_SLICE, "cake_eaten", new int[]{20, 200, 2000},
-                "%user% has eaten a total of %count% slices of cake! Bob can barely keep up with the amount of cake they're eating! They're now a level %level% cake eater!"
-        );
-
-        registerVanillaStat(Stats.CUSTOM, Stats.JUMP, "times_jumped", new int[]{1000, 10000, 75000},
-                "%user% must have fitted springs to their shoes! They have jumped %count% times! They're now jumping level %level%!"
-        );
-
-        registerVanillaStat(Stats.CUSTOM, Stats.AVIATE_ONE_CM, "distance_flown", new int[]{1000000, 10000000, 50000000},
-                "%user% has narrowly avoided experiencing kinetic energy and has flown a whopping %count%! They leveled up their Elytra flying skills to %level%!"
-        );
-
-        registerVanillaStat(Stats.CRAFTED, Items.BEACON, "beacons_crafted", new int[]{2, 8, 24},
-                "How many status effects can one person need! %user% crafted a total of %count% beacons. They're now a level %level% beacon crafter!"
-        );
-
-        registerVanillaStat(Stats.CUSTOM, Stats.DEATHS, "deaths", new int[]{2, 25, 250},
-                "%user% pulled a Kallum and died %count% times. They've leveled up their dying skills to %level%"
-        );
-
-        registerVanillaStat(Stats.CUSTOM, Stats.TARGET_HIT, "targets_hit", new int[]{10, 200, 2500},
-                "Call %user% Legolas because they are one sharp shooter. They have hit %count% targets, and leveled up their target hitting skill to %level%!"
-        );
-
-        registerVanillaStat(Stats.CUSTOM, Stats.PIG_ONE_CM, "distance_by_pig", new int[]{1000, 100000, 500000},
-                "%user% is a lazy little piggy and has decided to ride a pig to get from A to B! The poor pig has been ridden %count%! %user% leveled up their pig riding skills to %level%!"
+        registerVanillaStat(Stats.KILLED, EntityType.GLOW_SQUID, "glow_squids_killed", new int[]{5, 200, 5000},
+                "%user% is a heartless monster and likes to murder cuties. They have murdered %count% Glow Squids, and reached level %level%. Press F to pay respects."
         );
     }
 

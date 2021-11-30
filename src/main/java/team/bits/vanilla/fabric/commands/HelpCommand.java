@@ -15,8 +15,8 @@ import java.util.ArrayList;
 
 public class HelpCommand extends Command {
 
-    private final static String CMD_HELP_STRING = "%s - %s";
-    private final static String USAGE_STRING = "Usage: %s %s";
+    private static final String CMD_HELP_STRING = "%s - %s";
+    private static final String USAGE_STRING = "Usage: %s %s";
 
     public HelpCommand() {
         super("help", new CommandInformation()
@@ -28,7 +28,7 @@ public class HelpCommand extends Command {
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         ArrayList<TextComponent> cmdStrings = new ArrayList<>();
 
-        for (Command command : Commands.COMMANDS_LIST) {
+        for (Command command : Commands.getCommands()) {
             // If command is to be used by the public
             if (command.getCommandInfo().isPublic()) {
                 StringBuilder cmdString = new StringBuilder();

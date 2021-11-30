@@ -25,6 +25,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 public class BedCommand extends Command {
+
     private static final String NO_SPAWN_ERR = "You do not have a bed or respawn anchor";
     private static final String RESPAWN_ANCHOR_ERR = "Could not teleport to your respawn anchor";
     private static final String BED_ERR = "Could not teleport to your bed";

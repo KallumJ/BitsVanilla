@@ -6,43 +6,37 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mojang.brigadier.tree.CommandNode;
-import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import org.jetbrains.annotations.NotNull;
 import team.bits.nibbles.command.Command;
 import team.bits.nibbles.command.CommandInformation;
 import team.bits.nibbles.utils.Colors;
-import team.bits.nibbles.utils.TextUtils;
 import team.bits.vanilla.fabric.BitsVanilla;
 import team.bits.vanilla.fabric.database.player.PlayerUtils;
-import team.bits.vanilla.fabric.statistics.lib.StatUtils;
 import team.bits.vanilla.fabric.util.CommandSuggestionUtils;
+import team.bits.vanilla.fabric.util.ExtendedPlayerEntity;
 
-import java.util.Collection;
 import java.util.Optional;
 
 import static net.minecraft.server.command.CommandManager.literal;
 
-public class StatsCommand extends Command {
+public class PlaytimeCommand extends Command {
 
-    private static final String STATS_HEADER = "%s's Statistics:";
-    private static final String STAT_LINE = "%s: %s (Level %s)";
     private static final String NO_PLAYER_ERR = "There is no player %s online";
-    private static final String NO_STATS_ERR = "The player %s has no statistics";
+    private static final String PLAYTIME = "Player %s has played for %s hours";
 
-    public StatsCommand() {
-        super("statistics", new CommandInformation()
-                        .setDescription("See your statistics, or those of another player")
-                        .setUsage("[player]")
-                        .setPublic(true),
-                "stats"
+    public PlaytimeCommand() {
+        super("playtime", new CommandInformation()
+                .setDescription("See the active playtime of a player")
+                .setPublic(true)
         );
     }
 
     @Override
-    public void registerCommand(CommandDispatcher<ServerCommandSource> dispatcher) {
+    public void registerCommand(@NotNull CommandDispatcher<ServerCommandSource> dispatcher) {
         CommandNode<ServerCommandSource> commandNode = dispatcher.register(
                 literal(super.getName())
                         .executes(this)
@@ -52,11 +46,7 @@ public class StatsCommand extends Command {
                         )
         );
 
-        dispatcher.register(
-                literal("stats")
-                        .executes(this)
-                        .redirect(commandNode)
-        );
+        super.registerAliases(dispatcher, commandNode);
     }
 
     @Override
@@ -76,23 +66,10 @@ public class StatsCommand extends Command {
             player = context.getSource().getPlayer();
         }
 
-        Collection<StatUtils.StatisticRecord> stats = StatUtils.getStats(player);
+        long playtime = ((ExtendedPlayerEntity) player).getTimePlayed();
+        int hours = (int) Math.round(((playtime / 20.0) / 60.0) / 60.0);
 
-        if (!stats.isEmpty()) {
-            Audience audience = BitsVanilla.audience(source);
-            audience.sendMessage(
-                    Component.text(String.format(STATS_HEADER, PlayerUtils.getEffectiveName(player)), Colors.HEADER)
-            );
-
-            for (StatUtils.StatisticRecord statRecord : stats) {
-                String name = TextUtils.fancyFormat(statRecord.stat().customName());
-                audience.sendMessage(
-                        Component.text(String.format(STAT_LINE, name, statRecord.stat().stat().format(statRecord.count()), statRecord.level()), Colors.NEUTRAL)
-                );
-            }
-        } else {
-            BitsVanilla.audience(source).sendMessage(Component.text(String.format(NO_STATS_ERR, PlayerUtils.getEffectiveName(player))).color(Colors.NEGATIVE));
-        }
+        BitsVanilla.audience(source).sendMessage(Component.text(String.format(PLAYTIME, PlayerUtils.getEffectiveName(player), hours)).color(Colors.NEUTRAL));
 
         return 1;
     }

@@ -9,6 +9,9 @@ import java.util.Properties;
 
 public class ServerUtils {
 
+    private ServerUtils() {
+    }
+
     public static @NotNull String getServerName() {
         Properties properties = PropertiesFileUtils.loadFromFile(new File("server.properties"));
         if (properties.containsKey("server-name")) {

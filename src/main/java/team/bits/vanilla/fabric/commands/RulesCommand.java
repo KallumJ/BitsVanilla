@@ -30,8 +30,8 @@ public class RulesCommand extends Command {
 
     public RulesCommand() {
         super("rules", new CommandInformation()
-            .setDescription("Lists the rules to the player")
-            .setPublic(true)
+                .setDescription("Lists the rules to the player")
+                .setPublic(true)
         );
 
 

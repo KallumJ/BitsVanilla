@@ -1,7 +1,7 @@
 package team.bits.vanilla.fabric.mixin.stats;
 
-import net.minecraft.block.BedBlock;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.CakeBlock;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
@@ -16,17 +16,19 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import team.bits.vanilla.fabric.statistics.lib.CustomStats;
 import team.bits.vanilla.fabric.statistics.lib.StatUtils;
 
-@Mixin(BedBlock.class)
-public class BedsExplodedMixin {
+@Mixin(CakeBlock.class)
+public class CandleOnCakeMixin {
 
     @Inject(
+            method = "onUse",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/world/World;createExplosion(Lnet/minecraft/entity/Entity;Lnet/minecraft/entity/damage/DamageSource;Lnet/minecraft/world/explosion/ExplosionBehavior;DDDFZLnet/minecraft/world/explosion/Explosion$DestructionType;)Lnet/minecraft/world/explosion/Explosion;"
-            ),
-            method = "onUse"
+                    target = "Lnet/minecraft/world/World;setBlockState(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;)Z"
+            )
     )
-    public void onBedExplode(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit, CallbackInfoReturnable<ActionResult> cir) {
-        StatUtils.incrementStat((ServerPlayerEntity) player, CustomStats.BEDS_EXPLODED, 1);
+    public void onCandleAddedToCake(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand,
+                                    BlockHitResult hit, CallbackInfoReturnable<ActionResult> cir) {
+
+        StatUtils.incrementStat((ServerPlayerEntity) player, CustomStats.CANDLE_CAKES_MADE, 1);
     }
 }

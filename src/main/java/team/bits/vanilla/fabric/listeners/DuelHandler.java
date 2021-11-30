@@ -34,6 +34,9 @@ public class DuelHandler {
         Scheduler.scheduleAtFixedRate(DuelHandler::tick, 20, 20);
     }
 
+    private DuelHandler() {
+    }
+
     public static void startDuel(@NotNull PlayerEntity player1, @NotNull PlayerEntity player2) {
         Duel duel = new Duel(player1, player2);
         QUEUED_DUELS.add(duel);
@@ -61,7 +64,7 @@ public class DuelHandler {
     }
 
     private static void playSound(PlayerEntity player, SoundEvent sound, float volume, float pitch) {
-        final ServerWorld world = ((ServerPlayerEntity) player).getServerWorld();
+        final ServerWorld world = ((ServerPlayerEntity) player).getWorld();
         final Vec3d position = player.getPos();
 
         world.playSound(

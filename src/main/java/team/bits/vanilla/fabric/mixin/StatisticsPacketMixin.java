@@ -37,7 +37,7 @@ public class StatisticsPacketMixin {
                     stat.getValue() instanceof Identifier statId && // if the value is an identifier
                     statId.getNamespace().equals("bits")) { // and if the namespace is bits
 
-                // remove the statistic from the map so it doesn't get sent to the client
+                // remove the statistic from the map, so it doesn't get sent to the client
                 this.stats.removeInt(stat);
             }
         }

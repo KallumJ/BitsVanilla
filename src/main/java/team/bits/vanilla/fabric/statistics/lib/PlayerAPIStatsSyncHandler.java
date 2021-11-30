@@ -26,8 +26,8 @@ public class PlayerAPIStatsSyncHandler {
 
     public static void enqueue(@NotNull TrackedStat stat,
                                @NotNull ServerPlayerEntity player,
-                               @NotNull StatRecord record) {
-        databaseQueue.add(new QueuedDatabaseUpdate(stat, player, record));
+                               @NotNull StatRecord statRecord) {
+        databaseQueue.add(new QueuedDatabaseUpdate(stat, player, statRecord));
     }
 
     public static void init(@NotNull Connection connection) {
@@ -50,6 +50,7 @@ public class PlayerAPIStatsSyncHandler {
             try {
                 this.handleEntry(databaseQueue.take());
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 break;
             }
         }
@@ -58,7 +59,7 @@ public class PlayerAPIStatsSyncHandler {
     private void handleEntry(@NotNull QueuedDatabaseUpdate entry) {
         final ServerPlayerEntity player = entry.player();
         final TrackedStat trackedStat = entry.stat();
-        final StatRecord statRecord = entry.record();
+        final StatRecord statRecord = entry.statRecord();
 
         try {
             rpcClient.call(
@@ -88,6 +89,6 @@ public class PlayerAPIStatsSyncHandler {
 
     private static record QueuedDatabaseUpdate(@NotNull TrackedStat stat,
                                                @NotNull ServerPlayerEntity player,
-                                               @NotNull StatRecord record) {
+                                               @NotNull StatRecord statRecord) {
     }
 }

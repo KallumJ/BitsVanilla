@@ -11,13 +11,13 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import java.util.UUID;
 
 @Mixin(ServerPlayNetworkHandler.class)
-public abstract class PlayerLeaveMixin {
+public class PlayerLeaveMixin {
 
     @Redirect(
             method = "onDisconnected",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/server/PlayerManager;broadcastChatMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/MessageType;Ljava/util/UUID;)V"
+                    target = "Lnet/minecraft/server/PlayerManager;broadcast(Lnet/minecraft/text/Text;Lnet/minecraft/network/MessageType;Ljava/util/UUID;)V"
             )
     )
     public void customBroadcastChatMessage(PlayerManager playerManager, Text message, MessageType type, UUID sender) {

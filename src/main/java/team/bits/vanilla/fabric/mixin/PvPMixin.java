@@ -14,7 +14,7 @@ import team.bits.vanilla.fabric.util.ExtendedPlayerEntity;
 import java.util.Optional;
 
 @Mixin(ServerPlayerEntity.class)
-public abstract class PvPMixin {
+public class PvPMixin {
 
     @Redirect(
             method = "shouldDamagePlayer",

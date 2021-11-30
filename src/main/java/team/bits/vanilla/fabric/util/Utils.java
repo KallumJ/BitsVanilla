@@ -5,9 +5,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 import team.bits.nibbles.utils.ServerInstance;
 
-import java.util.Arrays;
-import java.util.Objects;
-
 public final class Utils {
 
     private Utils() {

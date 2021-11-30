@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
 public class CommandSuggestionUtils {
+
     public static final SuggestionProvider<ServerCommandSource> ONLINE_PLAYERS;
     public static final SuggestionProvider<ServerCommandSource> ALL_PLAYERS;
     public static final SuggestionProvider<ServerCommandSource> NICKNAMES;
@@ -21,6 +22,9 @@ public class CommandSuggestionUtils {
         ALL_PLAYERS = (context, builder) -> filterSuggestionsByInputAsync(builder, PlayerUtils.getAllNamesAsync());
         NICKNAMES = (context, builder) -> filterSuggestionsByInputAsync(builder, PlayerUtils.getNicknamesAsync());
         WARPS = (context, builder) -> filterSuggestionsByInputAsync(builder, WarpUtils.getWarpsListAsync());
+    }
+
+    private CommandSuggestionUtils() {
     }
 
     // instead of running the queries for suggestions on the server thread

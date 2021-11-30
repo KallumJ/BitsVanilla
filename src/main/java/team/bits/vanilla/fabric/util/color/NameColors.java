@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.jetbrains.annotations.NotNull;
 import team.bits.nibbles.utils.TextUtils;
-import team.bits.vanilla.fabric.util.Utils;
 
 import java.awt.*;
 import java.io.InputStream;
@@ -24,7 +23,12 @@ public final class NameColors {
 
     public void load() {
         InputStream colorsFile = this.getClass().getClassLoader().getResourceAsStream("colours.json");
+
+        // we use the deprecated version of the JsonParser because of
+        // a gson version mismatch on fabric
+        @SuppressWarnings("deprecation")
         JsonObject root = new JsonParser().parse(new InputStreamReader(Objects.requireNonNull(colorsFile))).getAsJsonObject();
+
         root.entrySet().forEach(entry -> {
             String color = TextUtils.fancyFormat(entry.getKey());
             List<NameColor> shades = new LinkedList<>();

@@ -7,7 +7,7 @@ pipeline {
     }
 
     tools {
-        jdk 'jdk_16'
+        jdk 'jdk_17'
     }
 
     stages {
@@ -24,7 +24,12 @@ pipeline {
                 sh 'chmod +x test/production_server_test.sh'
                 sh 'rm -rf prod-server/ && mkdir -p prod-server/config'
                 sh 'cp $CONFIG_FILE prod-server/config/bits-vanilla.cfg'
-                sh 'test/production_server_test.sh "${JAVA_HOME}" "bits-vanilla-fabric-${BRANCH_NAME}-${BUILD_NUMBER}"'
+                sh """test/production_server_test.sh \
+                        --java-path '${JAVA_HOME}' \
+                        --mod-jar 'bits-vanilla-fabric-${BRANCH_NAME}-${BUILD_NUMBER}.jar' \
+                        --mc-version '1.18' \
+                        --loader-version '0.12.6'
+                   """
             }
         }
         stage('Archive') {

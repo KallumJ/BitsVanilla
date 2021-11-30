@@ -30,7 +30,7 @@ public class StatTracker implements Runnable {
                 // check if either the level or the count increased
                 if (currentCount > storedRecord.count() || currentLevel > storedRecord.level()) {
 
-                    // create an updated record and store it in the player data
+                    // create an updated statRecord and store it in the player data
                     StatRecord updatedRecord = new StatRecord(currentLevel, currentCount);
                     setStoredRecord(player, stat, updatedRecord);
 
@@ -41,7 +41,7 @@ public class StatTracker implements Runnable {
                     if (currentLevel > storedRecord.level()) {
 
                         // play a sound and send a message
-                        player.getServerWorld().playSound(
+                        player.getWorld().playSound(
                                 player, player.getBlockPos(),
                                 SoundEvents.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS,
                                 1.0f, 1.0f
@@ -69,10 +69,11 @@ public class StatTracker implements Runnable {
         return ePlayer.getStatRecord(statId);
     }
 
-    public static void setStoredRecord(@NotNull ServerPlayerEntity player, @NotNull Stat<?> stat, @NotNull StatRecord record) {
+    public static void setStoredRecord(@NotNull ServerPlayerEntity player, @NotNull Stat<?> stat,
+                                       @NotNull StatRecord statRecord) {
         ExtendedPlayerEntity ePlayer = (ExtendedPlayerEntity) player;
         Identifier statId = getStatId(stat);
-        ePlayer.setStatRecord(statId, record);
+        ePlayer.setStatRecord(statId, statRecord);
     }
 
     private static int getCurrentLevel(@NotNull ServerPlayerEntity player, @NotNull Stat<?> stat) {

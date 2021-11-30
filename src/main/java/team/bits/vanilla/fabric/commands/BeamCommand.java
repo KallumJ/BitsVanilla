@@ -10,7 +10,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -31,8 +30,8 @@ import static net.minecraft.server.command.CommandManager.literal;
 
 public class BeamCommand extends Command {
 
-    private final static HashMap<ServerPlayerEntity, Beam> BEAM_REQUESTS = new HashMap<>();
-    private final static String REQUEST_STRING = "Beam requested!";
+    private static final HashMap<ServerPlayerEntity, Beam> BEAM_REQUESTS = new HashMap<>();
+    private static final String REQUEST_STRING = "Beam requested!";
     private static final String ACCEPT_STRING = "%s has requested to beam to you. Click here to accept, or type /beam accept";
     private static final String ACCEPT_ERR = "You have no beam request to accept right now";
     private static final String BEAM_SELF_ERR = "You can not beam to yourself";
@@ -167,7 +166,7 @@ public class BeamCommand extends Command {
 record Beam(ServerPlayerEntity sendingPlayer,
             ServerPlayerEntity receivingPlayer) {
 
-    private final static String ACCEPT_MSG = "Beam accepted";
+    private static final String ACCEPT_MSG = "Beam accepted";
 
     public void executeBeam() {
         BitsVanilla.audience(sendingPlayer).sendMessage(Component.text(ACCEPT_MSG).color(Colors.NEUTRAL));

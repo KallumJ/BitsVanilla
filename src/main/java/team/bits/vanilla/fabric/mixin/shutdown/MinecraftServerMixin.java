@@ -15,7 +15,7 @@ public class MinecraftServerMixin {
 
     @Shadow
     @Final
-    static Logger LOGGER;
+    private static Logger LOGGER;
 
     @Shadow
     @Final

@@ -8,7 +8,6 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.title.Title;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.network.ClientConnection;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 import team.bits.nibbles.event.misc.PlayerConnectEvent;
@@ -21,7 +20,7 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
 
-public class NewPlayerListener implements PlayerConnectEvent {
+public class NewPlayerListener implements PlayerConnectEvent.Listener {
 
     private static final Collection<ItemStack> STARTER_ITEMS = Arrays.asList(
             new ItemStack(Items.STONE_AXE, 1),
@@ -30,7 +29,8 @@ public class NewPlayerListener implements PlayerConnectEvent {
     );
 
     @Override
-    public void onPlayerConnect(@NotNull ServerPlayerEntity player, @NotNull ClientConnection connection) {
+    public void onPlayerConnect(@NotNull PlayerConnectEvent event) {
+        final ServerPlayerEntity player = event.getPlayer();
         final ExtendedPlayerEntity ePlayer = (ExtendedPlayerEntity) player;
         final Audience audience = BitsVanilla.audience(player);
 
@@ -44,7 +44,7 @@ public class NewPlayerListener implements PlayerConnectEvent {
             Style style = Style.style(NamedTextColor.AQUA, TextDecoration.BOLD);
             audience.showTitle(Title.title(
                     Component.text("Welcome to Bits", style), // title
-                    Component.text("Season 5", style),        // subtitle
+                    Component.text("Season 6", style),        // subtitle
                     Title.Times.of(
                             Duration.ofSeconds(1), // fade-in
                             Duration.ofSeconds(5), // stay

@@ -69,7 +69,7 @@ public class PlayerHeadCommand extends Command {
                 }
             }
 
-            if (ePlayer.hasItem(Items.DIAMOND, 1)) {
+            if (ePlayer.hasItem(Items.DIAMOND, 1) || requestingPlayer.isCreative()) {
                 ItemStack playerHead = new ItemStack(Items.PLAYER_HEAD, 1);
                 NbtCompound tag = playerHead.getOrCreateNbt();
 
@@ -78,8 +78,10 @@ public class PlayerHeadCommand extends Command {
                 playerHead.setNbt(tag);
 
                 ePlayer.giveItem(playerHead);
-                ePlayer.removeItem(Items.DIAMOND, 1);
 
+                if (!requestingPlayer.isCreative()) {
+                    ePlayer.removeItem(Items.DIAMOND, 1);
+                }
             } else {
                 throw new IllegalStateException();
             }
