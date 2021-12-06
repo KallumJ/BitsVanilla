@@ -37,6 +37,7 @@ public class Commands {
         addCommand(new StatsCommand());
         addCommand(new VersionCommand());
         addCommand(new PlaytimeCommand());
+        addCommand(new DisableTPCommand());
     }
 
     public static @NotNull Collection<Command> getCommands() {

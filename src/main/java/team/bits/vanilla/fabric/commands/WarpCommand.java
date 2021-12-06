@@ -21,6 +21,7 @@ import team.bits.nibbles.command.CommandInformation;
 import team.bits.nibbles.teleport.Location;
 import team.bits.nibbles.utils.Colors;
 import team.bits.vanilla.fabric.BitsVanilla;
+import team.bits.vanilla.fabric.database.player.PlayerUtils;
 import team.bits.vanilla.fabric.database.warp.Warp;
 import team.bits.vanilla.fabric.database.warp.WarpUtils;
 import team.bits.vanilla.fabric.teleport.Teleporter;
@@ -40,6 +41,7 @@ public class WarpCommand extends Command {
     private static final String WARP_SET_FAIL = "Warp set failed!";
     private static final String WARP_DELETED = "Warp deleted!";
     private static final String WARP_DELETE_FAIL = "Warp delete failed!";
+    private static final String TELEPORTS_DISABLED = "You have teleporting disabled!";
 
     public WarpCommand() {
         super("warp", new CommandInformation()
@@ -92,6 +94,11 @@ public class WarpCommand extends Command {
     public int run(@NotNull CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         final ServerPlayerEntity player = context.getSource().getPlayer();
         final String warpName = context.getArgument("warp", String.class);
+
+        if (PlayerUtils.hasTPDisabled(player)) {
+            BitsVanilla.audience(player).sendMessage(Component.text(TELEPORTS_DISABLED, Colors.NEGATIVE));
+            return 1;
+        }
 
         WarpUtils.getWarpAsync(warpName).thenAccept(warp -> {
             if (warp.isPresent()) {

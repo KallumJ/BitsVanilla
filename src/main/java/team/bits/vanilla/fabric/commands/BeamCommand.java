@@ -38,6 +38,7 @@ public class BeamCommand extends Command {
     private static final String SAME_DIM_ERR = "You must be in the same dimension as your target";
     private static final String NO_PLAYER_ERR = "There is no player %s online";
     private static final String NO_ARGS_ERR = "To use /beam, you must specify a player, or do /beam accept. For more info, do /help";
+    private static final String TELEPORTS_DISABLED = "You have teleporting disabled!";
 
     public BeamCommand() {
         super("beam", new CommandInformation()
@@ -77,6 +78,11 @@ public class BeamCommand extends Command {
      */
     public int initialiseBeamRequest(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         ServerPlayerEntity sendingPlayer = context.getSource().getPlayer();
+
+        if (PlayerUtils.hasTPDisabled(sendingPlayer)) {
+            BitsVanilla.audience(sendingPlayer).sendMessage(Component.text(TELEPORTS_DISABLED, Colors.NEGATIVE));
+            return 1;
+        }
 
         String playerArg = context.getArgument("player", String.class);
 

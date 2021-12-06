@@ -184,6 +184,24 @@ public final class PlayerUtils {
         return false;
     }
 
+    public static boolean hasTPDisabled(@NotNull ServerPlayerEntity player) {
+        JsonObject response;
+        try {
+            response = rpcClient.call(
+                    "query($uuid: ID!) { player(uuid: $uuid) { no_tp, vip } }",
+                    Map.of("uuid", player.getUuidAsString())
+            ).get();
+        } catch (InterruptedException | ExecutionException | IOException ex) {
+            throw new RuntimeException("Error while getting player data", ex);
+        }
+
+        if (response.size() > 0) {
+            return response.getAsJsonObject("player").get("no_tp").getAsBoolean();
+        }
+
+        return false;
+    }
+
     /**
      * Get a player uuid from their nickname or username.
      * The player does not have to be online.
@@ -287,6 +305,10 @@ public final class PlayerUtils {
 
     public static void setVIP(@NotNull ServerPlayerEntity player, boolean vip) {
         updatePlayer(player, Map.of("vip", vip));
+    }
+
+    public static void setNoTP(@NotNull ServerPlayerEntity player, boolean noTP) {
+        updatePlayer(player, Map.of("no_tp", noTP));
     }
 
     private static void updatePlayer(@NotNull ServerPlayerEntity player, @NotNull Map playerData) {

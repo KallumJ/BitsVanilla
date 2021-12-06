@@ -3,6 +3,7 @@ package team.bits.vanilla.fabric.commands;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import net.kyori.adventure.text.Component;
 import net.minecraft.block.BedBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -19,6 +20,9 @@ import net.minecraft.world.World;
 import team.bits.nibbles.command.Command;
 import team.bits.nibbles.command.CommandInformation;
 import team.bits.nibbles.teleport.Location;
+import team.bits.nibbles.utils.Colors;
+import team.bits.vanilla.fabric.BitsVanilla;
+import team.bits.vanilla.fabric.database.player.PlayerUtils;
 import team.bits.vanilla.fabric.teleport.Teleporter;
 
 import java.util.Objects;
@@ -29,6 +33,7 @@ public class BedCommand extends Command {
     private static final String NO_SPAWN_ERR = "You do not have a bed or respawn anchor";
     private static final String RESPAWN_ANCHOR_ERR = "Could not teleport to your respawn anchor";
     private static final String BED_ERR = "Could not teleport to your bed";
+    private static final String TELEPORTS_DISABLED = "You have teleporting disabled!";
 
     public BedCommand() {
         super("bed", new CommandInformation()
@@ -42,6 +47,11 @@ public class BedCommand extends Command {
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         ServerPlayerEntity player = context.getSource().getPlayer();
         MinecraftServer server = context.getSource().getServer();
+
+        if (PlayerUtils.hasTPDisabled(player)) {
+            BitsVanilla.audience(player).sendMessage(Component.text(TELEPORTS_DISABLED, Colors.NEGATIVE));
+            return 1;
+        }
 
         BlockPos spawnPosition = player.getSpawnPointPosition();
         RegistryKey<World> spawnDimension = player.getSpawnPointDimension();
