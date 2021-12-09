@@ -1,0 +1,207 @@
+-- MariaDB dump 10.19  Distrib 10.6.5-MariaDB, for Linux (x86_64)
+--
+-- Host: localhost    Database: bits_vanilla
+-- ------------------------------------------------------
+-- Server version	10.6.5-MariaDB
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Current Database: `bits_vanilla`
+--
+
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `bits_vanilla` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci */;
+
+USE `bits_vanilla`;
+
+ALTER USER 'bits_vanilla'@'%' IDENTIFIED WITH mysql_native_password BY 'rainbows';
+GRANT ALL PRIVILEGES ON bits_vanilla.* TO 'bits_vanilla'@'%';
+
+--
+-- Table structure for table `player_data`
+--
+
+DROP TABLE IF EXISTS `player_data`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `player_data` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uuid` int(11) NOT NULL,
+  `username` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nickname` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vip` tinyint(1) NOT NULL DEFAULT 0,
+  `colour` int(9) DEFAULT NULL,
+  `no_tp` tinyint(1) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uuid` (`uuid`),
+  CONSTRAINT `player_data_ibfk_1` FOREIGN KEY (`uuid`) REFERENCES `uuid` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=161 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `player_data`
+--
+
+LOCK TABLES `player_data` WRITE;
+/*!40000 ALTER TABLE `player_data` DISABLE KEYS */;
+INSERT INTO `player_data` VALUES (2,2,'KallumJ',NULL,1,5636095,0),(3,3,'Heshueish','Hesh',1,NULL,0),(4,4,'Ninjaturtle1999','Ninja',1,0,0),(5,5,'Immortal_JOA','TheIndianGuy',1,NULL,0),(6,6,'Broooke','Bruk',1,14524637,0),(7,7,'NotKoenn','ImNotEvil',0,4210752,0),(8,8,'katsuunoodles','kit',1,9662683,0),(9,9,'NotKallumJ',NULL,0,16729344,0),(10,10,'Battletas','Tas',1,65280,0),(11,11,'Knottleif','Leif',0,NULL,0),(12,12,'LuckyLuc015','Luc',1,NULL,0),(13,13,'rubenhoot','Ruben',0,NULL,0),(14,14,'opfinder_viz',NULL,1,9699539,0),(15,15,'Cindayra','Sin',0,NULL,0),(16,16,'velvetReveries','V',1,16716947,0),(17,17,'Theengineer415','Engie',1,9109504,0),(18,18,'Xerosese','Xero',0,NULL,0),(19,19,'jkwayne',NULL,0,NULL,0),(20,20,'MissChikoo',NULL,0,NULL,0),(21,21,'Edahs_Shade','KallumjInDenial',1,8388564,0),(22,22,'gurkburk1','gurk',1,2263842,0),(23,23,'TheRunner2015',NULL,0,NULL,0),(24,24,'SpaceDroid200','Space',1,8087790,0),(25,25,'Bacon_Nugget','Bacon',1,16716947,0),(26,26,'KeithSinister','Sinister',1,43690,0),(27,27,'victorode',NULL,0,NULL,0),(28,28,'Mageta',NULL,1,16711935,0),(29,29,'paulbowden75','paul',0,NULL,0),(30,30,'mattbowden','MattB',0,NULL,0),(31,31,'Multivitz',NULL,0,NULL,0),(32,32,'zarmar12',NULL,0,NULL,0),(33,33,'avondtuurster','avond',1,9109643,0),(34,34,'MrDucDuck',NULL,0,NULL,0),(35,35,'LiloBelli',NULL,1,10040012,0),(36,36,'StabyBoy',NULL,1,16729344,0),(37,37,'Litt3n',NULL,0,NULL,0),(38,38,'MrNew10',NULL,0,NULL,0),(39,39,'thefableofamy',NULL,0,NULL,0),(40,40,'EmRussssss',NULL,0,NULL,0),(41,41,'Marcootje',NULL,0,NULL,0),(42,42,'skruvad',NULL,0,NULL,0),(43,43,'monument2yoursin',NULL,0,NULL,0),(44,44,'herolncs',NULL,0,NULL,0),(45,45,'DrOddball',NULL,0,NULL,0),(46,46,'Robbot3',NULL,0,NULL,0),(47,47,'Last_Iseki',NULL,0,NULL,0),(48,48,'Arcaniax',NULL,0,NULL,0),(49,49,'Ragterias','Alexis',1,16716947,0),(50,50,'OtterPopcicle',NULL,0,NULL,0),(51,51,'Ja_cka1','Dulkin',0,NULL,0),(52,52,'Lipilojo1',NULL,0,NULL,0),(53,53,'hotwire2',NULL,0,NULL,0),(54,54,'SergeantCrazy',NULL,0,NULL,0),(55,55,'ImEmilyy','Emily',1,9662683,0),(57,57,'Player623',NULL,0,NULL,0),(58,58,'Player696',NULL,0,NULL,0),(59,59,'Player839',NULL,0,NULL,0),(60,60,'Player87',NULL,0,NULL,0),(61,61,'Player612',NULL,0,NULL,0),(62,62,'Player852',NULL,0,NULL,0),(63,63,'Player699',NULL,0,NULL,0),(64,64,'Player614',NULL,0,NULL,0),(65,65,'Player698',NULL,0,NULL,0),(66,66,'Player710',NULL,0,NULL,0),(67,67,'Player130',NULL,0,NULL,0),(68,68,'Player251',NULL,0,NULL,0),(69,69,'Koenn',NULL,0,NULL,0),(105,76,'Im_Nex','Nex',1,9662683,1),(146,117,'ChaoticEntropy_','Entropy',0,16777215,0);
+/*!40000 ALTER TABLE `player_data` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `server`
+--
+
+DROP TABLE IF EXISTS `server`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `server` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `server`
+--
+
+LOCK TABLES `server` WRITE;
+/*!40000 ALTER TABLE `server` DISABLE KEYS */;
+INSERT INTO `server` VALUES (1,'local');
+/*!40000 ALTER TABLE `server` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `statistic`
+--
+
+DROP TABLE IF EXISTS `statistic`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `statistic` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=1732 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `statistic`
+--
+
+LOCK TABLES `statistic` WRITE;
+/*!40000 ALTER TABLE `statistic` DISABLE KEYS */;
+INSERT INTO `statistic` VALUES (11,'armor_cleaned'),(7,'beacons_crafted'),(12,'beds_exploded'),(10,'bells_rung'),(17,'bucket_axolotl'),(4,'cake_eaten'),(1729,'candle_cakes_made'),(1721,'candles_lit_with_snowballs'),(27,'copper_waxed'),(9,'deaths'),(6,'distance_by_pig'),(3,'distance_flown'),(1,'flowers_potted'),(1722,'freezing_damage_taken'),(1730,'glow_ink_removed'),(1724,'glowberries_fed'),(1727,'kelp_sheared'),(13,'minecarts_fuelled'),(15,'mooshrooms_milked'),(16,'nether_portals_used'),(1725,'pigs_converted'),(5,'records_played'),(8,'sponge_placed'),(18,'targets_hit'),(2,'times_jumped'),(1701,'times_teleported'),(19,'waxing_copper'),(14,'zombies_cured');
+/*!40000 ALTER TABLE `statistic` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `statistic_data`
+--
+
+DROP TABLE IF EXISTS `statistic_data`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `statistic_data` (
+  `player` int(11) NOT NULL,
+  `statistic` int(11) NOT NULL,
+  `server` int(11) NOT NULL,
+  `count` int(11) NOT NULL,
+  `level` int(11) NOT NULL,
+  PRIMARY KEY (`player`,`statistic`,`server`),
+  KEY `statistic` (`statistic`),
+  KEY `server` (`server`),
+  CONSTRAINT `statistic_data_ibfk_1` FOREIGN KEY (`statistic`) REFERENCES `statistic` (`id`),
+  CONSTRAINT `statistic_data_ibfk_2` FOREIGN KEY (`player`) REFERENCES `uuid` (`id`),
+  CONSTRAINT `statistic_data_ibfk_3` FOREIGN KEY (`server`) REFERENCES `server` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `statistic_data`
+--
+
+LOCK TABLES `statistic_data` WRITE;
+/*!40000 ALTER TABLE `statistic_data` DISABLE KEYS */;
+INSERT INTO `statistic_data` VALUES (7,1,1,0,0),(7,2,1,57,0),(7,3,1,0,0),(7,4,1,0,0),(7,5,1,0,0),(7,6,1,0,0),(7,7,1,0,0),(7,8,1,0,0),(7,9,1,0,0),(7,10,1,0,0),(7,11,1,0,0),(7,12,1,0,0),(7,13,1,0,0),(7,14,1,0,0),(7,15,1,0,0),(7,16,1,0,0),(7,17,1,0,0),(7,18,1,0,0),(7,19,1,0,0),(76,2,1,41,0),(76,4,1,1,0),(76,9,1,3,1),(76,1701,1,1,1),(76,1721,1,1,1),(76,1722,1,3,2),(76,1724,1,1,1),(76,1725,1,2,2),(76,1727,1,6,3),(76,1729,1,1,1),(76,1730,1,2,2);
+/*!40000 ALTER TABLE `statistic_data` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `uuid`
+--
+
+DROP TABLE IF EXISTS `uuid`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `uuid` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uuid` char(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uuid` (`uuid`)
+) ENGINE=InnoDB AUTO_INCREMENT=134 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `uuid`
+--
+
+LOCK TABLES `uuid` WRITE;
+/*!40000 ALTER TABLE `uuid` DISABLE KEYS */;
+INSERT INTO `uuid` VALUES (38,'00fdec62-361d-45bc-bb3e-35981c2f00c8'),(24,'04f56e00-da28-402c-b249-536b2824dc42'),(57,'06087658-42ff-32b1-8890-bb9c27a66edd'),(10,'09c0e216-b534-4c55-be59-3febdf0babc8'),(45,'0ce1e253-1330-4c59-b819-a08c172cd8e8'),(7,'0d594da7-6b81-463e-a0a7-d21c2e6b76f5'),(32,'0e93cce1-b8ea-41e7-ae56-526b54c10f5d'),(16,'13bebc9f-d1f7-4ffc-8dc8-f9c9791374b3'),(37,'161150ed-66b1-42b5-b662-cd5cbe37453c'),(42,'195e211c-947e-4c63-9a2a-c344dfc80a0f'),(22,'1ab8a998-a7af-4ed9-b496-93f092f99107'),(51,'1c30c08a-63ab-4f69-901e-7cc4457ad67e'),(27,'246ed9af-f44b-4c27-958c-caeecb0f6f3a'),(53,'27c0dcae-9643-4bdd-bb3d-34216d14761c'),(66,'28507737-102c-35fd-ac17-02009db33c0a'),(33,'3a139a96-7092-4cd4-9b11-2ffbbd300535'),(60,'3eec9f18-1d0e-3f17-917c-6994e7d034d1'),(64,'4208f94a-cce0-3579-97ad-e56b96b8d526'),(14,'463e3335-5257-42d0-8edd-06cae670ade9'),(48,'4d3c1f2f-7126-4d9b-93ec-01208a57188c'),(47,'51acdc83-a82b-4f02-af35-7d4e9c5b0ec2'),(44,'590b1070-3b11-4f4b-bac2-b03b08e1d6f3'),(4,'5a339dfd-65ec-475e-8ef1-80cdcfa804a2'),(55,'5abe80a6-41e9-4816-b642-7c9d26174da2'),(6,'5d4caf57-895f-45fa-a649-9caeca67f2ae'),(59,'66397f00-f974-3e3d-944b-5f58f7613e27'),(65,'6aa22a6e-01b2-3515-a387-e8c7e0793117'),(36,'6b53b043-91f4-49a2-972b-8df730385107'),(8,'7917e4e7-e917-4bdc-8f99-cb55c22f0b08'),(63,'7a3400be-e31a-307d-9fe4-43aac536397b'),(23,'7ab77f14-6b63-4047-88f0-99591bc94b7b'),(58,'7b2fc485-d259-389c-bb22-fc20b2865ae3'),(34,'7d8528a4-9f56-40b4-9034-0611e9b6183c'),(21,'7d9f2d76-fe1d-4d02-9371-3406c771e3c9'),(17,'7eec41e3-9567-402b-9355-89af84216cdd'),(35,'844baf3d-f893-463e-bdd0-f10fc2f3b52b'),(18,'85f88faa-7abd-4f16-b7de-5b263f12fbef'),(39,'87ce3116-6522-4fee-92f8-d258f9c7f7fe'),(3,'8ca7257b-808a-4c87-8aeb-855475eb76e9'),(40,'8fdfc32b-54f2-4862-b5bb-730f1cfd9ad0'),(9,'90fd7b3f-239f-4ba4-809c-427081ebfa4e'),(29,'914d763a-1988-4479-a79b-19952a131121'),(70,'98c337e0-79f1-31dc-a301-1d9b5aa1d9a4'),(20,'9d0500ec-1597-4d13-a445-641bc290df9e'),(61,'a349eb7d-8b74-32da-bb8d-6a1fb49c3d85'),(13,'a6eb527f-7f6e-4d26-9a5b-82121969c31e'),(26,'a708c1a3-2d6b-47f2-a82d-dab1cc0b3eec'),(50,'aa533e00-357c-463c-89ff-efd170c4cb6e'),(62,'ab110892-c6b2-3de5-8fa5-f01e37cd4065'),(12,'b030a026-a3f2-4082-b550-3f73f3633b5f'),(117,'b06d5fe9-fc6b-4821-b60b-1efa80a74524'),(15,'b1096be1-9874-44f2-8eeb-ba4cba7a6be0'),(69,'b1fa5e6e-1d1f-3be5-8d44-df960804814a'),(67,'b7afed14-2796-3101-8914-97746139b82d'),(2,'b9be5135-fe8c-4a34-9e63-ffeef0fc80fb'),(30,'b9c22243-0f16-4430-85cd-b380a01d1cd0'),(54,'ba7c7f5c-f200-4386-b510-17ccadad3cb8'),(28,'bc18300c-5c25-4f88-b789-582f9a1266c1'),(49,'c6725ef6-0722-4418-982a-15e90a69937c'),(68,'c9700ac2-fb69-36ca-b322-09edfc5786fb'),(76,'cac04f5f-726f-4192-8290-24bdd9e7c9aa'),(11,'d50469ba-534a-49fe-9af4-555007bc1cf7'),(41,'d810d7ea-b014-4c99-a3d0-117acf3cd5ea'),(31,'e12806af-d664-4d19-a6b8-02fde6793c2f'),(5,'eb5eb0e2-a213-46fb-af66-93d23de65841'),(56,'ee360054-d38b-402f-b6f3-b0af622e29d1'),(43,'ef5c8563-fb2e-416e-8bee-cf18f2257f15'),(52,'f03cc76d-5e7b-4fae-896a-3ccb5e7e56c6'),(19,'f2f357b1-f82e-44cf-b50a-3562b5714d1a'),(25,'f5eb1121-e0b1-4cbc-ac1e-1e45d858024e'),(46,'ff273136-5cba-4e92-9262-71731d22084b');
+/*!40000 ALTER TABLE `uuid` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `warp`
+--
+
+DROP TABLE IF EXISTS `warp`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `warp` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `server` int(11) NOT NULL,
+  `world` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `x` int(11) NOT NULL,
+  `y` int(11) NOT NULL,
+  `z` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `server` (`server`,`name`),
+  CONSTRAINT `warp_ibfk_1` FOREIGN KEY (`server`) REFERENCES `server` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `warp`
+--
+
+LOCK TABLES `warp` WRITE;
+/*!40000 ALTER TABLE `warp` DISABLE KEYS */;
+INSERT INTO `warp` VALUES (13,'Somewhere',1,'world',540,71,-545),(14,'spawn',1,'world',980,64,842),(15,'nether',1,'world_nether',-81,55,21),(17,'magic',1,'world',951,66,854),(18,'Teste',1,'world',6,67,114),(19,'Test',1,'world',6,67,114);
+/*!40000 ALTER TABLE `warp` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2021-12-08 21:58:12
