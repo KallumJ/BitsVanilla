@@ -85,6 +85,8 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
         nbt.putBoolean("MigratedStats", this.migratedStats);
 
         nbt.putBoolean("Afk", this.afk);
+
+        nbt.putLong("Playtime", this.timePlayed);
     }
 
     /**
@@ -113,6 +115,10 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
         if (nbt.contains("Afk")) {
             this.afk = nbt.getBoolean("Afk");
         }
+
+        if (nbt.contains("Playtime")) {
+            this.timePlayed = nbt.getLong("Playtime");
+        }
     }
 
     public void bitsVanillaCopyFromOldPlayer(@NotNull PlayerEntityMixin oldPlayer) {
@@ -122,6 +128,7 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
         this.customClient = oldPlayer.customClient;
         this.sendTPS = oldPlayer.sendTPS;
         this.afk = false;
+        this.timePlayed = oldPlayer.timePlayed;
 
         Scheduler.runOffThread(() -> PlayerNameLoader.loadNameData((ServerPlayerEntity) (Object) this));
     }
