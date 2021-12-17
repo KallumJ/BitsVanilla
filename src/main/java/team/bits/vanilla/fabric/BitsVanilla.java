@@ -101,7 +101,6 @@ public class BitsVanilla implements ModInitializer, ServerStoppingEvent.Listener
 //        EventManager.INSTANCE.registerEvents(new CustomClientHandler());
 
         EventManager.INSTANCE.registerEvents(new PlayerConnectListener());
-        EventManager.INSTANCE.registerEvents(new PlayerMoveListener());
         EventManager.INSTANCE.registerEvents(new PlayerDisconnectListener());
 
         AFKManager.initAfkManager();

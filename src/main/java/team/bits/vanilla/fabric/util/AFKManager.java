@@ -16,6 +16,8 @@ public class AFKManager {
     public static final Map<UUID, AFKCounter> PLAYER_TRACKER = new HashMap<>();
     public static final int AFK_THRESHOLD = 300; // Time in seconds
 
+    private static final Map<UUID, Float> prevYawMap = new HashMap<>();
+
     private static final String NOW_AFK_MSG = "* %s is now AFK";
     private static final String NO_LONGER_AFK_MSG = "* %s is no longer AFK";
 
@@ -74,6 +76,15 @@ public class AFKManager {
 
                     ((ExtendedPlayerEntity) player).setAFK(true);
                 }
+
+                // If the player moves their mouse, tell the AFKManager the player has moved
+                float currentYaw = player.getHeadYaw();
+                float prevYaw = prevYawMap.getOrDefault(playerUUID, currentYaw);
+
+                if (prevYaw != currentYaw) {
+                    playerMoved(player);
+                }
+                prevYawMap.put(playerUUID, currentYaw);
             }
         }), 0, 10);
     }
