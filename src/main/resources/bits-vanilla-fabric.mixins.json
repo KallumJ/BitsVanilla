@@ -15,6 +15,7 @@
     "PlayerJoinMixin",
     "PlayerLeaveMixin",
     "PvPMixin",
+    "RegistryFreezeMixin",
     "ServerPlayerEntityMixin",
     "ServerWorldInvoker",
     "ServerWorldMixin",

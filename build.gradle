@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '0.10.57'
+    id 'fabric-loom' version '0.11-SNAPSHOT'
     id 'maven-publish'
 }
 
@@ -38,17 +38,15 @@ dependencies {
     mappings("net.fabricmc:yarn:${project.yarn_mappings}:v2")
     modImplementation("net.fabricmc:fabric-loader:${project.loader_version}")
 
+    // Fabric API
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
     // Adventure
     modImplementation(include("net.kyori:adventure-platform-fabric:${project.kyori_version}"))
-    modImplementation(include("net.kyori:adventure-platform-api:4.0.0"))
-    modImplementation(include("net.kyori:adventure-api:4.0.0"))
-    modImplementation(include("net.kyori:adventure-text-serializer-plain:4.0.0"))
-    modImplementation(include("net.kyori:adventure-text-serializer-gson:4.0.0") {
-        exclude(group: "com.google.code.gson")
-    })
 
     // Nibbles
     modImplementation(include("team.bits:nibbles:${project.nibbles_version}"))
+    // modImplementation(include("team.bits.nibbles.dev:nibbles-1.18.2:3"))
 
     // ServiceLib
     modImplementation(include("team.bits:servicelib:${project.servicelib_version}") {
@@ -56,6 +54,7 @@ dependencies {
         exclude group: 'org.apache.commons'
         exclude group: 'com.google.code.gson'
         exclude group: 'org.apache.httpcomponents'
+        exclude group: 'org.slf4j.slf4j-api'
     })
 }
 

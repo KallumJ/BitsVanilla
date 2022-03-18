@@ -27,8 +27,9 @@ pipeline {
                 sh """test/production_server_test.sh \
                         --java-path '${JAVA_HOME}' \
                         --mod-jar 'bits-vanilla-fabric-${BRANCH_NAME}-${BUILD_NUMBER}.jar' \
-                        --mc-version '1.18' \
-                        --loader-version '0.12.6'
+                        --mc-version '1.18.2' \
+                        --loader-version '0.13.3' \
+                        --install-mod 'fabric-api' '1.18.2'
                    """
             }
         }
