@@ -1,25 +1,20 @@
 package team.bits.vanilla.fabric.commands;
 
-import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.minecraft.entity.EntityType;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.registry.RegistryKey;
-import net.minecraft.world.World;
-import team.bits.nibbles.command.Command;
-import team.bits.nibbles.command.CommandInformation;
-import team.bits.vanilla.fabric.BitsVanilla;
+import com.mojang.brigadier.context.*;
+import com.mojang.brigadier.exceptions.*;
+import net.minecraft.entity.*;
+import net.minecraft.server.*;
+import net.minecraft.server.command.*;
+import net.minecraft.server.world.*;
+import net.minecraft.text.*;
+import net.minecraft.util.*;
+import net.minecraft.util.math.*;
+import net.minecraft.util.registry.*;
+import net.minecraft.world.*;
+import team.bits.nibbles.command.*;
 
 import java.util.*;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 public class ChunkInspectCommand extends Command {
 
@@ -38,7 +33,7 @@ public class ChunkInspectCommand extends Command {
     }
 
     private static void sendEntityList(ServerCommandSource source, List<EntityRecord> entityRecords) {
-        Map<RegistryKey<World>, List<TextComponent>> entityStrings = new HashMap<>();
+        Map<RegistryKey<World>, List<Text>> entityStrings = new HashMap<>();
 
         for (EntityRecord entityRecord : entityRecords) {
 
@@ -46,7 +41,7 @@ public class ChunkInspectCommand extends Command {
             if (entityRecord.getCount() >= YELLOW_THRESHOLD) {
 
                 // If there's a lot of entities, make the text red
-                NamedTextColor color = entityRecord.getCount() >= RED_THRESHOLD ? NamedTextColor.RED : NamedTextColor.YELLOW;
+                Formatting color = entityRecord.getCount() >= RED_THRESHOLD ? Formatting.RED : Formatting.YELLOW;
 
                 // Gather entity information
                 String entityKey = entityRecord.getEntityType().getTranslationKey();
@@ -55,18 +50,23 @@ public class ChunkInspectCommand extends Command {
                 int entityCount = entityRecord.getCount();
 
                 // Add it to text component
-                TextComponent textComponent = Component.text(
+                Text textComponent = Text.literal(
                                 String.format(ENTITY_RECORD_STRING,
                                         getEntityStringFromKey(entityKey),
                                         entityChunkPos,
                                         entityCount
-                                ), color)
-                        .clickEvent(ClickEvent.runCommand(String.format(TELEPORT_COMMAND,
-                                dimension.getValue(),
-                                source.getName(),
-                                getCommandLocationString(entityChunkPos)
-                        )))
-                        .append(Component.newline());
+                                )
+                        ).styled(style -> style
+                                .withColor(color)
+                                .withClickEvent(
+                                        new ClickEvent(ClickEvent.Action.RUN_COMMAND, String.format(TELEPORT_COMMAND,
+                                                dimension.getValue(),
+                                                source.getName(),
+                                                getCommandLocationString(entityChunkPos)
+                                        ))
+                                )
+                        )
+                        .append(Text.literal("\n"));
 
 
                 // Add text to relevant dimension list
@@ -76,14 +76,18 @@ public class ChunkInspectCommand extends Command {
         }
 
         // Create text components for each dimension, with all entity records in it
-        List<TextComponent> finalMessages = new LinkedList<>();
+        List<Text> finalMessages = new LinkedList<>();
 
         entityStrings.forEach((worldRegistryKey, textComponents) -> {
-            TextComponent message = Component.text("---" + worldRegistryKey.getValue() + "---", NamedTextColor.GREEN).append(Component.newline());
+            MutableText message = Text.literal("---" + worldRegistryKey.getValue() + "---")
+                    .styled(style -> style.withColor(Formatting.GREEN))
+                    .append(Text.literal("\n"));
             if (!textComponents.isEmpty()) {
-                message = message.append(Component.text().append(textComponents));
+                textComponents.forEach(message::append);
             } else {
-                message = message.append(Component.text("No entities found", NamedTextColor.GRAY).append(Component.newline()));
+                message.append(Text.literal("No entities found")
+                        .styled(style -> style.withColor(Formatting.GRAY))
+                        .append(Text.literal("\n")));
             }
 
             finalMessages.add(message);
@@ -92,12 +96,15 @@ public class ChunkInspectCommand extends Command {
 
         // Collate the per dimension information into one text component
         if (finalMessages.isEmpty()) {
-            finalMessages.add(Component.text("No problems to report").color(NamedTextColor.RED));
+            finalMessages.add(Text.literal("No problems to report")
+                    .styled(style -> style.withColor(Formatting.RED))
+            );
         }
-        TextComponent collatedMessage = Component.text().append(finalMessages).build();
+        MutableText collatedMessage = Text.empty();
+        finalMessages.forEach(collatedMessage::append);
 
         // Send the message
-        BitsVanilla.adventure().audience(source).sendMessage(collatedMessage);
+        source.sendFeedback(collatedMessage, false);
     }
 
     // Get actual co ordinates from chunk pos, default to y 100;

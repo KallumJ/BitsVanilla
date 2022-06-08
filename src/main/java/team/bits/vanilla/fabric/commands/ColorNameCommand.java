@@ -1,34 +1,26 @@
 package team.bits.vanilla.fabric.commands;
 
-import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
-import com.mojang.brigadier.tree.CommandNode;
-import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventure.text.event.HoverEvent;
-import net.kyori.adventure.text.format.TextColor;
+import com.mojang.brigadier.*;
+import com.mojang.brigadier.arguments.*;
+import com.mojang.brigadier.context.*;
+import com.mojang.brigadier.exceptions.*;
+import com.mojang.brigadier.tree.*;
 import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import team.bits.nibbles.command.Command;
-import team.bits.nibbles.command.CommandInformation;
-import team.bits.nibbles.utils.Colors;
-import team.bits.vanilla.fabric.BitsVanilla;
-import team.bits.vanilla.fabric.database.player.PlayerNameLoader;
-import team.bits.vanilla.fabric.database.player.PlayerUtils;
-import team.bits.vanilla.fabric.util.color.NameColor;
-import team.bits.vanilla.fabric.util.color.NameColors;
+import net.minecraft.server.command.*;
+import net.minecraft.server.network.*;
+import net.minecraft.text.*;
+import org.jetbrains.annotations.*;
+import team.bits.nibbles.command.*;
+import team.bits.nibbles.utils.*;
+import team.bits.vanilla.fabric.database.*;
+import team.bits.vanilla.fabric.util.*;
 
-import java.util.Collection;
-import java.util.Optional;
+import java.awt.*;
+import java.util.*;
 
-import static net.minecraft.server.command.CommandManager.literal;
+import static net.minecraft.server.command.CommandManager.*;
 
-public class ColorNameCommand extends Command {
+public class ColorNameCommand extends AsyncCommand {
 
     private static final String CLICK_CATEGORY_MSG = "Click on a category to see the colors!";
     private static final String CLICK_COLOR_MSG = "Click on a color to use it!";
@@ -75,25 +67,31 @@ public class ColorNameCommand extends Command {
         );
     }
 
-    public int list(CommandContext<ServerCommandSource> context) {
-        final ServerCommandSource source = context.getSource();
-        final Audience audience = BitsVanilla.adventure().audience(source);
+    public int list(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        final ServerPlayerEntity player = Objects.requireNonNull(context.getSource().getPlayer());
 
-        audience.sendMessage(Component.text(CLICK_CATEGORY_MSG, Colors.NEUTRAL));
+        player.sendMessage(Text.literal(CLICK_CATEGORY_MSG), MessageTypes.NEUTRAL);
 
         NameColors.INSTANCE.getColours().forEach((key, value) -> {
-            TextColor textColor = TextColor.color(value.get(0).getRGB());
+            Color color = value.get(0).color();
+            TextColor textColor = TextColor.fromRgb(
+                    color.getRed() << (16) |
+                            color.getGreen() << (8) |
+                            color.getBlue()
+            );
 
-            audience.sendMessage(
-                    Component.text(key, textColor)
-                            .hoverEvent(HoverEvent.showText(
-                                    Component.text("Click to see all ")
-                                            .append(Component.text(key, textColor))
-                                            .append(Component.text(" colors"))
+            player.sendMessage(
+                    Text.literal(key).styled(style -> style
+                            .withColor(textColor)
+                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                                    Text.literal("Click to see all ")
+                                            .append(Text.literal(key).styled(s -> s.withColor(textColor)))
+                                            .append(Text.literal(" colors"))
                             ))
-                            .clickEvent(ClickEvent.runCommand(
+                            .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                                     String.format("/cn category %s", key)
-                            ))
+                            ))),
+                    MessageTypes.PLAIN
             );
         });
 
@@ -101,12 +99,10 @@ public class ColorNameCommand extends Command {
     }
 
     public int showCategory(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        final ServerCommandSource source = context.getSource();
-        final Audience audience = BitsVanilla.adventure().audience(source);
+        final ServerPlayerEntity player = Objects.requireNonNull(context.getSource().getPlayer());
+        final String category = context.getArgument("category", String.class);
 
-        String category = context.getArgument("category", String.class);
-
-        audience.sendMessage(Component.text(CLICK_COLOR_MSG, Colors.NEUTRAL));
+        player.sendMessage(Text.literal(CLICK_COLOR_MSG), MessageTypes.NEUTRAL);
 
         Collection<NameColor> colours;
         try {
@@ -116,17 +112,25 @@ public class ColorNameCommand extends Command {
         }
 
         colours.forEach(shade -> {
-            TextColor textColor = TextColor.color(shade.getRGB());
-            audience.sendMessage(
-                    Component.text(shade.name(), textColor)
-                            .hoverEvent(HoverEvent.showText(
-                                            Component.text("Click to change your color to ")
-                                                    .append(Component.text(shade.name(), textColor))
+            Color color = shade.color();
+            TextColor textColor = TextColor.fromRgb(
+                    color.getRed() << (16) |
+                            color.getGreen() << (8) |
+                            color.getBlue()
+            );
+            player.sendMessage(
+                    Text.literal(shade.name()).styled(style -> style
+                            .withColor(textColor)
+                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                                            Text.literal("Click to change your color to ")
+                                                    .append(Text.literal(shade.name())
+                                                            .styled(s -> s.withColor(textColor)))
                                     )
                             )
-                            .clickEvent(ClickEvent.runCommand(
+                            .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                                     String.format("/cn set %s %s", category, shade.name())
-                            ))
+                            ))),
+                    MessageTypes.PLAIN
             );
         });
 
@@ -134,23 +138,20 @@ public class ColorNameCommand extends Command {
     }
 
     @Override
-    public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        final ServerPlayerEntity player = context.getSource().getPlayer();
-        final Audience audience = BitsVanilla.adventure().audience(player);
+    public void runAsync(@NotNull CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        final ServerPlayerEntity player = Objects.requireNonNull(context.getSource().getPlayer());
 
-        if (PlayerUtils.isVIP(player)) {
+        if (PlayerApiUtils.isVIP(player)) {
 
             String category = context.getArgument("category", String.class);
             String colorName = context.getArgument("color", String.class);
 
             Optional<NameColor> color = NameColors.INSTANCE.getColour(category, colorName);
             if (color.isPresent()) {
-                PlayerUtils.setColor(player, color.get().color());
+                PlayerApiUtils.setColor(player, color.get().color());
                 PlayerNameLoader.loadNameData(player);
 
-                audience.sendMessage(
-                        Component.text(String.format(COLOR_CHANGED_MSG, colorName), Colors.POSITIVE)
-                );
+                player.sendMessage(Text.literal(String.format(COLOR_CHANGED_MSG, colorName)), MessageTypes.POSITIVE);
             } else {
                 throw new SimpleCommandExceptionType(() -> String.format(INVALID_COLOR_ERR, colorName)).create();
             }
@@ -158,7 +159,5 @@ public class ColorNameCommand extends Command {
         } else {
             throw new SimpleCommandExceptionType(() -> NO_PERMISSION_ERR).create();
         }
-
-        return 1;
     }
 }

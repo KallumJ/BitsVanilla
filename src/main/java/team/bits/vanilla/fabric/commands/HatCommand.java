@@ -1,18 +1,15 @@
 package team.bits.vanilla.fabric.commands;
 
-import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
-import net.kyori.adventure.text.Component;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import team.bits.nibbles.command.Command;
-import team.bits.nibbles.command.CommandInformation;
-import team.bits.nibbles.utils.Colors;
-import team.bits.vanilla.fabric.BitsVanilla;
+import com.mojang.brigadier.context.*;
+import com.mojang.brigadier.exceptions.*;
+import net.minecraft.entity.*;
+import net.minecraft.entity.player.*;
+import net.minecraft.item.*;
+import net.minecraft.server.command.*;
+import net.minecraft.server.network.*;
+import net.minecraft.text.*;
+import team.bits.nibbles.command.*;
+import team.bits.nibbles.utils.*;
 
 public class HatCommand extends Command {
 
@@ -46,7 +43,7 @@ public class HatCommand extends Command {
             inventory.setStack(inventory.selectedSlot, oldHat);
 
             // send a confirmation message
-            BitsVanilla.audience(player).sendMessage(Component.text(HAT_EQUIPPED, Colors.POSITIVE));
+            player.sendMessage(Text.literal(HAT_EQUIPPED), MessageTypes.POSITIVE);
 
         } else {
             // if the player isn't holding an item, send an error message

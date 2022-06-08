@@ -1,35 +1,27 @@
 package team.bits.vanilla.fabric.commands;
 
-import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.tree.CommandNode;
-import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventure.text.event.HoverEvent;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.Style;
-import net.kyori.adventure.text.format.TextDecoration;
+import com.mojang.brigadier.*;
+import com.mojang.brigadier.arguments.*;
+import com.mojang.brigadier.context.*;
+import com.mojang.brigadier.tree.*;
 import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import org.jetbrains.annotations.NotNull;
-import team.bits.nibbles.command.Command;
-import team.bits.nibbles.command.CommandInformation;
-import team.bits.nibbles.teleport.Location;
-import team.bits.nibbles.utils.Colors;
-import team.bits.vanilla.fabric.BitsVanilla;
-import team.bits.vanilla.fabric.database.player.PlayerUtils;
-import team.bits.vanilla.fabric.database.warp.Warp;
-import team.bits.vanilla.fabric.database.warp.WarpUtils;
-import team.bits.vanilla.fabric.teleport.Teleporter;
-import team.bits.vanilla.fabric.util.CommandSuggestionUtils;
+import net.minecraft.server.command.*;
+import net.minecraft.server.network.*;
+import net.minecraft.text.*;
+import org.jetbrains.annotations.*;
+import team.bits.nibbles.command.*;
+import team.bits.nibbles.teleport.*;
+import team.bits.nibbles.utils.*;
+import team.bits.vanilla.fabric.database.*;
+import team.bits.vanilla.fabric.teleport.*;
+import team.bits.vanilla.fabric.util.*;
 
-import static net.minecraft.server.command.CommandManager.literal;
+import java.util.*;
+import java.util.concurrent.*;
 
-public class WarpCommand extends Command {
+import static net.minecraft.server.command.CommandManager.*;
+
+public class WarpCommand extends AsyncCommand {
 
     private static final String WARP_NOT_FOUND_ERR = "Cannot find warp '%s'";
     private static final String WARP_LIST_TOOLTIP = "Click to warp to %s";
@@ -56,7 +48,7 @@ public class WarpCommand extends Command {
         CommandNode<ServerCommandSource> commandNode = dispatcher.register(
                 literal(super.getName())
                         // if no arguments are given, list all the warps
-                        .executes(this::listWarps)
+                        .executes(AsyncCommand.wrap(this::listWarps))
 
                         // if the first argument is a warp, execute the default handler
                         .then(CommandManager.argument("warp", StringArgumentType.greedyString())
@@ -68,7 +60,7 @@ public class WarpCommand extends Command {
                         .then(literal("set")
                                 .requires(source -> source.hasPermissionLevel(4)) // requires permission level 4
                                 .then(CommandManager.argument("name", StringArgumentType.string())
-                                        .executes(this::setWarp)
+                                        .executes(AsyncCommand.wrap(this::setWarp))
                                 )
                         )
 
@@ -77,7 +69,7 @@ public class WarpCommand extends Command {
                                 .requires(source -> source.hasPermissionLevel(4)) // requires permission level 4
                                 .then(CommandManager.argument("warp", StringArgumentType.greedyString())
                                         .suggests(CommandSuggestionUtils.WARPS)
-                                        .executes(this::delWarp)
+                                        .executes(AsyncCommand.wrap(this::delWarp))
                                 )
                         )
         );
@@ -91,106 +83,107 @@ public class WarpCommand extends Command {
     }
 
     @Override
-    public int run(@NotNull CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        final ServerPlayerEntity player = context.getSource().getPlayer();
+    public void runAsync(@NotNull CommandContext<ServerCommandSource> context) throws InterruptedException, ExecutionException {
+        final ServerPlayerEntity player = Objects.requireNonNull(context.getSource().getPlayer());
         final String warpName = context.getArgument("warp", String.class);
 
-        if (PlayerUtils.hasTPDisabled(player)) {
-            BitsVanilla.audience(player).sendMessage(Component.text(TELEPORTS_DISABLED, Colors.NEGATIVE));
-            return 1;
-        }
+        boolean hasTpDisabled = PlayerApiUtils.getHasTPDisabled(player).get();
+        if (!hasTpDisabled) {
 
-        WarpUtils.getWarpAsync(warpName).thenAccept(warp -> {
+            Optional<Warp> warp = WarpApiUtils.getWarpAsync(warpName).get();
             if (warp.isPresent()) {
                 Location location = warp.get().location();
                 Teleporter.queueTeleport(player, location, true);
 
             } else {
-                BitsVanilla.audience(player).sendMessage(
-                        Component.text(String.format(WARP_NOT_FOUND_ERR, warpName), Colors.NEGATIVE)
+                player.sendMessage(
+                        Text.literal(String.format(WARP_NOT_FOUND_ERR, warpName)),
+                        MessageTypes.NEGATIVE
                 );
             }
-        });
 
-        return 1;
+        } else {
+            player.sendMessage(Text.literal(TELEPORTS_DISABLED), MessageTypes.NEGATIVE);
+        }
     }
 
-    public int listWarps(@NotNull CommandContext<ServerCommandSource> context) {
-        final Audience audience = BitsVanilla.adventure().audience(context.getSource());
+    public void listWarps(@NotNull CommandContext<ServerCommandSource> context) throws ExecutionException, InterruptedException {
+        final ServerPlayerEntity player = Objects.requireNonNull(context.getSource().getPlayer());
 
-        audience.sendMessage(
-                Component.text(WARP_HEADER, Colors.HEADER)
-                        .append(Component.newline())
-                        .append(Component.text(WARP_SUBHEADER, Style.style(Colors.NEUTRAL, TextDecoration.ITALIC)))
+        player.sendMessage(
+                Text.literal(WARP_HEADER)
+                        .append(Text.literal("\n"))
+                        .append(Text.literal(WARP_SUBHEADER)
+                                .styled(style -> style
+                                        .withColor(Colors.NEUTRAL)
+                                        .withItalic(true)
+                                )),
+                MessageTypes.HEADER
         );
 
-        WarpUtils.getWarpsListAsync().thenAccept(warps -> {
-            for (String warpName : warps) {
-                audience.sendMessage(
-                        Component.text(warpName, NamedTextColor.WHITE)
-                                .hoverEvent(HoverEvent.showText(
-                                        Component.text(String.format(WARP_LIST_TOOLTIP, warpName))
-                                ))
-                                .clickEvent(ClickEvent.runCommand(
-                                        String.format(WARP_COMMAND, warpName)
-                                ))
-                );
-            }
-        });
-
-        return 1;
+        Collection<String> warps = WarpApiUtils.getWarpsListAsync().get();
+        for (String warpName : warps) {
+            player.sendMessage(
+                    Text.literal(warpName)
+                            .styled(style -> style
+                                    .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                                            Text.literal(String.format(WARP_LIST_TOOLTIP, warpName))
+                                    ))
+                                    .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                                            String.format(WARP_COMMAND, warpName)
+                                    ))
+                            ),
+                    MessageTypes.PLAIN
+            );
+        }
     }
 
-    public int setWarp(@NotNull CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        final ServerPlayerEntity player = context.getSource().getPlayer();
+    public void setWarp(@NotNull CommandContext<ServerCommandSource> context) throws ExecutionException, InterruptedException {
+        final ServerPlayerEntity player = Objects.requireNonNull(context.getSource().getPlayer());
         final String warpName = context.getArgument("name", String.class);
         final Location location = Location.get(player);
 
-        WarpUtils.getWarpAsync(warpName).thenAccept(existingWarp -> {
-            if (existingWarp.isEmpty()) {
+        Optional<Warp> existingWarp = WarpApiUtils.getWarpAsync(warpName).get();
+        if (existingWarp.isEmpty()) {
 
-                Warp warp = new Warp(warpName, location);
-                WarpUtils.addWarpAsync(warp).thenAccept(success -> {
-                    if (success) {
-                        BitsVanilla.adventure().audience(context.getSource())
-                                .sendMessage(Component.text(WARP_SET, Colors.POSITIVE));
-                    } else {
-                        BitsVanilla.adventure().audience(context.getSource())
-                                .sendMessage(Component.text(WARP_SET_FAIL, Colors.NEGATIVE));
-                    }
-                });
-
+            Warp warp = new Warp(warpName, location);
+            boolean success = WarpApiUtils.addWarpAsync(warp).get();
+            if (success) {
+                player.sendMessage(
+                        Text.literal(WARP_SET),
+                        MessageTypes.POSITIVE
+                );
             } else {
-                BitsVanilla.audience(player).sendMessage(Component.text(WARP_EXISTS, Colors.NEGATIVE));
-            }
-        });
-
-        return 1;
-    }
-
-    public int delWarp(@NotNull CommandContext<ServerCommandSource> context) {
-        final String warpName = context.getArgument("warp", String.class);
-
-        WarpUtils.getWarpAsync(warpName).thenAccept(warp -> {
-            if (warp.isPresent()) {
-
-                WarpUtils.deleteWarpAsync(warp.get()).thenAccept(success -> {
-                    if (success) {
-                        BitsVanilla.adventure().audience(context.getSource())
-                                .sendMessage(Component.text(WARP_DELETED, Colors.POSITIVE));
-                    } else {
-                        BitsVanilla.adventure().audience(context.getSource())
-                                .sendMessage(Component.text(WARP_DELETE_FAIL, Colors.NEGATIVE));
-                    }
-                });
-
-            } else {
-                BitsVanilla.audience(context.getSource()).sendMessage(
-                        Component.text(String.format(WARP_NOT_FOUND_ERR, warpName), Colors.NEGATIVE)
+                player.sendMessage(
+                        Text.literal(WARP_SET_FAIL),
+                        MessageTypes.NEGATIVE
                 );
             }
-        });
 
-        return 1;
+        } else {
+            player.sendMessage(
+                    Text.literal(WARP_EXISTS),
+                    MessageTypes.NEGATIVE
+            );
+        }
+    }
+
+    public void delWarp(@NotNull CommandContext<ServerCommandSource> context) throws ExecutionException, InterruptedException {
+        final ServerPlayerEntity player = Objects.requireNonNull(context.getSource().getPlayer());
+        final String warpName = context.getArgument("warp", String.class);
+
+        Optional<Warp> warp = WarpApiUtils.getWarpAsync(warpName).get();
+        if (warp.isPresent()) {
+
+            boolean success = WarpApiUtils.deleteWarpAsync(warp.get()).get();
+            if (success) {
+                player.sendMessage(Text.literal(WARP_DELETED), MessageTypes.POSITIVE);
+            } else {
+                player.sendMessage(Text.literal(WARP_DELETE_FAIL), MessageTypes.NEGATIVE);
+            }
+
+        } else {
+            player.sendMessage(Text.literal(String.format(WARP_NOT_FOUND_ERR, warpName)), MessageTypes.NEGATIVE);
+        }
     }
 }

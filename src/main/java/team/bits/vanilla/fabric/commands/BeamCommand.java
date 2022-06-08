@@ -1,40 +1,37 @@
 package team.bits.vanilla.fabric.commands;
 
-import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
-import com.mojang.brigadier.tree.CommandNode;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventure.text.event.HoverEvent;
+import com.mojang.brigadier.*;
+import com.mojang.brigadier.arguments.*;
+import com.mojang.brigadier.context.*;
+import com.mojang.brigadier.exceptions.*;
+import com.mojang.brigadier.tree.*;
 import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.world.dimension.DimensionType;
-import team.bits.nibbles.command.Command;
-import team.bits.nibbles.command.CommandInformation;
-import team.bits.nibbles.teleport.Location;
-import team.bits.nibbles.utils.Colors;
-import team.bits.vanilla.fabric.BitsVanilla;
-import team.bits.vanilla.fabric.database.player.PlayerUtils;
-import team.bits.vanilla.fabric.teleport.Teleporter;
-import team.bits.vanilla.fabric.util.CommandSuggestionUtils;
+import net.minecraft.server.command.*;
+import net.minecraft.server.network.*;
+import net.minecraft.text.*;
+import net.minecraft.world.dimension.*;
+import org.jetbrains.annotations.*;
+import team.bits.nibbles.command.*;
+import team.bits.nibbles.teleport.*;
+import team.bits.nibbles.utils.*;
+import team.bits.vanilla.fabric.database.*;
+import team.bits.vanilla.fabric.teleport.*;
+import team.bits.vanilla.fabric.util.*;
 
-import java.util.HashMap;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.*;
 
-import static net.minecraft.server.command.CommandManager.literal;
+import static net.minecraft.server.command.CommandManager.*;
 
-public class BeamCommand extends Command {
+public class BeamCommand extends AsyncCommand {
 
     private static final HashMap<ServerPlayerEntity, Beam> BEAM_REQUESTS = new HashMap<>();
     private static final String REQUEST_STRING = "Beam requested!";
     private static final String ACCEPT_STRING = "%s has requested to beam to you. Click here to accept, or type /beam accept";
     private static final String ACCEPT_ERR = "You have no beam request to accept right now";
     private static final String BEAM_SELF_ERR = "You can not beam to yourself";
+    private static final String BEAM_FREECAM_ERR = "You can not beam to someone in freecam";
+    private static final String ACCEPT_FREECAM_ERR = "You can not accept a beam while in freecam";
     private static final String SAME_DIM_ERR = "You must be in the same dimension as your target";
     private static final String NO_PLAYER_ERR = "There is no player %s online";
     private static final String NO_ARGS_ERR = "To use /beam, you must specify a player, or do /beam accept. For more info, do /help";
@@ -55,14 +52,14 @@ public class BeamCommand extends Command {
                 literal(super.getName())
                         .then(CommandManager.argument("player", StringArgumentType.greedyString())
                                 .suggests(CommandSuggestionUtils.ONLINE_PLAYERS)
-                                .executes(this::initialiseBeamRequest)
+                                .executes(AsyncCommand.wrap(this::initialiseBeamRequest))
                         )
         );
 
         // Register /beam accept
         dispatcher.register(literal(super.getName())
                 .then(literal("accept")
-                        .executes(this::acceptBeam)
+                        .executes(AsyncCommand.wrap(this::acceptBeam))
                 )
         );
 
@@ -74,39 +71,44 @@ public class BeamCommand extends Command {
      *
      * @param context The command context
      * @return int, command error code
-     * @throws CommandSyntaxException if sending player is not in the same dimension, they are beaming to themselves, or there is no player by that name online
      */
-    public int initialiseBeamRequest(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        ServerPlayerEntity sendingPlayer = context.getSource().getPlayer();
+    public void initialiseBeamRequest(CommandContext<ServerCommandSource> context)
+            throws ExecutionException, InterruptedException {
 
-        if (PlayerUtils.hasTPDisabled(sendingPlayer)) {
-            BitsVanilla.audience(sendingPlayer).sendMessage(Component.text(TELEPORTS_DISABLED, Colors.NEGATIVE));
-            return 1;
-        }
+        final ServerPlayerEntity sendingPlayer = Objects.requireNonNull(context.getSource().getPlayer());
+        final String playerArg = context.getArgument("player", String.class);
 
-        String playerArg = context.getArgument("player", String.class);
+        boolean hasTpDisabled = PlayerApiUtils.getHasTPDisabled(sendingPlayer).get();
+        if (!hasTpDisabled) {
 
-        Optional<ServerPlayerEntity> receivingPlayer = PlayerUtils.getPlayer(playerArg);
+            Optional<ServerPlayerEntity> receivingPlayer = PlayerApiUtils.getPlayer(playerArg);
 
-        // If a receiving player is found, proceed, else, throw exception
-        if (receivingPlayer.isPresent()) {
-            DimensionType sendingDimension = sendingPlayer.world.getDimension();
-            DimensionType receivingDimension = receivingPlayer.get().world.getDimension();
+            // If a receiving player is found, proceed, else, throw exception
+            if (receivingPlayer.isPresent()) {
+                DimensionType sendingDimension = sendingPlayer.world.getDimension();
+                DimensionType receivingDimension = receivingPlayer.get().world.getDimension();
 
-            // If players are not in the same dimension, throw exception
-            if (!sendingDimension.equals(receivingDimension)) {
-                throw new SimpleCommandExceptionType(() -> SAME_DIM_ERR).create();
-                // If player is beaming to themselves, throw exception
-            } else if (sendingPlayer.equals(receivingPlayer.get())) {
-                throw new SimpleCommandExceptionType(() -> BEAM_SELF_ERR).create();
+                // If players are not in the same dimension, throw exception
+                if (!sendingDimension.equals(receivingDimension)) {
+
+                    sendingPlayer.sendMessage(Text.literal(SAME_DIM_ERR), MessageTypes.NEGATIVE);
+
+                    // If player is beaming to themselves, throw exception
+                } else if (sendingPlayer.equals(receivingPlayer.get())) {
+                    sendingPlayer.sendMessage(Text.literal(BEAM_SELF_ERR), MessageTypes.NEGATIVE);
+                } else if (receivingPlayer.get().isSpectator()) {
+                    sendingPlayer.sendMessage(Text.literal(BEAM_FREECAM_ERR), MessageTypes.NEGATIVE);
+                } else {
+                    addBeam(sendingPlayer, receivingPlayer.get());
+                }
+
             } else {
-                addBeam(sendingPlayer, receivingPlayer.get());
+                sendingPlayer.sendMessage(Text.literal(String.format(NO_PLAYER_ERR, playerArg)), MessageTypes.NEGATIVE);
             }
-        } else {
-            throw new SimpleCommandExceptionType(() -> String.format(NO_PLAYER_ERR, playerArg)).create();
-        }
 
-        return 1;
+        } else {
+            sendingPlayer.sendMessage(Text.literal(TELEPORTS_DISABLED), MessageTypes.NEGATIVE);
+        }
     }
 
     /**
@@ -116,19 +118,21 @@ public class BeamCommand extends Command {
      * @return int, command error code
      * @throws CommandSyntaxException if no beam for this player is active
      */
-    private int acceptBeam(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        ServerPlayerEntity acceptingPlayer = context.getSource().getPlayer();
-        Beam beamRequest = BEAM_REQUESTS.get(acceptingPlayer);
+    private void acceptBeam(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        final ServerPlayerEntity acceptingPlayer = Objects.requireNonNull(context.getSource().getPlayer());
+        final Beam beamRequest = BEAM_REQUESTS.get(acceptingPlayer);
 
         // If a beam request for this player was found, execute beam, else, throw exception
         if (beamRequest != null) {
-            beamRequest.executeBeam();
-            BEAM_REQUESTS.remove(acceptingPlayer);
+            if (!acceptingPlayer.isSpectator()) {
+                beamRequest.executeBeam();
+                BEAM_REQUESTS.remove(acceptingPlayer);
+            } else {
+                throw new SimpleCommandExceptionType(() -> ACCEPT_FREECAM_ERR).create();
+            }
         } else {
             throw new SimpleCommandExceptionType(() -> ACCEPT_ERR).create();
         }
-
-        return 1;
     }
 
     /**
@@ -144,27 +148,24 @@ public class BeamCommand extends Command {
 
 
         // Send success message
-        TextComponent requestMessage = Component.text(REQUEST_STRING)
-                .color(Colors.POSITIVE);
-
-        BitsVanilla.adventure().audience(sendingPlayer)
-                .sendMessage(requestMessage);
+        sendingPlayer.sendMessage(Text.literal(REQUEST_STRING), MessageTypes.POSITIVE);
 
         // Notify receiving player of request
-        String sendingPlayerName = PlayerUtils.getEffectiveName(sendingPlayer);
-        TextComponent acceptMessage = Component.text(String.format(ACCEPT_STRING, sendingPlayerName))
-                .hoverEvent(HoverEvent.showText(Component.text("Click here to accept!")))
-                .clickEvent(ClickEvent.runCommand("/beam accept"))
-                .color(Colors.POSITIVE);
+        String sendingPlayerName = PlayerApiUtils.getEffectiveName(sendingPlayer);
+        Text acceptMessage = Text.literal(String.format(ACCEPT_STRING, sendingPlayerName))
+                .styled(style -> style
+                        .withHoverEvent(new HoverEvent(
+                                HoverEvent.Action.SHOW_TEXT, Text.literal("Click here to accept!")
+                        ))
+                        .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/beam accept"))
+                );
 
-        BitsVanilla.adventure().audience(receivingPlayer)
-                .sendMessage(acceptMessage);
-
+        receivingPlayer.sendMessage(acceptMessage, MessageTypes.POSITIVE);
     }
 
     // Don't think this actually gets used, but its required so. here it is.
     @Override
-    public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+    public void runAsync(@NotNull CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         throw new SimpleCommandExceptionType(() -> NO_ARGS_ERR).create();
     }
 }
@@ -175,8 +176,8 @@ record Beam(ServerPlayerEntity sendingPlayer,
     private static final String ACCEPT_MSG = "Beam accepted";
 
     public void executeBeam() {
-        BitsVanilla.audience(sendingPlayer).sendMessage(Component.text(ACCEPT_MSG).color(Colors.NEUTRAL));
-        BitsVanilla.audience(receivingPlayer).sendMessage(Component.text(ACCEPT_MSG).color(Colors.NEUTRAL));
+        sendingPlayer.sendMessage(Text.literal(ACCEPT_MSG), MessageTypes.NEUTRAL);
+        receivingPlayer.sendMessage(Text.literal(ACCEPT_MSG), MessageTypes.NEUTRAL);
         Teleporter.queueTeleport(this.sendingPlayer, Location.get(this.receivingPlayer), false);
     }
 }

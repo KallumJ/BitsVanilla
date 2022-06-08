@@ -1,22 +1,22 @@
 package team.bits.vanilla.fabric.teleport;
 
-import net.minecraft.entity.player.PlayerEntity;
-import org.jetbrains.annotations.NotNull;
-import team.bits.nibbles.teleport.Location;
+import net.minecraft.entity.player.*;
+import org.jetbrains.annotations.*;
+import team.bits.nibbles.teleport.*;
 
-import java.util.Objects;
+import java.util.*;
 
 public class Teleport {
 
     private final PlayerEntity player;
     private final Location destination;
 
-    private int cooldown;
+    private int warmup;
 
-    public Teleport(@NotNull PlayerEntity player, @NotNull Location destination, int cooldown) {
+    public Teleport(@NotNull PlayerEntity player, @NotNull Location destination, int warmup) {
         this.player = Objects.requireNonNull(player);
         this.destination = Objects.requireNonNull(destination);
-        this.cooldown = cooldown;
+        this.warmup = warmup;
     }
 
     public @NotNull PlayerEntity getPlayer() {
@@ -27,11 +27,11 @@ public class Teleport {
         return this.destination;
     }
 
-    public int getCooldown() {
-        return cooldown;
+    public int getRemainingWarmup() {
+        return this.warmup;
     }
 
-    public void setCooldown(int cooldown) {
-        this.cooldown = cooldown;
+    public void tick(int elapsedTime) {
+        this.warmup -= elapsedTime;
     }
 }

@@ -1,12 +1,9 @@
 package team.bits.vanilla.fabric.commands;
 
-import org.jetbrains.annotations.NotNull;
-import team.bits.nibbles.command.Command;
-import team.bits.nibbles.command.CommandManager;
+import org.jetbrains.annotations.*;
+import team.bits.nibbles.command.*;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
+import java.util.*;
 
 public class Commands {
 
@@ -34,10 +31,14 @@ public class Commands {
         addCommand(new AFKCommand());
         addCommand(new WhoisCommand());
         addCommand(new RulesCommand());
-        addCommand(new StatsCommand());
         addCommand(new VersionCommand());
         addCommand(new PlaytimeCommand());
         addCommand(new DisableTPCommand());
+        addCommand(new RTPLockCommand());
+        addCommand(new MapCommand());
+        addCommand(new ChallengesCommand());
+        addCommand(new WorldPregenCommand());
+        addCommand(new FreecamCommand());
     }
 
     public static @NotNull Collection<Command> getCommands() {

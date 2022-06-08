@@ -1,31 +1,24 @@
 package team.bits.vanilla.fabric.commands;
 
-import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
-import com.mojang.brigadier.tree.CommandNode;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventure.text.event.HoverEvent;
+import com.mojang.brigadier.*;
+import com.mojang.brigadier.arguments.*;
+import com.mojang.brigadier.context.*;
+import com.mojang.brigadier.exceptions.*;
+import com.mojang.brigadier.tree.*;
 import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.command.*;
+import net.minecraft.server.network.*;
+import net.minecraft.text.*;
 import team.bits.nibbles.command.Command;
-import team.bits.nibbles.command.CommandInformation;
-import team.bits.nibbles.utils.Colors;
-import team.bits.vanilla.fabric.BitsVanilla;
-import team.bits.vanilla.fabric.database.player.PlayerUtils;
-import team.bits.vanilla.fabric.listeners.DuelHandler;
-import team.bits.vanilla.fabric.util.CommandSuggestionUtils;
-import team.bits.vanilla.fabric.util.ExtendedPlayerEntity;
+import team.bits.nibbles.command.*;
+import team.bits.nibbles.utils.*;
+import team.bits.vanilla.fabric.database.*;
+import team.bits.vanilla.fabric.listeners.*;
+import team.bits.vanilla.fabric.util.*;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
-import static net.minecraft.server.command.CommandManager.literal;
+import static net.minecraft.server.command.CommandManager.*;
 
 public class DuelCommand extends Command {
 
@@ -68,7 +61,7 @@ public class DuelCommand extends Command {
         final ExtendedPlayerEntity eRequestingPlayer = (ExtendedPlayerEntity) requestingPlayer;
 
         String targetName = context.getArgument("player", String.class);
-        Optional<ServerPlayerEntity> target = PlayerUtils.getPlayer(targetName);
+        Optional<ServerPlayerEntity> target = PlayerApiUtils.getPlayer(targetName);
 
         if (target.isPresent() && !target.get().equals(requestingPlayer)) {
             ServerPlayerEntity targetPlayer = target.get();
@@ -77,13 +70,20 @@ public class DuelCommand extends Command {
 
                 this.duelRequests.put(targetPlayer, requestingPlayer);
 
-                String requestingPlayerName = PlayerUtils.getEffectiveName(requestingPlayer);
-                BitsVanilla.audience(targetPlayer).sendMessage(
-                        Component.text(String.format(DUEL_REQUEST_MSG, requestingPlayerName), Colors.NEUTRAL)
-                                .hoverEvent(HoverEvent.showText(Component.text("Click to accept")))
-                                .clickEvent(ClickEvent.runCommand("/duel accept"))
+                String requestingPlayerName = PlayerApiUtils.getEffectiveName(requestingPlayer);
+                targetPlayer.sendMessage(Text.literal(String.format(DUEL_REQUEST_MSG, requestingPlayerName))
+                                .styled(style -> style
+                                        .withColor(Colors.NEUTRAL)
+                                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                                                Text.literal("Click to accept")
+                                        ))
+                                        .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                                                "/duel accept"
+                                        ))
+                                ),
+                        false
                 );
-                BitsVanilla.audience(requestingPlayer).sendMessage(Component.text(DUEL_SENT_MSG, Colors.NEUTRAL));
+                requestingPlayer.sendMessage(Text.literal(DUEL_SENT_MSG), MessageTypes.NEUTRAL);
 
             } else {
                 throw new SimpleCommandExceptionType(() -> ALREADY_IN_DUEL_ERR).create();
@@ -102,9 +102,8 @@ public class DuelCommand extends Command {
         if (this.duelRequests.containsKey(player)) {
             ServerPlayerEntity targetPlayer = this.duelRequests.get(player);
 
-            Component confirmMessage = Component.text(DUEL_ACCEPTED_MSG, Colors.POSITIVE);
-            BitsVanilla.audience(player).sendMessage(confirmMessage);
-            BitsVanilla.audience(targetPlayer).sendMessage(confirmMessage);
+            player.sendMessage(Text.literal(DUEL_ACCEPTED_MSG), MessageTypes.POSITIVE);
+            targetPlayer.sendMessage(Text.literal(DUEL_ACCEPTED_MSG), MessageTypes.POSITIVE);
 
             DuelHandler.startDuel(player, targetPlayer);
 

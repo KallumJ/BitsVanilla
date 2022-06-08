@@ -18,6 +18,9 @@ To be used in conjunction with:
 
 - [Spark](https://spark.lucko.me/download)
 - [Lithium](https://modrinth.com/mod/lithium)
-- [Hydrogen](https://modrinth.com/mod/hydrogen)
+- [Ferrite Core](https://modrinth.com/mod/ferrite-core)
 - [Ledger](https://modrinth.com/mod/ledger)
 - [Fabric Language Kotlin](https://modrinth.com/mod/fabric-language-kotlin)
+
+Credits:
+Vanilla Tweaks by Xisumavoid: https://www.xisumavoid.com/vanillatweaks - For mob head data

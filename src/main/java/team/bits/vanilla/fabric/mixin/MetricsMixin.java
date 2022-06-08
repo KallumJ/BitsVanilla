@@ -1,7 +1,7 @@
 package team.bits.vanilla.fabric.mixin;
 
-import net.minecraft.util.MetricsData;
-import org.spongepowered.asm.mixin.Mixin;
+import net.minecraft.util.*;
+import org.spongepowered.asm.mixin.*;
 
 @Mixin(MetricsData.class)
 public class MetricsMixin {

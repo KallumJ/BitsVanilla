@@ -1,14 +1,11 @@
 package team.bits.vanilla.fabric.util;
 
-import com.mojang.brigadier.suggestion.SuggestionProvider;
-import com.mojang.brigadier.suggestion.Suggestions;
-import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.minecraft.server.command.ServerCommandSource;
-import team.bits.vanilla.fabric.database.player.PlayerUtils;
-import team.bits.vanilla.fabric.database.warp.WarpUtils;
+import com.mojang.brigadier.suggestion.*;
+import net.minecraft.server.command.*;
+import team.bits.vanilla.fabric.database.*;
 
-import java.util.Collection;
-import java.util.concurrent.CompletableFuture;
+import java.util.*;
+import java.util.concurrent.*;
 
 public class CommandSuggestionUtils {
 
@@ -18,10 +15,10 @@ public class CommandSuggestionUtils {
     public static final SuggestionProvider<ServerCommandSource> WARPS;
 
     static {
-        ONLINE_PLAYERS = (context, builder) -> filterSuggestionsByInputAsync(builder, PlayerUtils.getOnlinePlayerNamesAsync());
-        ALL_PLAYERS = (context, builder) -> filterSuggestionsByInputAsync(builder, PlayerUtils.getAllNamesAsync());
-        NICKNAMES = (context, builder) -> filterSuggestionsByInputAsync(builder, PlayerUtils.getNicknamesAsync());
-        WARPS = (context, builder) -> filterSuggestionsByInputAsync(builder, WarpUtils.getWarpsListAsync());
+        ONLINE_PLAYERS = (context, builder) -> filterSuggestionsByInputAsync(builder, PlayerApiUtils.getOnlinePlayerNamesAsync());
+        ALL_PLAYERS = (context, builder) -> filterSuggestionsByInputAsync(builder, PlayerApiUtils.getAllNamesAsync());
+        NICKNAMES = (context, builder) -> filterSuggestionsByInputAsync(builder, PlayerApiUtils.getNicknamesAsync());
+        WARPS = (context, builder) -> filterSuggestionsByInputAsync(builder, WarpApiUtils.getWarpsListAsync());
     }
 
     private CommandSuggestionUtils() {

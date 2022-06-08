@@ -1,25 +1,23 @@
 package team.bits.vanilla.fabric.commands;
 
-import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
-import com.mojang.brigadier.tree.CommandNode;
-import net.kyori.adventure.text.Component;
+import com.mojang.brigadier.*;
+import com.mojang.brigadier.arguments.*;
+import com.mojang.brigadier.context.*;
+import com.mojang.brigadier.exceptions.*;
+import com.mojang.brigadier.tree.*;
 import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.command.*;
+import net.minecraft.server.network.*;
+import net.minecraft.text.*;
 import team.bits.nibbles.command.Command;
-import team.bits.nibbles.command.CommandInformation;
-import team.bits.nibbles.utils.Colors;
-import team.bits.vanilla.fabric.BitsVanilla;
-import team.bits.vanilla.fabric.database.player.PlayerUtils;
-import team.bits.vanilla.fabric.util.CommandSuggestionUtils;
+import team.bits.nibbles.command.*;
+import team.bits.nibbles.utils.*;
+import team.bits.vanilla.fabric.database.*;
+import team.bits.vanilla.fabric.util.*;
 
-import java.util.Optional;
+import java.util.*;
 
-import static net.minecraft.server.command.CommandManager.literal;
+import static net.minecraft.server.command.CommandManager.*;
 
 public class VIPCommand extends Command {
 
@@ -94,20 +92,17 @@ public class VIPCommand extends Command {
      * @return true if succeeded, false if failed.
      */
     private boolean updateVip(boolean vipStatus, String playerArg, ServerPlayerEntity requestingPlayer) {
-        Optional<ServerPlayerEntity> playerToChange = PlayerUtils.getPlayer(playerArg);
+        Optional<ServerPlayerEntity> playerToChange = PlayerApiUtils.getPlayer(playerArg);
 
         if (playerToChange.isPresent()) {
             ServerPlayerEntity player = playerToChange.get();
 
             // Update the passed player with the passed status, and inform the requesting player
-            PlayerUtils.setVIP(player, vipStatus);
+            PlayerApiUtils.setVIP(player, vipStatus);
 
-            BitsVanilla.audience(requestingPlayer).sendMessage(
-                    Component.text(String.format(UPDATE_SUCCESS, player.getEntityName()), Colors.POSITIVE)
-            );
+            requestingPlayer.sendMessage(Text.literal(String.format(UPDATE_SUCCESS, player.getEntityName())), MessageTypes.POSITIVE);
 
             return true;
-
         } else {
             return false;
         }

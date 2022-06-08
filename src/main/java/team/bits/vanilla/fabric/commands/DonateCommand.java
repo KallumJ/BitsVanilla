@@ -1,16 +1,12 @@
 package team.bits.vanilla.fabric.commands;
 
-import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventure.text.event.HoverEvent;
-import net.minecraft.server.command.ServerCommandSource;
-import team.bits.nibbles.command.Command;
-import team.bits.nibbles.command.CommandInformation;
-import team.bits.nibbles.utils.Colors;
-import team.bits.vanilla.fabric.BitsVanilla;
+import com.mojang.brigadier.context.*;
+import com.mojang.brigadier.exceptions.*;
+import net.minecraft.server.command.*;
+import net.minecraft.server.network.*;
+import net.minecraft.text.*;
+import team.bits.nibbles.command.*;
+import team.bits.nibbles.utils.*;
 
 public class DonateCommand extends Command {
 
@@ -25,13 +21,19 @@ public class DonateCommand extends Command {
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        TextComponent message = Component.text("Donate here! Thank you very much for your generosity!: " + DONATE_LINK)
-                .color(Colors.POSITIVE)
-                .hoverEvent(HoverEvent.showText(Component.text("Click here to donate!")))
-                .clickEvent(ClickEvent.openUrl(DONATE_LINK));
+        ServerPlayerEntity player = context.getSource().getPlayer();
 
-        BitsVanilla.adventure().audience(context.getSource())
-                .sendMessage(message);
+        if (player != null) {
+            Text message = Text.literal("Donate here! Thank you very much for your generosity!: " + DONATE_LINK)
+                    .styled(style -> style
+                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                                    Text.literal("Click here to donate!"))
+                            )
+                            .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, DONATE_LINK))
+                    );
+
+            player.sendMessage(message, MessageTypes.POSITIVE);
+        }
 
         return 1;
     }

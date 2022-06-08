@@ -1,14 +1,12 @@
 package team.bits.vanilla.fabric.mixin;
 
-import net.minecraft.network.MessageType;
-import net.minecraft.server.PlayerManager;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.text.Text;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
-
-import java.util.UUID;
+import net.minecraft.network.message.*;
+import net.minecraft.server.*;
+import net.minecraft.server.network.*;
+import net.minecraft.text.*;
+import net.minecraft.util.registry.*;
+import org.spongepowered.asm.mixin.*;
+import org.spongepowered.asm.mixin.injection.*;
 
 @Mixin(ServerPlayNetworkHandler.class)
 public class PlayerLeaveMixin {
@@ -17,10 +15,10 @@ public class PlayerLeaveMixin {
             method = "onDisconnected",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/server/PlayerManager;broadcast(Lnet/minecraft/text/Text;Lnet/minecraft/network/MessageType;Ljava/util/UUID;)V"
+                    target = "Lnet/minecraft/server/PlayerManager;broadcast(Lnet/minecraft/text/Text;Lnet/minecraft/util/registry/RegistryKey;)V"
             )
     )
-    public void customBroadcastChatMessage(PlayerManager playerManager, Text message, MessageType type, UUID sender) {
+    public void customBroadcastChatMessage(PlayerManager instance, Text message, RegistryKey<MessageType> registryKey) {
         // we handle leave messages in Velocity, so we want to drop this broadcast
     }
 }

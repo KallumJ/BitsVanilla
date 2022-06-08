@@ -1,27 +1,24 @@
 package team.bits.vanilla.fabric.commands;
 
-import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
-import com.mojang.brigadier.tree.CommandNode;
-import net.kyori.adventure.text.Component;
+import com.mojang.brigadier.*;
+import com.mojang.brigadier.arguments.*;
+import com.mojang.brigadier.context.*;
+import com.mojang.brigadier.exceptions.*;
+import com.mojang.brigadier.tree.*;
 import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import org.jetbrains.annotations.NotNull;
+import net.minecraft.server.command.*;
+import net.minecraft.server.network.*;
+import net.minecraft.text.*;
+import org.jetbrains.annotations.*;
 import team.bits.nibbles.command.Command;
-import team.bits.nibbles.command.CommandInformation;
-import team.bits.nibbles.utils.Colors;
-import team.bits.vanilla.fabric.BitsVanilla;
-import team.bits.vanilla.fabric.database.player.PlayerUtils;
-import team.bits.vanilla.fabric.util.CommandSuggestionUtils;
-import team.bits.vanilla.fabric.util.ExtendedPlayerEntity;
+import team.bits.nibbles.command.*;
+import team.bits.nibbles.utils.*;
+import team.bits.vanilla.fabric.database.*;
+import team.bits.vanilla.fabric.util.*;
 
-import java.util.Optional;
+import java.util.*;
 
-import static net.minecraft.server.command.CommandManager.literal;
+import static net.minecraft.server.command.CommandManager.*;
 
 public class PlaytimeCommand extends Command {
 
@@ -56,7 +53,7 @@ public class PlaytimeCommand extends Command {
         ServerPlayerEntity player;
         try {
             String playerName = context.getArgument("player", String.class);
-            Optional<ServerPlayerEntity> foundPlayer = PlayerUtils.getPlayer(playerName);
+            Optional<ServerPlayerEntity> foundPlayer = PlayerApiUtils.getPlayer(playerName);
             if (foundPlayer.isPresent()) {
                 player = foundPlayer.get();
             } else {
@@ -69,7 +66,11 @@ public class PlaytimeCommand extends Command {
         long playtime = ((ExtendedPlayerEntity) player).getTimePlayed();
         int hours = (int) Math.round(((playtime / 20.0) / 60.0) / 60.0);
 
-        BitsVanilla.audience(source).sendMessage(Component.text(String.format(PLAYTIME, PlayerUtils.getEffectiveName(player), hours)).color(Colors.NEUTRAL));
+        source.sendFeedback(
+                Text.literal(String.format(PLAYTIME, PlayerApiUtils.getEffectiveName(player), hours))
+                        .styled(style -> style.withColor(Colors.NEUTRAL)),
+                false
+        );
 
         return 1;
     }

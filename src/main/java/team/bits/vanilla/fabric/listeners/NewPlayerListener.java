@@ -1,24 +1,17 @@
 package team.bits.vanilla.fabric.listeners;
 
-import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.Style;
-import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.title.Title;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.server.network.ServerPlayerEntity;
-import org.jetbrains.annotations.NotNull;
-import team.bits.nibbles.event.misc.PlayerConnectEvent;
-import team.bits.nibbles.teleport.TeleportUtils;
-import team.bits.vanilla.fabric.BitsVanilla;
-import team.bits.vanilla.fabric.database.warp.WarpUtils;
-import team.bits.vanilla.fabric.util.ExtendedPlayerEntity;
+import net.minecraft.item.*;
+import net.minecraft.server.network.*;
+import net.minecraft.text.*;
+import net.minecraft.util.*;
+import org.jetbrains.annotations.*;
+import team.bits.nibbles.event.server.*;
+import team.bits.nibbles.teleport.*;
+import team.bits.nibbles.utils.*;
+import team.bits.vanilla.fabric.database.*;
+import team.bits.vanilla.fabric.util.*;
 
-import java.time.Duration;
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.*;
 
 public class NewPlayerListener implements PlayerConnectEvent.Listener {
 
@@ -32,7 +25,6 @@ public class NewPlayerListener implements PlayerConnectEvent.Listener {
     public void onPlayerConnect(@NotNull PlayerConnectEvent event) {
         final ServerPlayerEntity player = event.getPlayer();
         final ExtendedPlayerEntity ePlayer = (ExtendedPlayerEntity) player;
-        final Audience audience = BitsVanilla.audience(player);
 
         // check if this player is new (has never played before)
         if (!ePlayer.hasPlayedBefore()) {
@@ -41,19 +33,17 @@ public class NewPlayerListener implements PlayerConnectEvent.Listener {
             STARTER_ITEMS.forEach(stack -> ePlayer.giveItem(stack.copy()));
 
             // show a welcome title
-            Style style = Style.style(NamedTextColor.AQUA, TextDecoration.BOLD);
-            audience.showTitle(Title.title(
-                    Component.text("Welcome to Bits", style), // title
-                    Component.text("Season 6", style),        // subtitle
-                    Title.Times.of(
-                            Duration.ofSeconds(1), // fade-in
-                            Duration.ofSeconds(5), // stay
-                            Duration.ofSeconds(1)  // fade-out
-                    )
-            ));
+            Style style = Style.EMPTY.withColor(Formatting.AQUA).withBold(true);
+            TitleUtils.showTitle(player,
+                    Text.literal("Welcome to Bits").setStyle(style), // title
+                    Text.literal("Season 7").setStyle(style),        // subtitle
+                    20,  // fade-in
+                    200, // stay
+                    20   // fade-out
+            );
 
             // teleport the player to spawn
-            WarpUtils.getWarpAsync("spawn").thenAccept(warp -> warp.ifPresent(spawn ->
+            WarpApiUtils.getWarpAsync("spawn").thenAcceptAsync(warp -> warp.ifPresent(spawn ->
                     // we use Utils.teleport instead of the Teleporter
                     // to bypass the teleport delay
                     TeleportUtils.teleport(player, spawn.location())

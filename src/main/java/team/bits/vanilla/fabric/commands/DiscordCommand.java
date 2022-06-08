@@ -1,16 +1,11 @@
 package team.bits.vanilla.fabric.commands;
 
-import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventure.text.event.HoverEvent;
-import net.minecraft.server.command.ServerCommandSource;
-import team.bits.nibbles.command.Command;
-import team.bits.nibbles.command.CommandInformation;
-import team.bits.nibbles.utils.Colors;
-import team.bits.vanilla.fabric.BitsVanilla;
+import com.mojang.brigadier.context.*;
+import com.mojang.brigadier.exceptions.*;
+import net.minecraft.server.command.*;
+import net.minecraft.text.*;
+import team.bits.nibbles.command.*;
+import team.bits.nibbles.utils.*;
 
 public class DiscordCommand extends Command {
 
@@ -25,13 +20,15 @@ public class DiscordCommand extends Command {
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        TextComponent message = Component.text("Join our discord here: " + DISCORD_INVITE)
-                .color(Colors.POSITIVE)
-                .hoverEvent(HoverEvent.showText(Component.text("Click here to join!")))
-                .clickEvent(ClickEvent.openUrl(DISCORD_INVITE));
+        Text message = Text.literal("Join our discord here: " + DISCORD_INVITE)
+                .styled(style -> style
+                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                                Text.literal("Click here to join!"))
+                        )
+                        .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, DISCORD_INVITE))
+                );
 
-        BitsVanilla.adventure().audience(context.getSource())
-                .sendMessage(message);
+        context.getSource().getPlayer().sendMessage(message, MessageTypes.POSITIVE);
 
         return 1;
     }

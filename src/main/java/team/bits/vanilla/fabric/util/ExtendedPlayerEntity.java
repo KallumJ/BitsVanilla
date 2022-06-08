@@ -1,13 +1,11 @@
 package team.bits.vanilla.fabric.util;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import team.bits.nibbles.player.INibblesPlayer;
-import team.bits.vanilla.fabric.statistics.lib.StatRecord;
+import net.minecraft.entity.player.*;
+import org.jetbrains.annotations.*;
+import team.bits.nibbles.player.*;
+import team.bits.vanilla.fabric.challenges.*;
 
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Interface with custom methods added to the {@link net.minecraft.entity.player.PlayerEntity} class.
@@ -23,14 +21,6 @@ public interface ExtendedPlayerEntity extends INibblesPlayer {
 
     void setDuelTarget(@Nullable PlayerEntity player);
 
-    @NotNull StatRecord getStatRecord(@NotNull Identifier statId);
-
-    void setStatRecord(@NotNull Identifier statId, @NotNull StatRecord statRecord);
-
-    boolean hasMigratedStats();
-
-    void markMigratedStats();
-
     void setCustomClient(boolean customClient);
 
     boolean isCustomClient();
@@ -42,4 +32,12 @@ public interface ExtendedPlayerEntity extends INibblesPlayer {
     void setAFK(boolean afk);
 
     long getTimePlayed();
+
+    boolean hasCompletedChallenge(@NotNull Challenge challenge);
+
+    void markChallengeCompleted(@NotNull Challenge challenge);
+
+    boolean hasVisitedCorner(@NotNull WorldCorner corner);
+
+    void markVisitedCorner(@NotNull WorldCorner corner);
 }

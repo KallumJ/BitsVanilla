@@ -1,26 +1,20 @@
 package team.bits.vanilla.fabric.commands;
 
-import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
-import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.text.Component;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.dedicated.MinecraftDedicatedServer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.border.WorldBorder;
-import team.bits.nibbles.command.Command;
-import team.bits.nibbles.command.CommandInformation;
-import team.bits.nibbles.utils.Colors;
-import team.bits.nibbles.utils.ServerInstance;
-import team.bits.nibbles.utils.TextUtils;
-import team.bits.vanilla.fabric.BitsVanilla;
-import team.bits.vanilla.fabric.util.ExtendedPlayerEntity;
+import com.mojang.brigadier.context.*;
+import com.mojang.brigadier.exceptions.*;
+import net.minecraft.server.command.*;
+import net.minecraft.server.dedicated.*;
+import net.minecraft.server.network.*;
+import net.minecraft.server.world.*;
+import net.minecraft.text.*;
+import net.minecraft.util.math.*;
+import net.minecraft.world.*;
+import net.minecraft.world.border.*;
+import team.bits.nibbles.command.*;
+import team.bits.nibbles.utils.*;
+import team.bits.vanilla.fabric.util.*;
 
-import java.util.Date;
+import java.util.*;
 
 public class RandomTeleportCommand extends Command {
 
@@ -40,46 +34,54 @@ public class RandomTeleportCommand extends Command {
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        final ServerPlayerEntity player = context.getSource().getPlayer();
-        final ExtendedPlayerEntity ePlayer = (ExtendedPlayerEntity) player;
-        final Audience audience = BitsVanilla.audience(player);
+        if (RTPLockCommand.isRTPUnlocked()) {
+            final ServerPlayerEntity player = Objects.requireNonNull(context.getSource().getPlayer());
+            final ExtendedPlayerEntity ePlayer = (ExtendedPlayerEntity) player;
 
-        // get the current time and the time at which the player last rtp'ed
-        long currentTime = new Date().getTime();
-        long lastTime = ePlayer.getLastRTPTime();
+            // get the current time and the time at which the player last rtp'ed
+            long currentTime = new Date().getTime();
+            long lastTime = ePlayer.getLastRTPTime();
 
-        // check if the rtp cooldown has elapsed already
-        long elapsed = currentTime - lastTime;
-        if (elapsed < RTP_COOLDOWN) {
-            String cooldown = TextUtils.formatTimeRemaining(lastTime, currentTime, RTP_COOLDOWN);
-            throw new SimpleCommandExceptionType(() -> String.format(RTP_COOLDOWN_ERR, cooldown)).create();
+            // check if the rtp cooldown has elapsed already
+            long elapsed = currentTime - lastTime;
+            if (elapsed < RTP_COOLDOWN) {
+                String cooldown = TextUtils.formatTimeRemaining(lastTime, currentTime, RTP_COOLDOWN);
+                throw new SimpleCommandExceptionType(() -> String.format(RTP_COOLDOWN_ERR, cooldown)).create();
+            }
+
+            // make sure the player is in the overworld
+            ServerWorld world = player.getWorld();
+            if (!world.getRegistryKey().equals(World.OVERWORLD)) {
+                throw new SimpleCommandExceptionType(() -> OVERWORLD_ONLY_ERR).create();
+            }
+
+            // tell the player we're starting the teleport
+            player.sendMessage(Text.literal(TELEPORTING_MSG), MessageTypes.NEUTRAL);
+
+            // get the world size and spawn point
+            WorldBorder border = world.getWorldBorder();
+            int size = (int) (Math.round(Math.min(border.getSize(), 100000) / 2) - 1000);
+            BlockPos spawn = world.getSpawnPos();
+
+            // teleport the player to a random location inside the border
+            MinecraftDedicatedServer server = ServerInstance.get();
+            server.enqueueCommand(
+                    String.format("spreadplayers %s %s 1 %s false %s",
+                            spawn.getX(), spawn.getZ(), size, player.getName().getString()
+                    ),
+                    server.getCommandSource()
+            );
+
+            // store the current time as the last rtp time
+            ePlayer.setLastRTPTime(currentTime);
+        } else {
+            ServerPlayerEntity player = context.getSource().getPlayer();
+            if (player != null) {
+                player.sendMessage(Text.literal("The random teleport command is currently locked"), MessageTypes.NEGATIVE);
+            }
+
         }
 
-        // make sure the player is in the overworld
-        ServerWorld world = player.getWorld();
-        if (!world.getRegistryKey().equals(World.OVERWORLD)) {
-            throw new SimpleCommandExceptionType(() -> OVERWORLD_ONLY_ERR).create();
-        }
-
-        // tell the player we're starting the teleport
-        audience.sendMessage(Component.text(TELEPORTING_MSG, Colors.NEUTRAL));
-
-        // get the world size and spawn point
-        WorldBorder border = world.getWorldBorder();
-        int size = (int) (Math.round(Math.min(border.getSize(), 100000) / 2) - 1000);
-        BlockPos spawn = world.getSpawnPos();
-
-        // teleport the player to a random location inside the border
-        MinecraftDedicatedServer server = ServerInstance.get();
-        server.enqueueCommand(
-                String.format("spreadplayers %s %s 1 %s false %s",
-                        spawn.getX(), spawn.getZ(), size, player.getName().getString()
-                ),
-                server.getCommandSource()
-        );
-
-        // store the current time as the last rtp time
-        ePlayer.setLastRTPTime(currentTime);
 
         return 1;
     }

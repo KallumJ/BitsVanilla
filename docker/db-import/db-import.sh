@@ -2,6 +2,6 @@ sleep 5
 
 echo "Importing database..."
 
-mysql -h slytherin -u root -prainbows < db.dump
+mysql -h slytherin -u bits_vanilla -prainbows < db.dump
 
 echo "Done!"

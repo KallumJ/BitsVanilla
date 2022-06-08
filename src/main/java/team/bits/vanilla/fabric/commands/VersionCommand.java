@@ -1,15 +1,12 @@
 package team.bits.vanilla.fabric.commands;
 
-import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.fabricmc.loader.api.FabricLoader;
-import net.kyori.adventure.text.Component;
-import net.minecraft.server.command.ServerCommandSource;
-import team.bits.nibbles.command.Command;
-import team.bits.nibbles.command.CommandInformation;
-import team.bits.nibbles.utils.Colors;
-import team.bits.nibbles.utils.ServerInstance;
-import team.bits.vanilla.fabric.BitsVanilla;
+import com.mojang.brigadier.context.*;
+import com.mojang.brigadier.exceptions.*;
+import net.fabricmc.loader.api.*;
+import net.minecraft.server.command.*;
+import net.minecraft.text.*;
+import team.bits.nibbles.command.*;
+import team.bits.nibbles.utils.*;
 
 public class VersionCommand extends Command {
 
@@ -39,12 +36,12 @@ public class VersionCommand extends Command {
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        BitsVanilla.audience(context.getSource()).sendMessage(
-                Component.text()
-                        .append(Component.text(String.format("Server version %s", serverVersion), Colors.POSITIVE))
-                        .append(Component.newline())
-                        .append(Component.text(String.format("Bits version %s", bitsVersion), Colors.POSITIVE))
-                        .build()
+        context.getSource().sendFeedback(
+                Text.empty()
+                        .append(Text.literal(String.format("Server version %s", serverVersion)).styled(style -> style.withColor(Colors.POSITIVE)))
+                        .append(Text.literal("\n"))
+                        .append(Text.literal(String.format("Bits version %s", bitsVersion)).styled(style -> style.withColor(Colors.POSITIVE))),
+                false
         );
         return 1;
     }

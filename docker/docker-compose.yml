@@ -7,13 +7,14 @@ services:
     ports:
       - '5672:5672'
   slytherin:
-    image: mysql:5.7
+    image: mariadb:10.7
     restart: always
     environment:
-      MYSQL_DATABASE: 'bits_vanilla'
-      MYSQL_USER: 'bits_vanilla'
-      MYSQL_PASSWORD: 'rainbows'
-      MYSQL_ROOT_PASSWORD: 'rainbows'
+      MARIADB_DATABASE: 'bits_vanilla'
+      MARIADB_USER: 'bits_vanilla'
+      MARIADB_PASSWORD: 'rainbows'
+      MARIADB_ROOT_PASSWORD: 'rainbows'
+      MARIADB_ROOT_HOST: '%'
     expose:
       - '3306'
   db-import:

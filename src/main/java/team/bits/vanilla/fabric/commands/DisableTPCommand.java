@@ -1,20 +1,21 @@
 package team.bits.vanilla.fabric.commands;
 
-import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.tree.CommandNode;
-import net.kyori.adventure.text.Component;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
+import com.mojang.brigadier.*;
+import com.mojang.brigadier.context.*;
+import com.mojang.brigadier.exceptions.*;
+import com.mojang.brigadier.tree.*;
+import net.minecraft.server.command.*;
+import net.minecraft.server.network.*;
+import net.minecraft.text.*;
 import team.bits.nibbles.command.Command;
-import team.bits.nibbles.command.CommandInformation;
-import team.bits.nibbles.utils.Colors;
-import team.bits.nibbles.utils.ServerInstance;
-import team.bits.vanilla.fabric.BitsVanilla;
-import team.bits.vanilla.fabric.database.player.PlayerUtils;
+import team.bits.nibbles.command.*;
+import team.bits.nibbles.utils.*;
+import team.bits.vanilla.fabric.database.*;
 
-import static net.minecraft.server.command.CommandManager.literal;
+import java.util.*;
+import java.util.concurrent.*;
+
+import static net.minecraft.server.command.CommandManager.*;
 
 public class DisableTPCommand extends Command {
 
@@ -36,11 +37,11 @@ public class DisableTPCommand extends Command {
         CommandNode<ServerCommandSource> commandNode = dispatcher.register(
                 literal(super.getName())
                         .executes(this)
-                        .then(literal("confirm").executes(this::confirmNoTP))
+                        .then(literal("confirm").executes(AsyncCommand.wrap(this::confirmNoTP)))
 
                         .then(literal("undo")
                                 .executes(this::askUndo)
-                                .then(literal("confirm").executes(this::confirmUndo))
+                                .then(literal("confirm").executes(AsyncCommand.wrap(this::confirmUndo)))
                         ));
 
 
@@ -48,46 +49,38 @@ public class DisableTPCommand extends Command {
     }
 
     @Override
-    public int run(CommandContext<ServerCommandSource> context) {
-        BitsVanilla.audience(context.getSource()).sendMessage(Component.text(ASK_NO_TP, Colors.NEUTRAL));
+    public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        final ServerPlayerEntity player = Objects.requireNonNull(context.getSource().getPlayer());
+        player.sendMessage(Text.literal(ASK_NO_TP), MessageTypes.NEUTRAL);
         return 1;
     }
 
-    public int confirmNoTP(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        ServerPlayerEntity requestingPlayer = context.getSource().getPlayer();
+    public void confirmNoTP(CommandContext<ServerCommandSource> context) throws ExecutionException, InterruptedException {
+        final ServerPlayerEntity player = Objects.requireNonNull(context.getSource().getPlayer());
 
-        if (PlayerUtils.hasTPDisabled(requestingPlayer)) {
-            return 0;
+        boolean hasTpDisabled = PlayerApiUtils.getHasTPDisabled(player).get();
+        if (!hasTpDisabled) {
+            PlayerApiUtils.setNoTP(player, true);
+            player.sendMessage(Text.literal(NO_TP_SUCCESS), MessageTypes.POSITIVE);
         }
-
-        PlayerUtils.setNoTP(requestingPlayer, true);
-        BitsVanilla.audience(requestingPlayer).sendMessage(Component.text(NO_TP_SUCCESS, Colors.POSITIVE));
-
-        return 1;
     }
 
     public int askUndo(CommandContext<ServerCommandSource> context) {
-        BitsVanilla.audience(context.getSource()).sendMessage(Component.text(ASK_UNDO, Colors.NEUTRAL));
+        final ServerPlayerEntity player = Objects.requireNonNull(context.getSource().getPlayer());
+        player.sendMessage(Text.literal(ASK_UNDO), MessageTypes.NEUTRAL);
         return 1;
     }
 
-    public int confirmUndo(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        ServerPlayerEntity requestingPlayer = context.getSource().getPlayer();
+    public void confirmUndo(CommandContext<ServerCommandSource> context) throws ExecutionException, InterruptedException {
+        final ServerPlayerEntity player = Objects.requireNonNull(context.getSource().getPlayer());
 
-        if (!PlayerUtils.hasTPDisabled(requestingPlayer)) {
-            return 0;
+        boolean hasTpDisabled = PlayerApiUtils.getHasTPDisabled(player).get();
+        if (hasTpDisabled) {
+            PlayerApiUtils.setNoTP(player, false);
+            player.sendMessage(Text.literal(UNDO_SUCCESS), MessageTypes.POSITIVE);
+
+            Text broadcast = Text.literal(String.format(UNDO_BROADCAST, PlayerApiUtils.getEffectiveName(player)));
+            ServerInstance.broadcast(broadcast, MessageTypes.NEUTRAL);
         }
-
-        PlayerUtils.setNoTP(requestingPlayer, false);
-        BitsVanilla.audience(requestingPlayer).sendMessage(Component.text(UNDO_SUCCESS, Colors.POSITIVE));
-
-        Component broadcast = Component.text(
-                String.format(UNDO_BROADCAST, PlayerUtils.getEffectiveName(requestingPlayer)), Colors.NEUTRAL
-        );
-        for (ServerPlayerEntity player : ServerInstance.get().getPlayerManager().getPlayerList()) {
-            BitsVanilla.audience(player).sendMessage(broadcast);
-        }
-
-        return 1;
     }
 }

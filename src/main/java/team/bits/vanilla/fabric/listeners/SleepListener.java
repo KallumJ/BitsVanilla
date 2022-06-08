@@ -1,26 +1,20 @@
 package team.bits.vanilla.fabric.listeners;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.PlayerManager;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.stat.Stats;
-import net.minecraft.world.GameMode;
-import org.jetbrains.annotations.NotNull;
-import team.bits.nibbles.event.sleep.PlayerSleepEvent;
-import team.bits.nibbles.event.sleep.PlayerWakeUpEvent;
-import team.bits.nibbles.utils.ServerInstance;
-import team.bits.vanilla.fabric.BitsVanilla;
-import team.bits.vanilla.fabric.mixin.ServerWorldInvoker;
-import team.bits.vanilla.fabric.util.AFKManager;
+import net.minecraft.entity.player.*;
+import net.minecraft.server.*;
+import net.minecraft.server.network.*;
+import net.minecraft.server.world.*;
+import net.minecraft.stat.*;
+import net.minecraft.text.*;
+import net.minecraft.util.*;
+import net.minecraft.world.*;
+import org.jetbrains.annotations.*;
+import team.bits.nibbles.event.interaction.*;
+import team.bits.nibbles.utils.*;
+import team.bits.vanilla.fabric.mixin.*;
+import team.bits.vanilla.fabric.util.*;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 public class SleepListener implements PlayerSleepEvent.Listener, PlayerWakeUpEvent.Listener {
 
@@ -34,23 +28,15 @@ public class SleepListener implements PlayerSleepEvent.Listener, PlayerWakeUpEve
         );
     }
 
-    private static void sendSleepingMessage(MinecraftServer server, int sleeping, int online, boolean green) {
-        float ratio = (float) sleeping / online;
-        TextComponent message = Component.text()
-                .append(
-                        Component.text()
-                                .append(Component.text(sleeping))
-                                .append(Component.text('/'))
-                                .append(Component.text(Math.max(online, 1)))
-                                .append(Component.text(" player(s) sleeping, "))
-                                .append(Component.text(Math.min(Math.round(ratio * 100f), 100f)))
-                                .append(Component.text("%"))
+    private static void sendSleepingMessage(int sleeping, int online, boolean green) {
+        final float ratio = (float) sleeping / online;
+        final Text message = Text.literal(
+                String.format("%s/%s player(s) sleeping, %s%%",
+                        sleeping, Math.max(online, 1), Math.min(Math.round(ratio * 100f), 100f)
                 )
-                .color(green ? NamedTextColor.GREEN : NamedTextColor.YELLOW)
-                .build();
+        ).styled(style -> style.withColor(green ? Formatting.GREEN : Formatting.YELLOW));
 
-        BitsVanilla.adventure().audience(server.getPlayerManager().getPlayerList())
-                .sendMessage(message);
+        ServerInstance.broadcast(message, MessageTypes.PLAIN);
     }
 
     @Override
@@ -68,21 +54,21 @@ public class SleepListener implements PlayerSleepEvent.Listener, PlayerWakeUpEve
         if (event.getPlayer() instanceof ServerPlayerEntity player && !this.sleeping.isEmpty()) {
             this.sleeping.remove(player);
 
-            MinecraftServer server = Objects.requireNonNull(player.getServer());
-            int sleepingCount = this.sleeping.size();
-            int online = Math.max(getOnlinePlayerCount(server), 1);
+            final MinecraftServer server = Objects.requireNonNull(player.getServer());
+            final int sleepingCount = this.sleeping.size();
+            final int online = Math.max(getOnlinePlayerCount(server), 1);
 
-            sendSleepingMessage(server, sleepingCount, online, false);
+            sendSleepingMessage(sleepingCount, online, false);
         }
     }
 
     private void checkSleeping(@NotNull ServerWorld world) {
-        MinecraftServer server = world.getServer();
+        final MinecraftServer server = world.getServer();
 
-        int sleepingCount = this.sleeping.size();
-        int online = Math.max(getOnlinePlayerCount(server), 1);
+        final int sleepingCount = this.sleeping.size();
+        final int online = Math.max(getOnlinePlayerCount(server), 1);
 
-        if ((double) sleepingCount / online >= 0.5) {
+        if ((float) sleepingCount / online >= 0.5f) {
 
             this.sleeping.clear();
 
@@ -94,10 +80,10 @@ public class SleepListener implements PlayerSleepEvent.Listener, PlayerWakeUpEve
                     player.resetStat(Stats.CUSTOM.getOrCreateStat(Stats.TIME_SINCE_REST))
             );
 
-            sendSleepingMessage(server, sleepingCount, online, true);
+            sendSleepingMessage(sleepingCount, online, true);
 
         } else {
-            sendSleepingMessage(server, sleepingCount, online, false);
+            sendSleepingMessage(sleepingCount, online, false);
         }
     }
 }

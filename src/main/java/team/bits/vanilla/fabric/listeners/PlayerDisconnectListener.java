@@ -1,8 +1,8 @@
 package team.bits.vanilla.fabric.listeners;
 
-import org.jetbrains.annotations.NotNull;
-import team.bits.nibbles.event.misc.PlayerDisconnectEvent;
-import team.bits.vanilla.fabric.util.AFKManager;
+import org.jetbrains.annotations.*;
+import team.bits.nibbles.event.server.*;
+import team.bits.vanilla.fabric.util.*;
 
 public class PlayerDisconnectListener implements PlayerDisconnectEvent.Listener {
 

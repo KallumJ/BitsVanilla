@@ -1,17 +1,13 @@
 package team.bits.vanilla.fabric.commands;
 
-import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.event.HoverEvent;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.minecraft.server.command.ServerCommandSource;
-import team.bits.nibbles.command.Command;
-import team.bits.nibbles.command.CommandInformation;
-import team.bits.vanilla.fabric.BitsVanilla;
+import com.mojang.brigadier.context.*;
+import com.mojang.brigadier.exceptions.*;
+import net.minecraft.server.command.*;
+import net.minecraft.text.*;
+import net.minecraft.util.*;
+import team.bits.nibbles.command.*;
 
-import java.util.ArrayList;
+import java.util.*;
 
 public class HelpCommand extends Command {
 
@@ -26,7 +22,7 @@ public class HelpCommand extends Command {
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        ArrayList<TextComponent> cmdStrings = new ArrayList<>();
+        ArrayList<Text> cmdStrings = new ArrayList<>();
 
         for (Command command : Commands.getCommands()) {
             // If command is to be used by the public
@@ -41,11 +37,16 @@ public class HelpCommand extends Command {
                 // Generate string with name and description
                 cmdString.append(String.format(CMD_HELP_STRING, commandName, helpDesc));
 
-                TextComponent textComponent = Component.text(cmdString + "\n").color(NamedTextColor.WHITE);
+                MutableText textComponent = Text.literal(cmdString + "\n")
+                        .styled(style -> style.withColor(Formatting.WHITE));
 
                 // If there is usage, add it as a hover event
                 if (helpInformation.getUsage() != null) {
-                    textComponent = textComponent.hoverEvent(HoverEvent.showText(Component.text(String.format(USAGE_STRING, commandName, helpInformation.getUsage()))));
+                    textComponent.styled(style ->
+                            style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                                    Text.literal(String.format(USAGE_STRING, commandName, helpInformation.getUsage()))
+                            ))
+                    );
                 }
 
                 // Add the string as a TextComponent to the array list
@@ -54,12 +55,12 @@ public class HelpCommand extends Command {
         }
 
         // Create the final text component
-        TextComponent message = Component.text("---List of commands--- \n").color(NamedTextColor.GREEN)
-                .append(Component.text().append(cmdStrings));
+        MutableText message = Text.literal("---List of commands--- \n")
+                .styled(style -> style.withColor(Formatting.GREEN));
+        cmdStrings.forEach(message::append);
 
         // Send the message
-        BitsVanilla.adventure().audience(context.getSource())
-                .sendMessage(message);
+        context.getSource().sendFeedback(message, false);
 
         return 1;
     }

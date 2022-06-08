@@ -1,26 +1,16 @@
 package team.bits.vanilla.fabric.listeners;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.Style;
-import net.kyori.adventure.text.format.TextDecoration;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.math.Vec3d;
-import org.jetbrains.annotations.NotNull;
-import team.bits.nibbles.utils.Colors;
-import team.bits.nibbles.utils.Scheduler;
-import team.bits.nibbles.utils.ServerInstance;
-import team.bits.vanilla.fabric.BitsVanilla;
-import team.bits.vanilla.fabric.database.player.PlayerUtils;
-import team.bits.vanilla.fabric.util.ExtendedPlayerEntity;
+import net.minecraft.entity.player.*;
+import net.minecraft.server.network.*;
+import net.minecraft.sound.*;
+import net.minecraft.text.*;
+import org.jetbrains.annotations.*;
+import team.bits.nibbles.player.*;
+import team.bits.nibbles.utils.*;
+import team.bits.vanilla.fabric.database.*;
+import team.bits.vanilla.fabric.util.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
+import java.util.*;
 
 public class DuelHandler {
 
@@ -37,7 +27,7 @@ public class DuelHandler {
     private DuelHandler() {
     }
 
-    public static void startDuel(@NotNull PlayerEntity player1, @NotNull PlayerEntity player2) {
+    public static void startDuel(@NotNull ServerPlayerEntity player1, @NotNull ServerPlayerEntity player2) {
         Duel duel = new Duel(player1, player2);
         QUEUED_DUELS.add(duel);
     }
@@ -46,16 +36,18 @@ public class DuelHandler {
         ((ExtendedPlayerEntity) winner).setDuelTarget(null);
         ((ExtendedPlayerEntity) loser).setDuelTarget(null);
 
-        playSound(winner, SoundEvents.ENTITY_WITHER_DEATH, 1.0f, 1.5f);
-        playSound(loser, SoundEvents.ENTITY_WITHER_DEATH, 1.0f, 1.5f);
+        ((INibblesPlayer) winner).playSound(SoundEvents.ENTITY_WITHER_DEATH, SoundCategory.PLAYERS, 1.0f, 1.5f);
+        ((INibblesPlayer) loser).playSound(SoundEvents.ENTITY_WITHER_DEATH, SoundCategory.PLAYERS, 1.0f, 1.5f);
 
-        Component finishedMessage = Component.text(String.format(DUEL_FINISHED,
-                PlayerUtils.getEffectiveName((ServerPlayerEntity) winner),
-                PlayerUtils.getEffectiveName((ServerPlayerEntity) loser)
-        ), Colors.POSITIVE);
+        Text finishedMessage = Text.literal(
+                String.format(DUEL_FINISHED,
+                        PlayerApiUtils.getEffectiveName((ServerPlayerEntity) winner),
+                        PlayerApiUtils.getEffectiveName((ServerPlayerEntity) loser)
+                )
+        );
 
         for (ServerPlayerEntity player : ServerInstance.get().getPlayerManager().getPlayerList()) {
-            BitsVanilla.audience(player).sendMessage(finishedMessage);
+            player.sendMessage(finishedMessage, MessageTypes.POSITIVE);
         }
     }
 
@@ -63,43 +55,36 @@ public class DuelHandler {
         new ArrayList<>(QUEUED_DUELS).forEach(Duel::tick);
     }
 
-    private static void playSound(PlayerEntity player, SoundEvent sound, float volume, float pitch) {
-        final ServerWorld world = ((ServerPlayerEntity) player).getWorld();
-        final Vec3d position = player.getPos();
-
-        world.playSound(
-                null, position.x, position.y, position.z,
-                sound, SoundCategory.PLAYERS, volume, pitch
-        );
-    }
-
     private static final class Duel {
 
-        private final PlayerEntity player1;
-        private final PlayerEntity player2;
+        private final ServerPlayerEntity player1;
+        private final ServerPlayerEntity player2;
 
         private int countdown = 5;
 
-        private Duel(PlayerEntity player1, PlayerEntity player2) {
+        private Duel(ServerPlayerEntity player1, ServerPlayerEntity player2) {
             this.player1 = player1;
             this.player2 = player2;
         }
 
         public void tick() {
+            INibblesPlayer nPlayer1 = (INibblesPlayer) player1;
+            INibblesPlayer nPlayer2 = (INibblesPlayer) player2;
 
             if (this.countdown > 0) {
-                this.sendMessage(Component.text(String.format(DUEL_STARTING_MSG, this.countdown), Colors.NEUTRAL));
+                this.sendMessage(Text.literal(String.format(DUEL_STARTING_MSG, this.countdown)));
 
-                playSound(this.player1, SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.2f);
-                playSound(this.player2, SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.2f);
+
+                nPlayer1.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.PLAYERS, 1.0f, 1.2f);
+                nPlayer2.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.PLAYERS, 1.0f, 1.2f);
             } else {
-                this.sendMessage(Component.text(DUEL_STARTED_MSG, Style.style(Colors.NEUTRAL, TextDecoration.BOLD)));
+                this.sendMessage(Text.literal(DUEL_STARTED_MSG).styled(style -> style.withBold(true)));
 
                 ((ExtendedPlayerEntity) this.player1).setDuelTarget(player2);
                 ((ExtendedPlayerEntity) this.player2).setDuelTarget(player1);
 
-                playSound(this.player1, SoundEvents.ENTITY_WITHER_SPAWN, 1.0f, 1.2f);
-                playSound(this.player2, SoundEvents.ENTITY_WITHER_SPAWN, 1.0f, 1.2f);
+                nPlayer1.playSound(SoundEvents.ENTITY_WITHER_SPAWN, SoundCategory.PLAYERS, 1.0f, 1.2f);
+                nPlayer2.playSound(SoundEvents.ENTITY_WITHER_SPAWN, SoundCategory.PLAYERS, 1.0f, 1.2f);
 
                 QUEUED_DUELS.remove(this);
             }
@@ -107,9 +92,9 @@ public class DuelHandler {
             this.countdown--;
         }
 
-        private void sendMessage(Component message) {
-            BitsVanilla.audience(this.player1).sendActionBar(message);
-            BitsVanilla.audience(this.player2).sendActionBar(message);
+        private void sendMessage(Text message) {
+            this.player1.sendMessage(message, MessageTypes.NEUTRAL);
+            this.player2.sendMessage(message, MessageTypes.NEUTRAL);
         }
     }
 }

@@ -1,12 +1,11 @@
 package team.bits.vanilla.fabric.mixin;
 
-import net.minecraft.server.filter.TextStream;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import net.minecraft.server.filter.*;
+import net.minecraft.server.network.*;
+import org.spongepowered.asm.mixin.*;
+import org.spongepowered.asm.mixin.injection.*;
 
-import java.util.List;
+import java.util.*;
 
 @Mixin(ServerPlayNetworkHandler.class)
 public class SignColorMixin {
@@ -35,11 +34,11 @@ public class SignColorMixin {
                     target = "Ljava/util/List;get(I)Ljava/lang/Object;"
             )
     )
-    public Object getSignLine(List<TextStream.Message> list, int index) {
+    public Object getSignLine(List<FilteredMessage<String>> list, int index) {
         // Message.permitted simply sets the raw and filtered
         // text to the same value. We don't use text filtering
         // so we can simply use this method to ignore it
-        return TextStream.Message.permitted(translateColorCodes(list.get(index).getRaw()));
+        return FilteredMessage.permitted(translateColorCodes(list.get(index).raw()));
     }
 
     /**

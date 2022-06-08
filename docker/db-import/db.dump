@@ -23,8 +23,8 @@ CREATE DATABASE /*!32312 IF NOT EXISTS*/ `bits_vanilla` /*!40100 DEFAULT CHARACT
 
 USE `bits_vanilla`;
 
-ALTER USER 'bits_vanilla'@'%' IDENTIFIED WITH mysql_native_password BY 'rainbows';
-GRANT ALL PRIVILEGES ON bits_vanilla.* TO 'bits_vanilla'@'%';
+-- ALTER USER 'bits_vanilla'@'%' IDENTIFIED BY 'rainbows';
+-- GRANT ALL PRIVILEGES ON bits_vanilla.* TO 'bits_vanilla'@'%';
 
 --
 -- Table structure for table `player_data`

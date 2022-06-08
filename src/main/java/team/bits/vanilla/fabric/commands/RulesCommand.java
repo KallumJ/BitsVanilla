@@ -1,26 +1,16 @@
 package team.bits.vanilla.fabric.commands;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.event.HoverEvent;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.minecraft.server.command.ServerCommandSource;
-import team.bits.nibbles.command.Command;
-import team.bits.nibbles.command.CommandInformation;
-import team.bits.vanilla.fabric.BitsVanilla;
+import com.google.gson.*;
+import com.mojang.brigadier.context.*;
+import com.mojang.brigadier.exceptions.*;
+import net.minecraft.server.command.*;
+import net.minecraft.text.*;
+import net.minecraft.util.*;
+import team.bits.nibbles.command.*;
+import team.bits.vanilla.fabric.*;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Scanner;
+import java.io.*;
+import java.util.*;
 
 public class RulesCommand extends Command {
 
@@ -51,24 +41,26 @@ public class RulesCommand extends Command {
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         JsonArray rulesArray = rulesJson.getAsJsonArray("rules");
 
-        List<TextComponent> ruleComponents = new LinkedList<>();
+        List<Text> ruleComponents = new LinkedList<>();
         int ruleCount = 1;
         for (JsonElement jsonElement : rulesArray) {
             JsonObject jsonObject = (JsonObject) jsonElement;
             String rule = String.format(RULE_STRING, ruleCount++, jsonObject.get("rule").getAsString());
             String hover = jsonObject.get("hover").getAsString();
 
-            TextComponent ruleComponent = Component.text(rule).hoverEvent(HoverEvent.showText(Component.text(hover))).color(NamedTextColor.WHITE);
+            Text ruleComponent = Text.literal(rule).styled(style ->
+                    style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal(hover)))
+            );
             ruleComponents.add(ruleComponent);
         }
         String ruleNote = rulesJson.get("note").getAsString();
 
-        TextComponent message = Component.text("---Rules--- \n").color(NamedTextColor.GREEN)
-                .append(Component.text().append(ruleComponents))
-                .append(Component.text(ruleNote));
+        MutableText message = Text.literal("---Rules--- \n")
+                .styled(style -> style.withColor(Formatting.GREEN));
+        ruleComponents.forEach(message::append);
+        message.append(ruleNote);
 
-        BitsVanilla.audience(context.getSource().getPlayer()).sendMessage(message);
-
+        context.getSource().sendFeedback(message, false);
 
         return 1;
     }

@@ -1,73 +1,63 @@
 package team.bits.vanilla.fabric.teleport;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
-import org.jetbrains.annotations.NotNull;
-import team.bits.nibbles.event.damage.PlayerDamageEvent;
-import team.bits.nibbles.event.misc.PlayerMoveEvent;
-import team.bits.nibbles.teleport.Location;
-import team.bits.nibbles.teleport.TeleportUtils;
-import team.bits.nibbles.utils.Colors;
-import team.bits.nibbles.utils.ParticleUtils;
-import team.bits.nibbles.utils.Scheduler;
-import team.bits.vanilla.fabric.BitsVanilla;
-import team.bits.vanilla.fabric.database.player.PlayerUtils;
-import team.bits.vanilla.fabric.statistics.lib.CustomStats;
-import team.bits.vanilla.fabric.statistics.lib.StatUtils;
+import net.minecraft.entity.effect.*;
+import net.minecraft.entity.player.*;
+import net.minecraft.particle.*;
+import net.minecraft.server.network.*;
+import net.minecraft.server.world.*;
+import net.minecraft.sound.*;
+import net.minecraft.text.*;
+import net.minecraft.util.math.*;
+import net.minecraft.world.*;
+import org.apache.logging.log4j.*;
+import org.jetbrains.annotations.*;
+import team.bits.nibbles.event.interaction.*;
+import team.bits.nibbles.teleport.*;
+import team.bits.nibbles.utils.*;
+import team.bits.vanilla.fabric.database.*;
 
 import java.util.*;
 
 public final class Teleporter implements PlayerMoveEvent.Listener, PlayerDamageEvent.Listener {
 
-    private static final TextComponent TELEPORT_START = Component.text("Teleporting...", Colors.NEUTRAL);
-    private static final TextComponent TELEPORT_CANCEL = Component.text("Teleport cancelled", Colors.NEGATIVE);
-    private static final TextComponent TELEPORT_DONE = Component.text("Teleported!", Colors.POSITIVE);
+    private static final Logger LOGGER = LogManager.getLogger();
+
+    private static final Text TELEPORT_START = Text.literal("Teleporting...");
+    private static final Text TELEPORT_CANCEL = Text.literal("Teleport cancelled");
+    private static final Text TELEPORT_DONE = Text.literal("Teleported!");
 
     private static final int SHORT_WARMUP = 20;
     private static final int LONG_WARMUP = 60;
 
-    private static final int TASK_INTERVAL = 5;
+    public static final int TASK_INTERVAL = 5;
 
     private static final Collection<Teleport> TELEPORTS = new LinkedList<>();
     private static final Set<PlayerEntity> TELEPORTING = new HashSet<>();
     private static final Set<PlayerEntity> NO_MOVE = new HashSet<>();
 
-    static {
-        Scheduler.scheduleAtFixedRate(Teleporter::teleportTask, 0, TASK_INTERVAL);
-    }
-
-    public static void queueTeleport(@NotNull ServerPlayerEntity player, @NotNull Location location, boolean cancelOnMove) {
+    public static void queueTeleport(@NotNull ServerPlayerEntity player,
+                                     @NotNull Location location, boolean cancelOnMove) {
         Objects.requireNonNull(player);
         Objects.requireNonNull(location);
 
         if (player.isOnGround()) {
 
-            Location targetLocation = location.add(0, 0.5, 0);
-            Location currentLocation = Location.get(player);
-            World world = targetLocation.world();
+            Location destination = location.add(0, 0.5, 0);
+            Location origin = Location.get(player);
+            World destinationWorld = destination.world();
 
-            BitsVanilla.audience(player).sendMessage(TELEPORT_START);
-            world.playSound(
+            player.sendMessage(TELEPORT_START, MessageTypes.NEUTRAL);
+            destinationWorld.playSound(
                     null, location.x(), location.y(), location.z(),
                     SoundEvents.BLOCK_PORTAL_TRIGGER, SoundCategory.PLAYERS,
                     0.2F, 1.5F
             );
 
-            teleportParticle(currentLocation);
-            teleportParticle(targetLocation);
+            teleportParticle(origin);
+            teleportParticle(destination);
 
-            int time = PlayerUtils.isVIP(player) ? SHORT_WARMUP : LONG_WARMUP;
-            Teleport teleport = new Teleport(player, targetLocation, time);
+            int warmupTime = PlayerApiUtils.isVIP(player) ? SHORT_WARMUP : LONG_WARMUP;
+            Teleport teleport = new Teleport(player, destination, warmupTime);
 
             TELEPORTS.add(teleport);
             TELEPORTING.add(player);
@@ -76,17 +66,16 @@ public final class Teleporter implements PlayerMoveEvent.Listener, PlayerDamageE
             }
 
         } else {
-            BitsVanilla.audience(player).sendMessage(TELEPORT_CANCEL);
+            player.sendMessage(TELEPORT_CANCEL, MessageTypes.NEGATIVE);
         }
     }
 
     private static void teleport(@NotNull Teleport teleport) {
         final ServerPlayerEntity player = (ServerPlayerEntity) teleport.getPlayer();
         final Location destination = teleport.getDestination();
-        final ServerWorld world = destination.world();
-        final Vec3d position = destination.position();
+        final ServerWorld destinationWorld = destination.world();
+        final Vec3d destinationPos = destination.position();
 
-        // give the player slow falling
         player.addStatusEffect(
                 new StatusEffectInstance(
                         StatusEffects.SLOW_FALLING, 10, 4,
@@ -94,54 +83,57 @@ public final class Teleporter implements PlayerMoveEvent.Listener, PlayerDamageE
                 )
         );
 
-        StatUtils.incrementStat(player, CustomStats.TIMES_TELEPORTED, 1);
-
-        // teleport the player to the destination
         TeleportUtils.teleport(player, destination);
 
-        // send a confirmation message
-        BitsVanilla.audience(player).sendMessage(TELEPORT_DONE);
+        player.sendMessage(TELEPORT_DONE, MessageTypes.POSITIVE);
 
-        // play sound and particle
-        world.playSound(
-                null, position.x, position.y, position.z,
+        destinationWorld.playSound(
+                null, destinationPos.x, destinationPos.y, destinationPos.z,
                 SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS,
                 0.2F, 0.8F
         );
         teleportParticle(destination);
 
+        LOGGER.info("Teleported player '{}' to {}", player.getDisplayName(), destination);
+
         TELEPORTING.remove(player);
         NO_MOVE.remove(player);
     }
 
-    private static void cancelTeleport(@NotNull PlayerEntity player) {
-        BitsVanilla.audience(player).sendMessage(TELEPORT_CANCEL);
+    private static void cancelTeleport(@NotNull ServerPlayerEntity player) {
+        player.sendMessage(TELEPORT_CANCEL, MessageTypes.NEGATIVE);
 
         TELEPORTING.remove(player);
         NO_MOVE.remove(player);
 
-        Optional<Teleport> optionalTeleport = TELEPORTS.stream()
+        Optional<Teleport> activeTeleport = TELEPORTS.stream()
                 .filter(teleport -> teleport.getPlayer().equals(player))
                 .findFirst();
 
-        optionalTeleport.ifPresent(TELEPORTS::remove);
+        activeTeleport.ifPresent(TELEPORTS::remove);
     }
 
     public static void teleportParticle(@NotNull Location location) {
         final World world = location.world();
         final Vec3d pos = location.position();
 
-        ParticleUtils.spawnParticle(world, ParticleTypes.PORTAL, pos, 250, 0.5, 0.5, 0.5);
-        ParticleUtils.spawnParticle(world, ParticleTypes.PORTAL, pos, 50, 0.1, 0.1, 0.1);
+        ParticleUtils.spawnParticle(world, ParticleTypes.PORTAL, pos,
+                250, 0.5, 0.5, 0.5);
+        ParticleUtils.spawnParticle(world, ParticleTypes.PORTAL, pos,
+                50, 0.1, 0.1, 0.1);
     }
 
     public static void teleportTask() {
         for (Teleport teleport : new ArrayList<>(TELEPORTS)) {
-            teleport.setCooldown(teleport.getCooldown() - TASK_INTERVAL);
+            teleport.tick(TASK_INTERVAL);
 
-            if (teleport.getCooldown() <= 0) {
-                TELEPORTS.remove(teleport);
+            if (teleport.getPlayer().isSpectator()) {
+                cancelTeleport((ServerPlayerEntity) teleport.getPlayer());
+            }
+
+            if (teleport.getRemainingWarmup() <= 0) {
                 teleport(teleport);
+                TELEPORTS.remove(teleport);
             }
         }
     }
@@ -150,7 +142,7 @@ public final class Teleporter implements PlayerMoveEvent.Listener, PlayerDamageE
     public void onPlayerMove(@NotNull PlayerMoveEvent event) {
         final PlayerEntity player = event.getPlayer();
         if (TELEPORTING.contains(player)) {
-            cancelTeleport(player);
+            cancelTeleport((ServerPlayerEntity) player);
         }
     }
 
@@ -158,7 +150,7 @@ public final class Teleporter implements PlayerMoveEvent.Listener, PlayerDamageE
     public void onPlayerDamage(@NotNull PlayerDamageEvent event) {
         final PlayerEntity player = event.getPlayer();
         if (NO_MOVE.contains(player)) {
-            cancelTeleport(player);
+            cancelTeleport((ServerPlayerEntity) player);
         }
     }
 }

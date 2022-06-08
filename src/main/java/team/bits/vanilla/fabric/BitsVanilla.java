@@ -1,71 +1,44 @@
 package team.bits.vanilla.fabric;
 
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
-import net.fabricmc.api.ModInitializer;
-import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.platform.fabric.FabricServerAudiences;
-import net.minecraft.server.command.CommandOutput;
-import net.minecraft.server.command.ServerCommandSource;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
-import team.bits.nibbles.event.base.EventManager;
-import team.bits.nibbles.event.misc.*;
-import team.bits.nibbles.utils.PropertiesFileUtils;
-import team.bits.nibbles.utils.Scheduler;
-import team.bits.vanilla.fabric.commands.Commands;
-import team.bits.vanilla.fabric.commands.VersionCommand;
-import team.bits.vanilla.fabric.database.player.PlayerNameLoader;
-import team.bits.vanilla.fabric.database.player.PlayerUtils;
-import team.bits.vanilla.fabric.database.util.ServerUtils;
-import team.bits.vanilla.fabric.database.warp.WarpUtils;
+import com.rabbitmq.client.*;
+import net.fabricmc.api.*;
+import org.apache.logging.log4j.*;
+import org.jetbrains.annotations.*;
+import team.bits.nibbles.event.base.*;
+import team.bits.nibbles.event.server.*;
+import team.bits.nibbles.utils.*;
+import team.bits.vanilla.fabric.commands.*;
+import team.bits.vanilla.fabric.database.*;
 import team.bits.vanilla.fabric.listeners.*;
-import team.bits.vanilla.fabric.statistics.lib.PlayerAPIStatsSyncHandler;
-import team.bits.vanilla.fabric.statistics.lib.StatTracker;
-import team.bits.vanilla.fabric.teleport.Teleporter;
-import team.bits.vanilla.fabric.util.AFKManager;
-import team.bits.vanilla.fabric.util.SpawnPreventionHandler;
-import team.bits.vanilla.fabric.util.color.NameColors;
+import team.bits.vanilla.fabric.teleport.*;
+import team.bits.vanilla.fabric.util.*;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Properties;
-import java.util.concurrent.TimeoutException;
+import java.io.*;
+import java.util.*;
+import java.util.concurrent.*;
 
 public class BitsVanilla implements ModInitializer, ServerStoppingEvent.Listener {
 
-    private static final Logger LOGGER = LogManager.getLogger();
-
-    private static FabricServerAudiences adventure;
+    public static final Logger LOGGER = LogManager.getLogger();
 
     private Connection apiConnection;
 
-    public static FabricServerAudiences adventure() {
-        if (adventure == null) {
-            throw new IllegalStateException("Tried to access Adventure without a running server!");
-        }
-        return adventure;
-    }
-
-    public static @NotNull Audience audience(@NotNull CommandOutput source) {
-        return adventure().audience(source);
-    }
-
-    public static @NotNull Audience audience(@NotNull ServerCommandSource source) {
-        return adventure().audience(source);
-    }
-
     @Override
     public void onInitialize() {
-        EventManager.INSTANCE.registerEvents((ServerStartingEvent.Listener) event -> adventure = FabricServerAudiences.of(event.getServer()));
-        EventManager.INSTANCE.registerEvents((ServerStoppedEvent.Listener) event -> adventure = null);
-
         EventManager.INSTANCE.registerEvents((ServerInstanceReadyEvent.Listener) serverInstanceReadyEvent -> VersionCommand.init());
 
-        LOGGER.info(String.format("Server name is '%s'", ServerUtils.getServerName()));
+        try {
+            LOGGER.info(String.format("Server name is '%s'", ServerUtils.getServerName()));
+        } catch (Exception ex) {
+            throw new RuntimeException("Cannot find server-name in server.properties");
+        }
 
-        Properties config = PropertiesFileUtils.loadFromFile(new File("config", "bits-vanilla.cfg"));
+        File configFile = new File("config", "bits-vanilla.cfg");
+        if (!configFile.exists()) {
+            throw new RuntimeException("Cannot find file 'config/bits-vanilla.cfg'");
+        }
+
+        Properties config = PropertiesFileUtils.loadFromFile(configFile);
         ConnectionFactory connectionFactory = new ConnectionFactory();
         connectionFactory.setHost(config.getProperty("hostname"));
         connectionFactory.setUsername(config.getProperty("username"));
@@ -76,13 +49,10 @@ public class BitsVanilla implements ModInitializer, ServerStoppingEvent.Listener
             throw new RuntimeException("Error while connecting to RabbitMQ", ex);
         }
 
-        PlayerUtils.init(this.apiConnection);
-        WarpUtils.init(this.apiConnection);
+        PlayerApiUtils.init(this.apiConnection);
+        WarpApiUtils.init(this.apiConnection);
 
-        int spawnProtectionRadius = Integer.parseInt(config.getProperty("spawn-radius", "32"));
-        // we want to initialize this after the first tick, because we have to wait for
-        // the world to be loaded before we can do this.
-        Scheduler.runAfterTick(() -> SpawnPreventionHandler.INSTANCE.init(spawnProtectionRadius));
+        Scheduler.scheduleAtFixedRate(Teleporter::teleportTask, 0, Teleporter.TASK_INTERVAL);
 
         NameColors.INSTANCE.load();
 
@@ -93,7 +63,7 @@ public class BitsVanilla implements ModInitializer, ServerStoppingEvent.Listener
         EventManager.INSTANCE.registerEvents(new Teleporter());
 
         EventManager.INSTANCE.registerEvents((PlayerConnectEvent.Listener) event -> {
-            PlayerUtils.updatePlayerUsername(event.getPlayer());
+            PlayerApiUtils.updatePlayerUsername(event.getPlayer());
             PlayerNameLoader.loadNameData(event.getPlayer());
         });
 
@@ -103,16 +73,16 @@ public class BitsVanilla implements ModInitializer, ServerStoppingEvent.Listener
         EventManager.INSTANCE.registerEvents(new PlayerConnectListener());
         EventManager.INSTANCE.registerEvents(new PlayerDisconnectListener());
 
+        EventManager.INSTANCE.registerEvents(new TreeFellingListener());
+        EventManager.INSTANCE.registerEvents(new RunningBootsRunListener());
+
+        EventManager.INSTANCE.registerEvents(new MobHeadListener());
+
         AFKManager.initAfkManager();
-
-        Scheduler.scheduleAtFixedRate(new StatTracker(), 0, 200);
-
-        PlayerAPIStatsSyncHandler.init(this.apiConnection);
     }
 
     @Override
     public void onServerStopping(@NotNull ServerStoppingEvent event) {
-        PlayerAPIStatsSyncHandler.stop();
         Scheduler.stop();
 
         try {

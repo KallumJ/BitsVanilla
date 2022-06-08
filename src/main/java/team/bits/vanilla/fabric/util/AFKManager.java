@@ -1,15 +1,12 @@
 package team.bits.vanilla.fabric.util;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.minecraft.server.network.ServerPlayerEntity;
-import team.bits.nibbles.utils.Scheduler;
-import team.bits.nibbles.utils.ServerInstance;
-import team.bits.vanilla.fabric.database.player.PlayerUtils;
+import net.minecraft.server.network.*;
+import net.minecraft.text.*;
+import net.minecraft.util.*;
+import team.bits.nibbles.utils.*;
+import team.bits.vanilla.fabric.database.*;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class AFKManager {
 
@@ -37,10 +34,10 @@ public class AFKManager {
 
         // If the player is AFK when their time gets reset, announce that they are no longer AFK
         if (playersAfkCounter.isAfk() || playersAfkCounter.isVisuallyAfk()) {
-            ServerInstance.broadcast(
-                    Component.text(String.format(NO_LONGER_AFK_MSG, PlayerUtils.getEffectiveName(player)))
-                            .color(NamedTextColor.GRAY)
-            );
+
+            Text text = Text.literal(String.format(NO_LONGER_AFK_MSG, PlayerApiUtils.getEffectiveName(player)))
+                    .styled(style -> style.withColor(Formatting.GRAY));
+            ServerInstance.broadcast(text, MessageTypes.PLAIN);
             ((ExtendedPlayerEntity) player).setAFK(false);
             wasAfk = true;
         }
@@ -69,9 +66,9 @@ public class AFKManager {
             if (player != null) {
                 if ((afkCounter.isAfk() || afkCounter.isVisuallyAfk()) && !afkCounter.isAnnounced()) {
                     afkCounter.setAnnounced(true);
-                    ServerInstance.broadcast(
-                            Component.text(String.format(NOW_AFK_MSG, PlayerUtils.getEffectiveName(player)))
-                                    .color(NamedTextColor.GRAY));
+                    Text text = Text.literal(String.format(NOW_AFK_MSG, PlayerApiUtils.getEffectiveName(player)))
+                            .styled(style -> style.withColor(Formatting.GRAY));
+                    ServerInstance.broadcast(text, MessageTypes.PLAIN);
                     Utils.updatePlayerDisplayName(player);
 
                     ((ExtendedPlayerEntity) player).setAFK(true);
