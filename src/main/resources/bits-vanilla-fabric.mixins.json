@@ -34,7 +34,8 @@
     "challenges.WorldCornersMixin",
     "pregen.ServerChunkManagerMixin",
     "pregen.ThreadedAnvilChunkStorageMixin",
-    "shutdown.DedicatedServerMixin"
+    "shutdown.DedicatedServerMixin",
+    "EndLockMixin"
   ],
   "injectors": {
     "defaultRequire": 1
