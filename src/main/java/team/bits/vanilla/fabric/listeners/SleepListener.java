@@ -22,7 +22,7 @@ public class SleepListener implements PlayerSleepEvent.Listener, PlayerWakeUpEve
 
     private static int getOnlinePlayerCount(MinecraftServer server) {
         return Math.toIntExact(server.getPlayerManager().getPlayerList().stream()
-                .filter(player -> player.interactionManager.getGameMode() == GameMode.SURVIVAL)
+                .filter(player -> player.interactionManager.getGameMode() == GameMode.SURVIVAL || player.interactionManager.getGameMode() == GameMode.SPECTATOR)
                 .filter(player -> !AFKManager.isAFK(player))
                 .count()
         );

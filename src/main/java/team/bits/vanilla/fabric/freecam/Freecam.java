@@ -12,6 +12,7 @@ import org.jetbrains.annotations.*;
 import team.bits.nibbles.event.base.*;
 import team.bits.nibbles.event.server.*;
 import team.bits.nibbles.utils.*;
+import team.bits.vanilla.fabric.commands.FreecamCommand;
 import team.bits.vanilla.fabric.mixin.entity.ExtendedArmorStand;
 import team.bits.vanilla.fabric.util.*;
 import team.bits.vanilla.fabric.util.heads.*;
@@ -42,6 +43,7 @@ public class Freecam implements ServerTickEvent.Listener, ServerStoppingEvent.Li
         this.player.changeGameMode(GameMode.SURVIVAL);
         this.bodyEntity.remove(Entity.RemovalReason.DISCARDED);
         EventManager.INSTANCE.unregisterEvents(this);
+        FreecamCommand.ACTIVE_FREECAMS.remove(player);
     }
 
     @Override
