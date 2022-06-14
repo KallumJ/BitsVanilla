@@ -15,6 +15,7 @@ import team.bits.nibbles.command.*;
 import team.bits.nibbles.teleport.*;
 import team.bits.nibbles.utils.*;
 import team.bits.vanilla.fabric.database.*;
+import team.bits.vanilla.fabric.freecam.Freecam;
 import team.bits.vanilla.fabric.teleport.*;
 import team.bits.vanilla.fabric.util.*;
 
@@ -96,7 +97,7 @@ public class BeamCommand extends AsyncCommand {
                     // If player is beaming to themselves, throw exception
                 } else if (sendingPlayer.equals(receivingPlayer.get())) {
                     sendingPlayer.sendMessage(Text.literal(BEAM_SELF_ERR), MessageTypes.NEGATIVE);
-                } else if (receivingPlayer.get().isSpectator()) {
+                } else if (Freecam.isPlayerInFreecam(receivingPlayer.get())) {
                     sendingPlayer.sendMessage(Text.literal(BEAM_FREECAM_ERR), MessageTypes.NEGATIVE);
                 } else {
                     addBeam(sendingPlayer, receivingPlayer.get());
@@ -124,7 +125,7 @@ public class BeamCommand extends AsyncCommand {
 
         // If a beam request for this player was found, execute beam, else, throw exception
         if (beamRequest != null) {
-            if (!acceptingPlayer.isSpectator()) {
+            if (!Freecam.isPlayerInFreecam(acceptingPlayer)) {
                 beamRequest.executeBeam();
                 BEAM_REQUESTS.remove(acceptingPlayer);
             } else {

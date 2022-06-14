@@ -38,6 +38,10 @@ public class Freecam implements ServerTickEvent.Listener, ServerStoppingEvent.Li
         this.bodyEntity = bodyEntity;
     }
 
+    public static boolean isPlayerInFreecam(ServerPlayerEntity player) {
+        return FreecamCommand.ACTIVE_FREECAMS.containsKey(player);
+    }
+
     public void removeAndReturnPlayer() {
         this.player.teleport(this.bodyEntity.getX(), this.bodyEntity.getY(), this.bodyEntity.getZ());
         this.player.changeGameMode(GameMode.SURVIVAL);

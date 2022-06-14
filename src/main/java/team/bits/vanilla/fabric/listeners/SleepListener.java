@@ -11,6 +11,7 @@ import net.minecraft.world.*;
 import org.jetbrains.annotations.*;
 import team.bits.nibbles.event.interaction.*;
 import team.bits.nibbles.utils.*;
+import team.bits.vanilla.fabric.freecam.Freecam;
 import team.bits.vanilla.fabric.mixin.*;
 import team.bits.vanilla.fabric.util.*;
 
@@ -22,7 +23,7 @@ public class SleepListener implements PlayerSleepEvent.Listener, PlayerWakeUpEve
 
     private static int getOnlinePlayerCount(MinecraftServer server) {
         return Math.toIntExact(server.getPlayerManager().getPlayerList().stream()
-                .filter(player -> player.interactionManager.getGameMode() == GameMode.SURVIVAL || player.interactionManager.getGameMode() == GameMode.SPECTATOR)
+                .filter(player -> player.interactionManager.getGameMode() == GameMode.SURVIVAL || Freecam.isPlayerInFreecam(player))
                 .filter(player -> !AFKManager.isAFK(player))
                 .count()
         );
