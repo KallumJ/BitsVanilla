@@ -3,6 +3,7 @@ package team.bits.vanilla.fabric.freecam;
 import net.minecraft.block.*;
 import net.minecraft.entity.*;
 import net.minecraft.entity.decoration.*;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.*;
 import net.minecraft.server.network.*;
 import net.minecraft.text.*;
@@ -151,7 +152,9 @@ public class Freecam implements ServerTickEvent.Listener, ServerStoppingEvent.Li
 
             return world.getBlockState(headPos).getBlock() != Blocks.WATER &&
                     player.isOnGround() &&
-                    !player.isOnFire();
+                    !player.isOnFire() &&
+                    !player.hasStatusEffect(StatusEffects.WITHER) &&
+                    !player.hasStatusEffect(StatusEffects.POISON);
         }
     }
 }
