@@ -59,6 +59,12 @@ public class Freecam implements ServerTickEvent.Listener, ServerStoppingEvent.Li
         }
 
         if (this.getDistanceToBody() > MAX_BODY_DISTANCE) {
+            // If the player has the perspective of an entity other than themselves
+            if (!this.player.getCameraEntity().equals(this.player)) {
+                // Dismount them from the entities perspective
+                this.player.setSneaking(true);
+            }
+
             // Prevent player going too far from their body
             Vec3d playerPos = this.player.getPos();
             Vec3d bodyPos = this.bodyEntity.getPos();
@@ -77,7 +83,6 @@ public class Freecam implements ServerTickEvent.Listener, ServerStoppingEvent.Li
                 this.player.sendMessage(TOO_FAR_MESSAGE, MessageTypes.NEGATIVE);
                 messageLastSent = currentTime;
             }
-
         }
     }
 
@@ -88,7 +93,9 @@ public class Freecam implements ServerTickEvent.Listener, ServerStoppingEvent.Li
 
     @Override
     public void onPlayerDisonnect(@NotNull PlayerDisconnectEvent event) {
-        this.removeAndReturnPlayer();
+        if (event.getPlayer().equals(player)) {
+            this.removeAndReturnPlayer();
+        }
     }
 
     private boolean hasNearbyHostileEntities() {
@@ -150,7 +157,13 @@ public class Freecam implements ServerTickEvent.Listener, ServerStoppingEvent.Li
             final World world = player.getWorld();
             final BlockPos headPos = player.getBlockPos().up();
 
-            return world.getBlockState(headPos).getBlock() != Blocks.WATER &&
+            BlockState headBlockState = world.getBlockState(headPos);
+
+            // Head must either be in air, or a transparent block that isnt water.
+            boolean headBlock = headBlockState.getBlock() == Blocks.AIR ||
+                    (!headBlockState.isOpaque() && headBlockState.getBlock() != Blocks.WATER);
+
+            return headBlock &&
                     player.isOnGround() &&
                     !player.isOnFire() &&
                     !player.hasStatusEffect(StatusEffects.WITHER) &&
