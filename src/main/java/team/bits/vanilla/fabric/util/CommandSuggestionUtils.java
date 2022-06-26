@@ -2,6 +2,7 @@ package team.bits.vanilla.fabric.util;
 
 import com.mojang.brigadier.suggestion.*;
 import net.minecraft.server.command.*;
+import team.bits.vanilla.fabric.challenges.*;
 import team.bits.vanilla.fabric.database.*;
 
 import java.util.*;
@@ -13,12 +14,14 @@ public class CommandSuggestionUtils {
     public static final SuggestionProvider<ServerCommandSource> ALL_PLAYERS;
     public static final SuggestionProvider<ServerCommandSource> NICKNAMES;
     public static final SuggestionProvider<ServerCommandSource> WARPS;
+    public static final SuggestionProvider<ServerCommandSource> CHALLENGES;
 
     static {
         ONLINE_PLAYERS = (context, builder) -> filterSuggestionsByInputAsync(builder, PlayerApiUtils.getOnlinePlayerNamesAsync());
         ALL_PLAYERS = (context, builder) -> filterSuggestionsByInputAsync(builder, PlayerApiUtils.getAllNamesAsync());
         NICKNAMES = (context, builder) -> filterSuggestionsByInputAsync(builder, PlayerApiUtils.getNicknamesAsync());
         WARPS = (context, builder) -> filterSuggestionsByInputAsync(builder, WarpApiUtils.getWarpsListAsync());
+        CHALLENGES = (context, builder) -> filterSuggestionsByInputAsync(builder, CompletableFuture.completedFuture(Challenges.getChallengeNames()));
     }
 
     private CommandSuggestionUtils() {

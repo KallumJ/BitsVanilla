@@ -39,6 +39,7 @@ public class Commands {
         addCommand(new ChallengesCommand());
         addCommand(new WorldPregenCommand());
         addCommand(new FreecamCommand());
+        addCommand(new ResetChallengeCommand());
     }
 
     public static @NotNull Collection<Command> getCommands() {

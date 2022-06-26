@@ -37,6 +37,8 @@ public interface ExtendedPlayerEntity extends INibblesPlayer {
 
     void markChallengeCompleted(@NotNull Challenge challenge);
 
+    void resetCompletedChallenge(@NotNull Challenge challenge);
+
     boolean hasVisitedCorner(@NotNull WorldCorner corner);
 
     void markVisitedCorner(@NotNull WorldCorner corner);

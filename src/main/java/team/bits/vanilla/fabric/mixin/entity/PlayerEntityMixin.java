@@ -191,6 +191,11 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
     }
 
     @Override
+    public void resetCompletedChallenge(@NotNull Challenge challenge) {
+        this.completedChallenges.remove(challenge.getInformation().tag());
+    }
+
+    @Override
     public boolean hasVisitedCorner(@NotNull WorldCorner corner) {
         return this.visitedWorldCorners.contains(corner);
     }

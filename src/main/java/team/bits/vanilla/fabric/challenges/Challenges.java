@@ -5,6 +5,7 @@ import net.minecraft.text.*;
 import team.bits.vanilla.fabric.database.*;
 
 import java.util.*;
+import java.util.stream.*;
 
 public final class Challenges {
 
@@ -51,6 +52,18 @@ public final class Challenges {
 
     public static Set<Challenge> getAllChallenges() {
         return CHALLENGES;
+    }
+
+    public static Set<String> getChallengeNames() {
+        return Challenges.getAllChallenges().stream()
+                .map(challenge -> challenge.getInformation().tag())
+                .collect(Collectors.toSet());
+    }
+
+    public static Optional<Challenge> getChallenge(String challengeName) {
+        return getAllChallenges().stream()
+                .filter(challenge -> challenge.getInformation().tag().equalsIgnoreCase(challengeName))
+                .findFirst();
     }
 
     public static Text getChallengeAnnouncement(Challenge challenge, ServerPlayerEntity player) {
