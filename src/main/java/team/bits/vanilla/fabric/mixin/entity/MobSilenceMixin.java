@@ -1,7 +1,6 @@
 package team.bits.vanilla.fabric.mixin.entity;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -13,19 +12,21 @@ public class MobSilenceMixin {
     private static final String NAME_TO_SILENCE = "silence me";
 
     @Inject(
-            method = "playSound",
-            at = @At("HEAD"),
-            cancellable = true
+            method = "tick",
+            at = @At("HEAD")
     )
-    public void onPlaySound(SoundEvent sound, float volume, float pitch, CallbackInfo ci) {
+    public void onTick(CallbackInfo ci) {
         Entity entity = (Entity) (Object) this;
         Text customName = entity.getCustomName();
+
+        boolean validName = false;
         if (customName != null) {
             String nameStr = customName.getString();
             if (nameStr.equalsIgnoreCase(NAME_TO_SILENCE)) {
-                ci.cancel();
+                validName = true;
             }
         }
-    }
 
+        entity.setSilent(validName);
+    }
 }

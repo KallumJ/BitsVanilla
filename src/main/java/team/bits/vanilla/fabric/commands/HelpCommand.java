@@ -11,7 +11,7 @@ import java.util.*;
 
 public class HelpCommand extends Command {
 
-    private static final String CMD_HELP_STRING = "%s - %s";
+    private static final String CMD_HELP_STRING = "%s - %s %s";
     private static final String USAGE_STRING = "Usage: %s %s";
 
     public HelpCommand() {
@@ -33,9 +33,10 @@ public class HelpCommand extends Command {
 
                 CommandInformation helpInformation = command.getCommandInfo();
                 String helpDesc = helpInformation.getDescription();
+                String aliases = getAliasesString(command.getAliases());
 
-                // Generate string with name and description
-                cmdString.append(String.format(CMD_HELP_STRING, commandName, helpDesc));
+                // Generate string with name, description and aliases
+                cmdString.append(String.format(CMD_HELP_STRING, commandName, helpDesc, aliases));
 
                 MutableText textComponent = Text.literal(cmdString + "\n")
                         .styled(style -> style.withColor(Formatting.WHITE));
@@ -67,5 +68,26 @@ public class HelpCommand extends Command {
 
     private String generateCommandString(Command command) {
         return "/" + command.getName();
+    }
+
+    private String getAliasesString(String[] aliases) {
+        if (aliases.length == 0) {
+             return "";
+        }
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("(");
+
+        for (int i = 0; i < aliases.length; i++) {
+            stringBuilder.append("/").append(aliases[i]);
+
+            if (i != aliases.length - 1) {
+                stringBuilder.append(", ");
+            }
+        }
+
+        stringBuilder.append(")");
+
+        return stringBuilder.toString();
     }
 }

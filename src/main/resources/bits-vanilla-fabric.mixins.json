@@ -36,7 +36,8 @@
     "pregen.ThreadedAnvilChunkStorageMixin",
     "shutdown.DedicatedServerMixin",
     "EndLockMixin",
-    "PreventFreecamTpMixin"
+    "PreventFreecamTpMixin",
+    "RespawnAnchorMixin"
   ],
   "injectors": {
     "defaultRequire": 1

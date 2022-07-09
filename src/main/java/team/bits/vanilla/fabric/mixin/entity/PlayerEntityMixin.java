@@ -33,6 +33,8 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
     private long timePlayed = 0;
     private boolean afk = false;
 
+    private boolean pvpEnabled = false;
+
     private final Set<String> completedChallenges = new HashSet<>();
     private final Set<WorldCorner> visitedWorldCorners = EnumSet.noneOf(WorldCorner.class);
 
@@ -81,6 +83,8 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
         NbtList corners = new NbtList();
         this.visitedWorldCorners.forEach(corner -> corners.add(NbtString.of(corner.name())));
         nbt.put("VisitedCorners", corners);
+
+        nbt.putBoolean("Pvp", this.pvpEnabled);
     }
 
     /**
@@ -112,6 +116,10 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
             NbtList corners = nbt.getList("VisitedCorners", NbtElement.STRING_TYPE);
             corners.forEach(challenge -> this.visitedWorldCorners.add(WorldCorner.valueOf(challenge.asString())));
         }
+
+        if (nbt.contains("Pvp")) {
+            this.pvpEnabled = nbt.getBoolean("Pvp");
+        }
     }
 
     public void bitsVanillaCopyFromOldPlayer(@NotNull PlayerEntityMixin oldPlayer) {
@@ -122,6 +130,7 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
         this.timePlayed = oldPlayer.timePlayed;
         this.completedChallenges.addAll(oldPlayer.completedChallenges);
         this.visitedWorldCorners.addAll(oldPlayer.visitedWorldCorners);
+        this.pvpEnabled = oldPlayer.pvpEnabled;
 
         Scheduler.runOffThread(() -> PlayerNameLoader.loadNameData((ServerPlayerEntity) (Object) this));
     }
@@ -203,6 +212,16 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
     @Override
     public void markVisitedCorner(@NotNull WorldCorner corner) {
         this.visitedWorldCorners.add(corner);
+    }
+
+    @Override
+    public boolean hasPvpEnabled() {
+        return this.pvpEnabled;
+    }
+
+    @Override
+    public void setPvpEnabled(boolean pvp) {
+        this.pvpEnabled = pvp;
     }
 
     /*

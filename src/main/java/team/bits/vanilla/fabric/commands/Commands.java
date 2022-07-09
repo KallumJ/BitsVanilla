@@ -23,7 +23,7 @@ public class Commands {
         addCommand(new NicknameCommand());
         addCommand(new WarpCommand());
         addCommand(new RandomTeleportCommand());
-        addCommand(new DuelCommand());
+        addCommand(new TogglePVPCommand());
         addCommand(new ColorNameCommand());
         addCommand(new HatCommand());
         addCommand(new VIPCommand());

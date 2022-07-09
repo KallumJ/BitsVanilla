@@ -12,10 +12,10 @@ public class MapCommand extends Command {
     private static final String MAP_LINK = "https://bits.team/map";
 
     public MapCommand() {
-        super("map", new CommandInformation()
+        super("webmap", new CommandInformation()
                         .setDescription("Displays the map link to the player")
                         .setPublic(true),
-                "m"
+                "wm", "m"
         );
     }
 
