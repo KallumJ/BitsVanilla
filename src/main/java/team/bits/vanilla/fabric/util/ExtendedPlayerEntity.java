@@ -43,6 +43,8 @@ public interface ExtendedPlayerEntity extends INibblesPlayer {
 
     void markVisitedCorner(@NotNull WorldCorner corner);
 
+    void clearVisitedCorners();
+
     boolean hasPvpEnabled();
 
     void setPvpEnabled(boolean pvp);

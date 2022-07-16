@@ -210,6 +210,11 @@ public abstract class PlayerEntityMixin implements ExtendedPlayerEntity {
     }
 
     @Override
+    public void clearVisitedCorners() {
+        this.visitedWorldCorners.clear();
+    }
+
+    @Override
     public void markVisitedCorner(@NotNull WorldCorner corner) {
         this.visitedWorldCorners.add(corner);
     }

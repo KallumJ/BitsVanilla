@@ -11,7 +11,6 @@ import net.minecraft.server.network.*;
 import net.minecraft.text.*;
 import team.bits.nibbles.command.Command;
 import team.bits.nibbles.command.*;
-import team.bits.nibbles.utils.*;
 import team.bits.vanilla.fabric.challenges.*;
 import team.bits.vanilla.fabric.database.*;
 import team.bits.vanilla.fabric.util.*;
@@ -63,6 +62,11 @@ public class ResetChallengeCommand extends Command {
             if (challenge.isPresent()) {
 
                 ExtendedPlayerEntity ePlayer = (ExtendedPlayerEntity) player.get();
+
+                if (challenge.get().equals(Challenges.WORLD_CORNERS)) {
+                    ePlayer.clearVisitedCorners();
+                }
+
                 ePlayer.resetCompletedChallenge(challenge.get());
 
                 source.sendFeedback(Text.literal(CHALLENGE_RESET_MSG), false);
