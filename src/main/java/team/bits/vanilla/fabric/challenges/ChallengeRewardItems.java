@@ -6,6 +6,7 @@ import net.minecraft.nbt.*;
 import net.minecraft.text.*;
 import net.minecraft.util.*;
 import team.bits.nibbles.utils.*;
+import team.bits.vanilla.fabric.util.heads.MobHeads;
 
 import java.util.*;
 
@@ -18,8 +19,28 @@ public class ChallengeRewardItems {
     public static final ItemStack RUNNING_BOOTS = createRunningBoots();
     public static final ItemStack NEPTUNE = createNeptuneTrident();
 
+    public static final ItemStack BIRTHDAY_CAKE = createBirthdayCake();
+    public static final ItemStack PORTABLE_BOB = createPortableBob();
+
     public static final String RUNNING_BOOTS_NBT = "running_boots";
     public static final String TREE_FELLER_NBT = "tree_feller";
+    public static final String BIRTHDAY_CAKE_NBT = "birthday_cake";
+    public static final String PORTABLE_BOB_NBT = "portable_bob";
+
+    private static ItemStack createPortableBob() {
+        ItemStack head = MobHeads.BOB.toItemStack();
+        head.setSubNbt(PORTABLE_BOB_NBT, NbtInt.of(1));
+
+        final Text name = createItemName("Portable Bob");
+        final List<Text> tooltip = List.of(
+                Text.empty(),
+                Text.literal("BEEP BOOP"),
+                Text.literal("*place me*")
+                        .styled(style -> style.withColor(Formatting.GRAY).withItalic(true)));
+        final List<Enchantment> enchantments = Collections.emptyList();
+
+        return convertItemStackToChallengeReward(head, enchantments, name, tooltip);
+    }
 
     private static ItemStack createNeptuneTrident() {
         final Text name = createItemName("Neptune");
@@ -32,6 +53,23 @@ public class ChallengeRewardItems {
         final Item item = Items.TRIDENT;
 
         return createEnchantedItem(item, enchantments, name, tooltip);
+    }
+
+    private static ItemStack createBirthdayCake() {
+        final Text name = createItemName("Unending Birthday Cake");
+        final List<Text> tooltip = List.of(
+                Text.empty(),
+                Text.literal("May the party never end ")
+        );
+        final List<Enchantment> enchantments = List.of(
+                new Enchantment(Enchantments.UNBREAKING, 10)
+        );
+        final Item item = Items.CAKE;
+
+        ItemStack itemStack = createEnchantedItem(item, enchantments, name, tooltip);
+        itemStack.setSubNbt(BIRTHDAY_CAKE_NBT, NbtInt.of(1));
+
+        return itemStack;
     }
 
     private static ItemStack createRunningBoots() {
@@ -114,6 +152,12 @@ public class ChallengeRewardItems {
                                                  Text name, List<Text> tooltip) {
         ItemStack itemStack = new ItemStack(item);
 
+        return convertItemStackToChallengeReward(itemStack, enchantments, name, tooltip);
+    }
+
+    private static ItemStack convertItemStackToChallengeReward(ItemStack itemStack, List<Enchantment> enchantments,
+                                                 Text name, List<Text> tooltip) {
+
         if (!enchantments.isEmpty()) {
             for (Enchantment enchantment : enchantments) {
                 itemStack.addEnchantment(enchantment.enchantment(), enchantment.level());
@@ -133,6 +177,15 @@ public class ChallengeRewardItems {
 
     private static Text createItemName(String name) {
         return Text.literal(name).styled(style -> style.withColor(Formatting.GOLD).withItalic(false));
+    }
+
+    public static boolean isPortableBob(ItemStack stack) {
+        // Check if block is portable bob
+        boolean isPortableBob = false;
+        if (stack.getNbt() != null) {
+            isPortableBob = stack.getNbt().getInt(ChallengeRewardItems.PORTABLE_BOB_NBT) == 1;
+        }
+        return isPortableBob;
     }
 }
 

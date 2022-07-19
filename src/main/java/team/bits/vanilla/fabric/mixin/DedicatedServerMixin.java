@@ -1,10 +1,11 @@
-package team.bits.vanilla.fabric.mixin.shutdown;
+package team.bits.vanilla.fabric.mixin;
 
 import net.minecraft.server.dedicated.*;
 import org.apache.logging.log4j.*;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.*;
+import team.bits.vanilla.fabric.util.*;
 
 @Mixin(MinecraftDedicatedServer.class)
 public class DedicatedServerMixin {
@@ -27,5 +28,14 @@ public class DedicatedServerMixin {
             System.exit(0);
 
         }, "Final shutdown thread").start();
+    }
+
+    @Inject(
+            method = "setupServer",
+            at = @At("RETURN")
+    )
+    public void onSetupDone(CallbackInfoReturnable<Boolean> cir) {
+        MinecraftDedicatedServer self = (MinecraftDedicatedServer) (Object) this;
+        ((ExtendedLevelProperties) self.getSaveProperties()).load();
     }
 }

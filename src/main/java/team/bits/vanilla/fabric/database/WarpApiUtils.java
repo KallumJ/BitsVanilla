@@ -133,7 +133,7 @@ public final class WarpApiUtils {
         return new Warp(warpName, location);
     }
 
-    private static @NotNull RegistryKey<World> nameToWorldKey(@NotNull String name) {
+    public static @NotNull RegistryKey<World> nameToWorldKey(@NotNull String name) {
         return switch (name.toLowerCase()) {
             case "world" -> World.OVERWORLD;
             case "world_nether" -> World.NETHER;
@@ -142,7 +142,7 @@ public final class WarpApiUtils {
         };
     }
 
-    private static @NotNull String worldKeyToName(@NotNull RegistryKey<World> key) {
+    public static @NotNull String worldKeyToName(@NotNull RegistryKey<World> key) {
         if (key.equals(World.OVERWORLD)) {
             return "world";
         } else if (key.equals(World.NETHER)) {

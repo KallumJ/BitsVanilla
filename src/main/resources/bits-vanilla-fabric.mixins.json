@@ -34,10 +34,17 @@
     "challenges.WorldCornersMixin",
     "pregen.ServerChunkManagerMixin",
     "pregen.ThreadedAnvilChunkStorageMixin",
-    "shutdown.DedicatedServerMixin",
+    "DedicatedServerMixin",
     "EndLockMixin",
     "PreventFreecamTpMixin",
-    "RespawnAnchorMixin"
+    "RespawnAnchorMixin",
+    "LevelPropertiesMixin",
+    "anniversary.BirthdayCakeItemMixin",
+    "anniversary.BirthdayCakeEatMixin",
+    "anniversary.BirthdayCakeBreakMixin",
+    "anniversary.BobPlaceMixin",
+    "anniversary.BobEquipMixin",
+    "anniversary.BirthdayCakeCandleMixin"
   ],
   "injectors": {
     "defaultRequire": 1
