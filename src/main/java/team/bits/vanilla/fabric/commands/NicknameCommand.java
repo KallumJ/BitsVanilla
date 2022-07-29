@@ -56,8 +56,8 @@ public class NicknameCommand extends Command {
         PlayerNameLoader.loadNameData(player);
 
         player.sendMessage(
-                Text.literal(String.format("Changed your nickname to '%s'", nickname)),
-                MessageTypes.POSITIVE
+                Text.literal(String.format("Changed your nickname to '%s'", nickname))
+                        .styled(style -> style.withColor(Colors.POSITIVE))
         );
 
         return 1;
@@ -69,7 +69,10 @@ public class NicknameCommand extends Command {
         PlayerApiUtils.setNickname(player, null);
         PlayerNameLoader.loadNameData(player);
 
-        player.sendMessage(Text.literal("Cleared your nickname"), MessageTypes.POSITIVE);
+        player.sendMessage(
+                Text.literal("Cleared your nickname")
+                        .styled(style -> style.withColor(Colors.POSITIVE))
+        );
 
         return 1;
     }

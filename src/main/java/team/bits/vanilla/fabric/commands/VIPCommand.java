@@ -100,7 +100,7 @@ public class VIPCommand extends Command {
             // Update the passed player with the passed status, and inform the requesting player
             PlayerApiUtils.setVIP(player, vipStatus);
 
-            requestingPlayer.sendMessage(Text.literal(String.format(UPDATE_SUCCESS, player.getEntityName())), MessageTypes.POSITIVE);
+            requestingPlayer.sendMessage(Text.literal(String.format(UPDATE_SUCCESS, player.getEntityName())).styled(style -> style.withColor(Colors.POSITIVE)));
 
             return true;
         } else {

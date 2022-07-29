@@ -5,8 +5,6 @@
   "compatibilityLevel": "JAVA_16",
   "mixins": [],
   "server": [
-    "entity.AllayBreedingMixin",
-    "ChatDecorationMixin",
     "entity.CreeperMixin",
     "entity.DragonElytraDropMixin",
     "entity.EndermanBlockPickupMixin",
@@ -44,7 +42,8 @@
     "anniversary.BirthdayCakeBreakMixin",
     "anniversary.BobPlaceMixin",
     "anniversary.BobEquipMixin",
-    "anniversary.BirthdayCakeCandleMixin"
+    "anniversary.BirthdayCakeCandleMixin",
+    "ChatMixin"
   ],
   "injectors": {
     "defaultRequire": 1

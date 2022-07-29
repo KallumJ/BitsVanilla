@@ -12,8 +12,8 @@ import java.util.*;
 
 public class FreecamCommand extends Command {
 
-    public static final Text ENTER_MSG = Text.literal("Entering freecam mode");
-    public static final Text EXIT_MSG = Text.literal("Returning to body");
+    public static final Text ENTER_MSG = Text.literal("Entering freecam mode").styled(style -> style.withColor(Colors.POSITIVE));
+    public static final Text EXIT_MSG = Text.literal("Returning to body").styled(style -> style.withColor(Colors.POSITIVE));
 
     public static final Map<ServerPlayerEntity, Freecam> ACTIVE_FREECAMS = new HashMap<>();
 
@@ -33,12 +33,12 @@ public class FreecamCommand extends Command {
             Optional<Freecam> freecam = Freecam.Factory.create(player);
             if (freecam.isPresent()) {
                 ACTIVE_FREECAMS.put(player, freecam.get());
-                player.sendMessage(ENTER_MSG, MessageTypes.POSITIVE);
+                player.sendMessage(ENTER_MSG);
             }
 
         } else {
             ACTIVE_FREECAMS.get(player).removeAndReturnPlayer();
-            player.sendMessage(EXIT_MSG, MessageTypes.POSITIVE);
+            player.sendMessage(EXIT_MSG);
         }
 
         return 1;

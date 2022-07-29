@@ -92,23 +92,23 @@ public class BeamCommand extends AsyncCommand {
                 // If players are not in the same dimension, throw exception
                 if (!sendingDimension.equals(receivingDimension)) {
 
-                    sendingPlayer.sendMessage(Text.literal(SAME_DIM_ERR), MessageTypes.NEGATIVE);
+                    sendingPlayer.sendMessage(Text.literal(SAME_DIM_ERR).styled(style -> style.withColor(Colors.NEGATIVE)));
 
                     // If player is beaming to themselves, throw exception
                 } else if (sendingPlayer.equals(receivingPlayer.get())) {
-                    sendingPlayer.sendMessage(Text.literal(BEAM_SELF_ERR), MessageTypes.NEGATIVE);
+                    sendingPlayer.sendMessage(Text.literal(BEAM_SELF_ERR).styled(style -> style.withColor(Colors.NEGATIVE)));
                 } else if (Freecam.isPlayerInFreecam(receivingPlayer.get())) {
-                    sendingPlayer.sendMessage(Text.literal(BEAM_FREECAM_ERR), MessageTypes.NEGATIVE);
+                    sendingPlayer.sendMessage(Text.literal(BEAM_FREECAM_ERR).styled(style -> style.withColor(Colors.NEGATIVE)));
                 } else {
                     addBeam(sendingPlayer, receivingPlayer.get());
                 }
 
             } else {
-                sendingPlayer.sendMessage(Text.literal(String.format(NO_PLAYER_ERR, playerArg)), MessageTypes.NEGATIVE);
+                sendingPlayer.sendMessage(Text.literal(String.format(NO_PLAYER_ERR, playerArg)).styled(style -> style.withColor(Colors.NEGATIVE)));
             }
 
         } else {
-            sendingPlayer.sendMessage(Text.literal(TELEPORTS_DISABLED), MessageTypes.NEGATIVE);
+            sendingPlayer.sendMessage(Text.literal(TELEPORTS_DISABLED).styled(style -> style.withColor(Colors.NEGATIVE)));
         }
     }
 
@@ -149,7 +149,7 @@ public class BeamCommand extends AsyncCommand {
 
 
         // Send success message
-        sendingPlayer.sendMessage(Text.literal(REQUEST_STRING), MessageTypes.POSITIVE);
+        sendingPlayer.sendMessage(Text.literal(REQUEST_STRING).styled(style -> style.withColor(Colors.POSITIVE)));
 
         // Notify receiving player of request
         String sendingPlayerName = PlayerApiUtils.getEffectiveName(sendingPlayer);
@@ -159,9 +159,10 @@ public class BeamCommand extends AsyncCommand {
                                 HoverEvent.Action.SHOW_TEXT, Text.literal("Click here to accept!")
                         ))
                         .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/beam accept"))
+                        .withColor(Colors.POSITIVE)
                 );
 
-        receivingPlayer.sendMessage(acceptMessage, MessageTypes.POSITIVE);
+        receivingPlayer.sendMessage(acceptMessage);
     }
 
     // Don't think this actually gets used, but its required so. here it is.
@@ -177,8 +178,8 @@ record Beam(ServerPlayerEntity sendingPlayer,
     private static final String ACCEPT_MSG = "Beam accepted";
 
     public void executeBeam() {
-        sendingPlayer.sendMessage(Text.literal(ACCEPT_MSG), MessageTypes.NEUTRAL);
-        receivingPlayer.sendMessage(Text.literal(ACCEPT_MSG), MessageTypes.NEUTRAL);
+        sendingPlayer.sendMessage(Text.literal(ACCEPT_MSG).styled(style -> style.withColor(Colors.NEUTRAL)));
+        receivingPlayer.sendMessage(Text.literal(ACCEPT_MSG).styled(style -> style.withColor(Colors.NEUTRAL)));
         Teleporter.queueTeleport(this.sendingPlayer, Location.get(this.receivingPlayer), false);
     }
 }

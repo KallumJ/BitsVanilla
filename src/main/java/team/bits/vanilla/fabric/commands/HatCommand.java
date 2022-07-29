@@ -43,7 +43,7 @@ public class HatCommand extends Command {
             inventory.setStack(inventory.selectedSlot, oldHat);
 
             // send a confirmation message
-            player.sendMessage(Text.literal(HAT_EQUIPPED), MessageTypes.POSITIVE);
+            player.sendMessage(Text.literal(HAT_EQUIPPED).styled(style -> style.withColor(Colors.POSITIVE)));
 
         } else {
             // if the player isn't holding an item, send an error message

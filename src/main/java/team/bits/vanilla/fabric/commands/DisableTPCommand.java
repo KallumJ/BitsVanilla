@@ -51,7 +51,7 @@ public class DisableTPCommand extends Command {
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         final ServerPlayerEntity player = Objects.requireNonNull(context.getSource().getPlayer());
-        player.sendMessage(Text.literal(ASK_NO_TP), MessageTypes.NEUTRAL);
+        player.sendMessage(Text.literal(ASK_NO_TP).styled(style -> style.withColor(Colors.NEUTRAL)));
         return 1;
     }
 
@@ -61,13 +61,13 @@ public class DisableTPCommand extends Command {
         boolean hasTpDisabled = PlayerApiUtils.getHasTPDisabled(player).get();
         if (!hasTpDisabled) {
             PlayerApiUtils.setNoTP(player, true);
-            player.sendMessage(Text.literal(NO_TP_SUCCESS), MessageTypes.POSITIVE);
+            player.sendMessage(Text.literal(NO_TP_SUCCESS).styled(style -> style.withColor(Colors.POSITIVE)));
         }
     }
 
     public int askUndo(CommandContext<ServerCommandSource> context) {
         final ServerPlayerEntity player = Objects.requireNonNull(context.getSource().getPlayer());
-        player.sendMessage(Text.literal(ASK_UNDO), MessageTypes.NEUTRAL);
+        player.sendMessage(Text.literal(ASK_UNDO).styled(style -> style.withColor(Colors.NEUTRAL)));
         return 1;
     }
 
@@ -77,10 +77,10 @@ public class DisableTPCommand extends Command {
         boolean hasTpDisabled = PlayerApiUtils.getHasTPDisabled(player).get();
         if (hasTpDisabled) {
             PlayerApiUtils.setNoTP(player, false);
-            player.sendMessage(Text.literal(UNDO_SUCCESS), MessageTypes.POSITIVE);
+            player.sendMessage(Text.literal(UNDO_SUCCESS).styled(style -> style.withColor(Colors.POSITIVE)));
 
-            Text broadcast = Text.literal(String.format(UNDO_BROADCAST, PlayerApiUtils.getEffectiveName(player)));
-            ServerInstance.broadcast(broadcast, MessageTypes.NEUTRAL);
+            Text broadcast = Text.literal(String.format(UNDO_BROADCAST, PlayerApiUtils.getEffectiveName(player))).styled(style -> style.withColor(Colors.NEUTRAL));
+            ServerInstance.broadcast(broadcast);
         }
     }
 }

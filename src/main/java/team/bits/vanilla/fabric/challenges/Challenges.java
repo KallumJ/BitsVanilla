@@ -2,6 +2,7 @@ package team.bits.vanilla.fabric.challenges;
 
 import net.minecraft.server.network.*;
 import net.minecraft.text.*;
+import team.bits.nibbles.utils.*;
 import team.bits.vanilla.fabric.database.*;
 
 import java.util.*;
@@ -79,6 +80,7 @@ public final class Challenges {
                 .append(" as a reward!")
                 .styled(style ->
                         style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal(description)))
+                                .withColor(Colors.POSITIVE)
                 );
     }
 }

@@ -97,13 +97,13 @@ public class WarpCommand extends AsyncCommand {
 
             } else {
                 player.sendMessage(
-                        Text.literal(String.format(WARP_NOT_FOUND_ERR, warpName)),
-                        MessageTypes.NEGATIVE
+                        Text.literal(String.format(WARP_NOT_FOUND_ERR, warpName))
+                                .styled(style -> style.withColor(Colors.NEGATIVE))
                 );
             }
 
         } else {
-            player.sendMessage(Text.literal(TELEPORTS_DISABLED), MessageTypes.NEGATIVE);
+            player.sendMessage(Text.literal(TELEPORTS_DISABLED).styled(style -> style.withColor(Colors.NEGATIVE)));
         }
     }
 
@@ -117,8 +117,8 @@ public class WarpCommand extends AsyncCommand {
                                 .styled(style -> style
                                         .withColor(Colors.NEUTRAL)
                                         .withItalic(true)
-                                )),
-                MessageTypes.HEADER
+                                ))
+                        .styled(style -> style.withColor(Colors.HEADER))
         );
 
         Collection<String> warps = WarpApiUtils.getWarpsListAsync().get();
@@ -132,8 +132,7 @@ public class WarpCommand extends AsyncCommand {
                                     .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                                             String.format(WARP_COMMAND, warpName)
                                     ))
-                            ),
-                    MessageTypes.PLAIN
+                            )
             );
         }
     }
@@ -150,20 +149,20 @@ public class WarpCommand extends AsyncCommand {
             boolean success = WarpApiUtils.addWarpAsync(warp).get();
             if (success) {
                 player.sendMessage(
-                        Text.literal(WARP_SET),
-                        MessageTypes.POSITIVE
+                        Text.literal(WARP_SET)
+                                .styled(style -> style.withColor(Colors.POSITIVE))
                 );
             } else {
                 player.sendMessage(
-                        Text.literal(WARP_SET_FAIL),
-                        MessageTypes.NEGATIVE
+                        Text.literal(WARP_SET_FAIL)
+                                .styled(style -> style.withColor(Colors.NEGATIVE))
                 );
             }
 
         } else {
             player.sendMessage(
-                    Text.literal(WARP_EXISTS),
-                    MessageTypes.NEGATIVE
+                    Text.literal(WARP_EXISTS)
+                            .styled(style -> style.withColor(Colors.NEGATIVE))
             );
         }
     }
@@ -177,13 +176,13 @@ public class WarpCommand extends AsyncCommand {
 
             boolean success = WarpApiUtils.deleteWarpAsync(warp.get()).get();
             if (success) {
-                player.sendMessage(Text.literal(WARP_DELETED), MessageTypes.POSITIVE);
+                player.sendMessage(Text.literal(WARP_DELETED).styled(style -> style.withColor(Colors.POSITIVE)));
             } else {
-                player.sendMessage(Text.literal(WARP_DELETE_FAIL), MessageTypes.NEGATIVE);
+                player.sendMessage(Text.literal(WARP_DELETE_FAIL).styled(style -> style.withColor(Colors.NEGATIVE)));
             }
 
         } else {
-            player.sendMessage(Text.literal(String.format(WARP_NOT_FOUND_ERR, warpName)), MessageTypes.NEGATIVE);
+            player.sendMessage(Text.literal(String.format(WARP_NOT_FOUND_ERR, warpName)).styled(style -> style.withColor(Colors.NEGATIVE)));
         }
     }
 }

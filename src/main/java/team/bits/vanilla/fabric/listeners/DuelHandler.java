@@ -44,10 +44,10 @@ public class DuelHandler {
                         PlayerApiUtils.getEffectiveName((ServerPlayerEntity) winner),
                         PlayerApiUtils.getEffectiveName((ServerPlayerEntity) loser)
                 )
-        );
+        ).styled(style -> style.withColor(Colors.POSITIVE));
 
         for (ServerPlayerEntity player : ServerInstance.get().getPlayerManager().getPlayerList()) {
-            player.sendMessage(finishedMessage, MessageTypes.POSITIVE);
+            player.sendMessage(finishedMessage);
         }
     }
 
@@ -93,8 +93,8 @@ public class DuelHandler {
         }
 
         private void sendMessage(Text message) {
-            this.player1.sendMessage(message, MessageTypes.NEUTRAL);
-            this.player2.sendMessage(message, MessageTypes.NEUTRAL);
+            this.player1.sendMessage(message);
+            this.player2.sendMessage(message);
         }
     }
 }

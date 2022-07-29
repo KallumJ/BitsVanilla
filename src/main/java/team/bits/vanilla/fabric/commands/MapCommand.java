@@ -5,6 +5,7 @@ import com.mojang.brigadier.exceptions.*;
 import net.minecraft.server.command.*;
 import net.minecraft.server.network.*;
 import net.minecraft.text.*;
+import net.minecraft.util.Formatting;
 import team.bits.nibbles.command.*;
 import team.bits.nibbles.utils.*;
 
@@ -30,8 +31,9 @@ public class MapCommand extends Command {
                                     Text.literal("Click here to view the map!"))
                             )
                             .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, MAP_LINK))
+                            .withColor(Colors.POSITIVE)
                     );
-            player.sendMessage(message, MessageTypes.POSITIVE);
+            player.sendMessage(message);
         }
 
         return 1;

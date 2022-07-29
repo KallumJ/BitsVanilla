@@ -28,7 +28,8 @@ public class Freecam implements ServerTickEvent.Listener, ServerStoppingEvent.Li
     private static final int MAX_BODY_DISTANCE = 50;
     private static final int TOO_FAR_NOTIF_THRESHOLD = 5 * 1000; // ms
     private static final Text TOO_FAR_MESSAGE =
-            Text.literal(String.format("You can not stray more than %d blocks from your body", MAX_BODY_DISTANCE));
+            Text.literal(String.format("You can not stray more than %d blocks from your body", MAX_BODY_DISTANCE))
+                    .styled(style -> style.withColor(Colors.NEGATIVE));
 
     private final ServerPlayerEntity player;
     private final Entity bodyEntity;
@@ -80,7 +81,7 @@ public class Freecam implements ServerTickEvent.Listener, ServerStoppingEvent.Li
             // Notify the player they have strayed too far
             long currentTime = System.currentTimeMillis();
             if (currentTime - messageLastSent > TOO_FAR_NOTIF_THRESHOLD) {
-                this.player.sendMessage(TOO_FAR_MESSAGE, MessageTypes.NEGATIVE);
+                this.player.sendMessage(TOO_FAR_MESSAGE);
                 messageLastSent = currentTime;
             }
         }

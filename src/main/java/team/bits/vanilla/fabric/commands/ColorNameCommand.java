@@ -70,7 +70,7 @@ public class ColorNameCommand extends AsyncCommand {
     public int list(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         final ServerPlayerEntity player = Objects.requireNonNull(context.getSource().getPlayer());
 
-        player.sendMessage(Text.literal(CLICK_CATEGORY_MSG), MessageTypes.NEUTRAL);
+        player.sendMessage(Text.literal(CLICK_CATEGORY_MSG).styled(style -> style.withColor(Colors.NEUTRAL)));
 
         NameColors.INSTANCE.getColours().forEach((key, value) -> {
             Color color = value.get(0).color();
@@ -90,8 +90,7 @@ public class ColorNameCommand extends AsyncCommand {
                             ))
                             .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                                     String.format("/cn category %s", key)
-                            ))),
-                    MessageTypes.PLAIN
+                            )))
             );
         });
 
@@ -102,7 +101,7 @@ public class ColorNameCommand extends AsyncCommand {
         final ServerPlayerEntity player = Objects.requireNonNull(context.getSource().getPlayer());
         final String category = context.getArgument("category", String.class);
 
-        player.sendMessage(Text.literal(CLICK_COLOR_MSG), MessageTypes.NEUTRAL);
+        player.sendMessage(Text.literal(CLICK_COLOR_MSG).styled(style -> style.withColor(Colors.NEUTRAL)));
 
         Collection<NameColor> colours;
         try {
@@ -129,8 +128,7 @@ public class ColorNameCommand extends AsyncCommand {
                             )
                             .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                                     String.format("/cn set %s %s", category, shade.name())
-                            ))),
-                    MessageTypes.PLAIN
+                            )))
             );
         });
 
@@ -151,7 +149,7 @@ public class ColorNameCommand extends AsyncCommand {
                 PlayerApiUtils.setColor(player, color.get().color());
                 PlayerNameLoader.loadNameData(player);
 
-                player.sendMessage(Text.literal(String.format(COLOR_CHANGED_MSG, colorName)), MessageTypes.POSITIVE);
+                player.sendMessage(Text.literal(String.format(COLOR_CHANGED_MSG, colorName)).styled(style -> style.withColor(Colors.POSITIVE)));
             } else {
                 throw new SimpleCommandExceptionType(() -> String.format(INVALID_COLOR_ERR, colorName)).create();
             }

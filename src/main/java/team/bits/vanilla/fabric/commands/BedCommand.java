@@ -66,15 +66,15 @@ public class BedCommand extends AsyncCommand {
                     handleRespawnAnchorSpawn(player, spawnWorld, spawnPosition);
 
                 } else {
-                    player.sendMessage(Text.literal(NO_SPAWN_ERR), MessageTypes.NEGATIVE);
+                    player.sendMessage(Text.literal(NO_SPAWN_ERR).styled(style -> style.withColor(Colors.NEGATIVE)));
                 }
 
             } else {
-                player.sendMessage(Text.literal(NO_SPAWN_ERR), MessageTypes.NEGATIVE);
+                player.sendMessage(Text.literal(NO_SPAWN_ERR).styled(style -> style.withColor(Colors.NEGATIVE)));
             }
 
         } else {
-            player.sendMessage(Text.literal(TELEPORTS_DISABLED), MessageTypes.NEGATIVE);
+            player.sendMessage(Text.literal(TELEPORTS_DISABLED).styled(style -> style.withColor(Colors.NEGATIVE)));
         }
     }
 
@@ -88,7 +88,7 @@ public class BedCommand extends AsyncCommand {
         if (bedPos.isPresent()) {
             Teleporter.queueTeleport(player, new Location(bedPos.get(), spawnWorld), false);
         } else {
-            player.sendMessage(Text.literal(BED_ERR), MessageTypes.NEGATIVE);
+            player.sendMessage(Text.literal(BED_ERR).styled(style -> style.withColor(Colors.NEGATIVE)));
         }
     }
 
@@ -97,7 +97,7 @@ public class BedCommand extends AsyncCommand {
         if (respawnAnchorPos.isPresent()) {
             Teleporter.queueTeleport(player, new Location(respawnAnchorPos.get(), spawnWorld), false);
         } else {
-            player.sendMessage(Text.literal(RESPAWN_ANCHOR_ERR), MessageTypes.NEGATIVE);
+            player.sendMessage(Text.literal(RESPAWN_ANCHOR_ERR).styled(style -> style.withColor(Colors.NEGATIVE)));
         }
     }
 

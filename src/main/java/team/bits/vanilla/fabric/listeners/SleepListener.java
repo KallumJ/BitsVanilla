@@ -37,7 +37,7 @@ public class SleepListener implements PlayerSleepEvent.Listener, PlayerWakeUpEve
                 )
         ).styled(style -> style.withColor(green ? Formatting.GREEN : Formatting.YELLOW));
 
-        ServerInstance.broadcast(message, MessageTypes.PLAIN);
+        ServerInstance.broadcast(message);
     }
 
     @Override

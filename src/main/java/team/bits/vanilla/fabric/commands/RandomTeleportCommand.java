@@ -56,7 +56,7 @@ public class RandomTeleportCommand extends Command {
             }
 
             // tell the player we're starting the teleport
-            player.sendMessage(Text.literal(TELEPORTING_MSG), MessageTypes.NEUTRAL);
+            player.sendMessage(Text.literal(TELEPORTING_MSG).styled(style -> style.withColor(Colors.NEUTRAL)));
 
             // get the world size and spawn point
             WorldBorder border = world.getWorldBorder();
@@ -77,7 +77,7 @@ public class RandomTeleportCommand extends Command {
         } else {
             ServerPlayerEntity player = context.getSource().getPlayer();
             if (player != null) {
-                player.sendMessage(Text.literal("The random teleport command is currently locked"), MessageTypes.NEGATIVE);
+                player.sendMessage(Text.literal("The random teleport command is currently locked").styled(style -> style.withColor(Colors.NEGATIVE)));
             }
 
         }

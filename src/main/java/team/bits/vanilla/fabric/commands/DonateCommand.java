@@ -24,15 +24,16 @@ public class DonateCommand extends Command {
         ServerPlayerEntity player = context.getSource().getPlayer();
 
         if (player != null) {
-            Text message = Text.literal("Donate here! Thank you very much for your generosity!: " + DONATE_LINK)
+            MutableText message = Text.literal("Donate here! Thank you very much for your generosity!: " + DONATE_LINK)
                     .styled(style -> style
                             .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
                                     Text.literal("Click here to donate!"))
                             )
                             .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, DONATE_LINK))
+                            .withColor(Colors.POSITIVE)
                     );
 
-            player.sendMessage(message, MessageTypes.POSITIVE);
+            player.sendMessage(message);
         }
 
         return 1;

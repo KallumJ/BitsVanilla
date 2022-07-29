@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import team.bits.nibbles.utils.MessageTypes;
+import team.bits.nibbles.utils.*;
 import team.bits.vanilla.fabric.commands.EndLockCommand;
 
 @Mixin(EnderEyeItem.class)
@@ -26,7 +26,7 @@ public class EndLockMixin {
         if (EndLockCommand.isEndLocked()) {
             if (context.getPlayer() != null) {
                 ServerPlayerEntity player = (ServerPlayerEntity) context.getPlayer();
-                player.sendMessage(Text.literal("The end is currently locked"), MessageTypes.NEGATIVE);
+                player.sendMessage(Text.literal("The end is currently locked").styled(style -> style.withColor(Colors.NEGATIVE)));
                 cir.setReturnValue(ActionResult.PASS);
             }
         }

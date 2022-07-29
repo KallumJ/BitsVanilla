@@ -22,9 +22,9 @@ public final class Teleporter implements PlayerMoveEvent.Listener, PlayerDamageE
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final Text TELEPORT_START = Text.literal("Teleporting...");
-    private static final Text TELEPORT_CANCEL = Text.literal("Teleport cancelled");
-    private static final Text TELEPORT_DONE = Text.literal("Teleported!");
+    private static final Text TELEPORT_START = Text.literal("Teleporting...").styled(style -> style.withColor(Colors.NEUTRAL));
+    private static final Text TELEPORT_CANCEL = Text.literal("Teleport cancelled").styled(style -> style.withColor(Colors.NEGATIVE));
+    private static final Text TELEPORT_DONE = Text.literal("Teleported!").styled(style -> style.withColor(Colors.POSITIVE));
 
     private static final int SHORT_WARMUP = 20;
     private static final int LONG_WARMUP = 60;
@@ -46,7 +46,7 @@ public final class Teleporter implements PlayerMoveEvent.Listener, PlayerDamageE
             Location origin = Location.get(player);
             World destinationWorld = destination.world();
 
-            player.sendMessage(TELEPORT_START, MessageTypes.NEUTRAL);
+            player.sendMessage(TELEPORT_START);
             destinationWorld.playSound(
                     null, location.x(), location.y(), location.z(),
                     SoundEvents.BLOCK_PORTAL_TRIGGER, SoundCategory.PLAYERS,
@@ -66,7 +66,7 @@ public final class Teleporter implements PlayerMoveEvent.Listener, PlayerDamageE
             }
 
         } else {
-            player.sendMessage(TELEPORT_CANCEL, MessageTypes.NEGATIVE);
+            player.sendMessage(TELEPORT_CANCEL);
         }
     }
 
@@ -85,7 +85,7 @@ public final class Teleporter implements PlayerMoveEvent.Listener, PlayerDamageE
 
         TeleportUtils.teleport(player, destination);
 
-        player.sendMessage(TELEPORT_DONE, MessageTypes.POSITIVE);
+        player.sendMessage(TELEPORT_DONE);
 
         destinationWorld.playSound(
                 null, destinationPos.x, destinationPos.y, destinationPos.z,
@@ -101,7 +101,7 @@ public final class Teleporter implements PlayerMoveEvent.Listener, PlayerDamageE
     }
 
     private static void cancelTeleport(@NotNull ServerPlayerEntity player) {
-        player.sendMessage(TELEPORT_CANCEL, MessageTypes.NEGATIVE);
+        player.sendMessage(TELEPORT_CANCEL);
 
         TELEPORTING.remove(player);
         NO_MOVE.remove(player);

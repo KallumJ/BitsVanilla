@@ -27,8 +27,8 @@ pipeline {
                 sh """test/production_server_test.sh \
                         --java-path '${JAVA_HOME}' \
                         --mod-jar 'bits-vanilla-fabric-${BRANCH_NAME}-${BUILD_NUMBER}.jar' \
-                        --mc-version '1.19' \
-                        --loader-version '0.14.6'
+                        --mc-version '1.19.1' \
+                        --loader-version '0.14.8'
                    """
             }
         }

@@ -24,7 +24,7 @@ public class Challenge {
         ePlayer.markChallengeCompleted(this);
         ePlayer.giveItem(this.information.reward().copy()); // use copy to prevent accidental back-references
         ePlayer.playSound(SoundEvents.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 1.0f, 1.0f);
-        ServerInstance.broadcast(Challenges.getChallengeAnnouncement(this, player), MessageTypes.POSITIVE);
+        ServerInstance.broadcast(Challenges.getChallengeAnnouncement(this, player));
     }
 
     public @NotNull ChallengeInformation getInformation() {

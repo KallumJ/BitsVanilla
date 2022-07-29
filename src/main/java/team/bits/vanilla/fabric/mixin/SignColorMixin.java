@@ -34,11 +34,13 @@ public class SignColorMixin {
                     target = "Ljava/util/List;get(I)Ljava/lang/Object;"
             )
     )
-    public Object getSignLine(List<FilteredMessage<String>> list, int index) {
+    public Object getSignLine(List<FilteredMessage> list, int index) {
         // Message.permitted simply sets the raw and filtered
         // text to the same value. We don't use text filtering
         // so we can simply use this method to ignore it
-        return FilteredMessage.permitted(translateColorCodes(list.get(index).raw()));
+
+        // OBF - method_45060 -> permitted
+        return FilteredMessage.method_45060(translateColorCodes(list.get(index).raw()));
     }
 
     /**

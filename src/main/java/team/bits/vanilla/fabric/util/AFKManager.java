@@ -37,7 +37,7 @@ public class AFKManager {
 
             Text text = Text.literal(String.format(NO_LONGER_AFK_MSG, PlayerApiUtils.getEffectiveName(player)))
                     .styled(style -> style.withColor(Formatting.GRAY));
-            ServerInstance.broadcast(text, MessageTypes.PLAIN);
+            ServerInstance.broadcast(text);
             ((ExtendedPlayerEntity) player).setAFK(false);
             wasAfk = true;
         }
@@ -68,7 +68,7 @@ public class AFKManager {
                     afkCounter.setAnnounced(true);
                     Text text = Text.literal(String.format(NOW_AFK_MSG, PlayerApiUtils.getEffectiveName(player)))
                             .styled(style -> style.withColor(Formatting.GRAY));
-                    ServerInstance.broadcast(text, MessageTypes.PLAIN);
+                    ServerInstance.broadcast(text);
                     Utils.updatePlayerDisplayName(player);
 
                     ((ExtendedPlayerEntity) player).setAFK(true);

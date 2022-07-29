@@ -26,9 +26,10 @@ public class DiscordCommand extends Command {
                                 Text.literal("Click here to join!"))
                         )
                         .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, DISCORD_INVITE))
+                        .withColor(Colors.POSITIVE)
                 );
 
-        context.getSource().getPlayer().sendMessage(message, MessageTypes.POSITIVE);
+        context.getSource().getPlayer().sendMessage(message);
 
         return 1;
     }
