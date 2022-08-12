@@ -27,16 +27,6 @@ A mod to add Bits and QoL related functionality for the Bits Minecraft servers.
 
 In order to use this plugin, the `server.properties` file of your server must include a `server-name` property.
 
-Additionally, the `resources/database.properties` should contain credentials pointing to a valid database in the following format.
-```
-db.driver_class=
-db.address=
-db.port=
-db.username=
-db.password=
-db.name=
-```
-
 ## Acknowledgements
 
 - [Vanilla Tweaks](https://vanillatweaks.net/) - for mob head data
