@@ -1,5 +1,5 @@
 
-# Bits Vanilla
+# Bits Vanilla [![Build Status](https://jenkins.bits.team/job/Bits/job/BitsVanilla/job/master/badge/icon)](https://jenkins.bits.team/job/Bits/job/BitsVanilla/job/master/) ![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=java&logoColor=white)
 
 A mod to add Bits and QoL related functionality for the Bits Minecraft servers.
 
